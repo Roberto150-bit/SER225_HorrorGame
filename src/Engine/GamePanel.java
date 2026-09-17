@@ -3,9 +3,8 @@ package Engine;
 import GameObject.Rectangle;
 import SpriteFont.SpriteFont;
 import Utils.Colors;
-
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 /*
  * This is where the game loop process and render back buffer is setup
@@ -14,6 +13,8 @@ public class GamePanel extends JPanel {
 	// loads Screens on to the JPanel
 	// each screen has its own update and draw methods defined to handle a "section" of the game.
 	private ScreenManager screenManager;
+
+	private Engine.UI ui; //Instaniate UI -----------------------------------------------------
 
 	// used to draw graphics to the panel
 	private GraphicsHandler graphicsHandler;
@@ -54,6 +55,8 @@ public class GamePanel extends JPanel {
 		// will continually update the game's logic and repaint the game's graphics
 		GameLoop gameLoop = new GameLoop(this);
 		gameLoopProcess = new Thread(gameLoop.getGameLoopProcess());
+
+		ui = new Engine.UI(this); //Instantiate UI -----------------------------------------------------
 	}
 
 	// this is called later after instantiation, and will initialize screenManager
@@ -112,9 +115,11 @@ public class GamePanel extends JPanel {
 		fpsDisplayLabel.setText("FPS: " + currentFPS);
 	}
 
-	public void draw() {			
+	public void draw() {		// Renderer	
 		// draw current game state
 		screenManager.draw(graphicsHandler);
+		// draw UI elements
+		ui.draw(graphicsHandler.getGraphics());    //Draw UI -----------------------------------------------------
 
 		// if game is paused, draw pause gfx over Screen gfx
 		if (isGamePaused) {
