@@ -3,16 +3,17 @@ package Level;
 import Engine.Config;
 import Engine.GraphicsHandler;
 import Engine.ScreenManager;
+import Engine.UI; // ----------------------------------------------------------------------------------
+import GameObject.Book;
 import GameObject.Rectangle;
 import Utils.Direction;
-import Utils.Point;
-
+import Utils.Point; 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Scanner; // ----------------------------------------------------------------------------------
 
 /*
     This class is for defining a map that is used for a specific level
@@ -73,6 +74,11 @@ public abstract class Map {
     // map's textbox instance
     protected Textbox textbox;
 
+    // Book's instance
+    protected Book book; // ----------------------------------------------------------------------------------
+
+    protected UI ui; // ----------------------------------------------------------------------------------
+
     // reference to current player
     protected Player player;
 
@@ -119,6 +125,8 @@ public abstract class Map {
 
         this.camera = new Camera(0, 0, tileset.getScaledSpriteWidth(), tileset.getScaledSpriteHeight(), this);
         this.textbox = new Textbox(this);
+        this.book = new Book();  // ----------------------------------------------------------------------------------
+        this.ui = new UI(this.book); // ----------------------------------------------------------------------------------
     }
 
     // reads in a map file to create the map's tilemap
@@ -518,6 +526,10 @@ public abstract class Map {
         if (textbox.isActive()) {
             textbox.update();
         }
+        // ------------------------------------------------------------------------------
+        book.update(); //Updates book state every update
+
+        
     }
 
     // based on the player's current X position (which in a level can potentially be updated each frame),
@@ -587,6 +599,12 @@ public abstract class Map {
         if (textbox.isActive()) {
             textbox.draw(graphicsHandler);
         }
+        if (book.isActive()) {
+            book.draw(graphicsHandler);
+        }
+        ui.draw(graphicsHandler);
+    
+
     }
 
     public FlagManager getFlagManager() { return flagManager; }

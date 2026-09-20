@@ -1,8 +1,5 @@
 package Level;
 
-import java.awt.Color;
-
-import Engine.GraphicsHandler;
 import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
@@ -38,6 +35,9 @@ public abstract class Player extends GameObject {
     protected Key MOVE_UP_KEY = Key.UP;
     protected Key MOVE_DOWN_KEY = Key.DOWN;
     protected Key INTERACT_KEY = Key.SPACE;
+    protected Key DROP_KEY = Key.Q;
+    protected Key PICKUP_KEY = Key.E;
+    protected Key OPEN_BOOK_KEY = Key.C; // -----------------------------------------------------------
 
     protected boolean isLocked = false;
 
@@ -98,6 +98,7 @@ public abstract class Player extends GameObject {
             playerState = PlayerState.WALKING;
         }
     }
+
 
     // player WALKING state logic
     protected void playerWalking() {
