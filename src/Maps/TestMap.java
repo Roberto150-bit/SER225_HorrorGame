@@ -1,6 +1,7 @@
 package Maps;
 
-import EnhancedMapTiles.PushableRock;
+import EnhancedMapTiles.*;
+import Enemies.Ghost;
 import Level.*;
 import NPCs.Bug;
 import NPCs.Dinosaur;
@@ -23,8 +24,11 @@ public class TestMap extends Map {
     public ArrayList<EnhancedMapTile> loadEnhancedMapTiles() {
         ArrayList<EnhancedMapTile> enhancedMapTiles = new ArrayList<>();
 
-        PushableRock pushableRock = new PushableRock(getMapTile(2, 7).getLocation());
-        enhancedMapTiles.add(pushableRock);
+        PuzzleObject puzzleObject = new PuzzleObject(getMapTile(2, 7).getLocation());
+        
+        puzzleObject.setInteractScript(new SimpleTextScript("PUZZLE TEST"));
+        
+        enhancedMapTiles.add(puzzleObject);
 
         return enhancedMapTiles;
     }
@@ -45,6 +49,9 @@ public class TestMap extends Map {
         Bug bug = new Bug(3, getMapTile(7, 12).getLocation().subtractX(20));
         bug.setInteractScript(new BugScript());
         npcs.add(bug);
+
+        Ghost ghost = new Ghost(4, getMapTile(15, 20).getLocation());
+        npcs.add(ghost);
 
         return npcs;
     }

@@ -3,9 +3,9 @@ package Engine;
 import GameObject.Rectangle;
 import SpriteFont.SpriteFont;
 import Utils.Colors;
-
-import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import javax.swing.*;
 
 /*
  * This is where the game loop process and render back buffer is setup
@@ -15,12 +15,14 @@ public class GamePanel extends JPanel {
 	// each screen has its own update and draw methods defined to handle a "section" of the game.
 	private ScreenManager screenManager;
 
+
 	// used to draw graphics to the panel
 	private GraphicsHandler graphicsHandler;
 
 	private boolean isGamePaused = false;
 	private SpriteFont pauseLabel;
 	private KeyLocker keyLocker = new KeyLocker();
+	private Cursor hiddenCursor;
 	private final Key pauseKey = Key.P;
 	private Thread gameLoopProcess;
 
@@ -38,6 +40,17 @@ public class GamePanel extends JPanel {
 		// attaches Keyboard class's keyListener to this JPanel
 		this.addKeyListener(Keyboard.getKeyListener());
 
+		/*---------MOUSE UPDATE----------- */
+		// adding Mouse class's mouseListener to this JPanel
+		Mouse mouse = new Mouse();
+		this.addMouseListener(mouse);
+		this.addMouseMotionListener(mouse);
+
+		// making cursor invisible during gameplay
+		BufferedImage cursorImage = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+		hiddenCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImage, new Point(0,0), "hiddenCursor");
+		hideMouseCursor();
+
 		graphicsHandler = new GraphicsHandler();
 
 		screenManager = new ScreenManager();
@@ -54,6 +67,7 @@ public class GamePanel extends JPanel {
 		// will continually update the game's logic and repaint the game's graphics
 		GameLoop gameLoop = new GameLoop(this);
 		gameLoopProcess = new Thread(gameLoop.getGameLoopProcess());
+
 	}
 
 	// this is called later after instantiation, and will initialize screenManager
@@ -112,9 +126,11 @@ public class GamePanel extends JPanel {
 		fpsDisplayLabel.setText("FPS: " + currentFPS);
 	}
 
-	public void draw() {			
+	public void draw() {		// Renderer	
 		// draw current game state
 		screenManager.draw(graphicsHandler);
+		// draw UI elements
+		//ui.draw(graphicsHandler.getGraphics());    //Draw UI -----------------------------------------------------
 
 		// if game is paused, draw pause gfx over Screen gfx
 		if (isGamePaused) {
@@ -136,5 +152,13 @@ public class GamePanel extends JPanel {
 			graphicsHandler.setGraphics((Graphics2D) g);
 			draw();
 		}
+	}
+
+	public void showMouseCursor() {
+		setCursor(Cursor.getDefaultCursor());
+	}
+
+	public void hideMouseCursor() {
+		setCursor(hiddenCursor);
 	}
 }

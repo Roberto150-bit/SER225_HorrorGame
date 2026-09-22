@@ -4,6 +4,7 @@ import Engine.GraphicsHandler;
 import Engine.ScreenManager;
 import GameObject.GameObject;
 import GameObject.Rectangle;
+import java.awt.geom.AffineTransform;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -22,6 +23,9 @@ public class Camera extends Rectangle {
     // this leftover space keeps track of that "extra" space, which is needed to calculate the camera's current "end" position on the screen (in map coordinates, not screen coordinates)
     private int leftoverSpaceX, leftoverSpaceY;
 
+    // Current zoom level. 1.0 = normal, 2.0 = zoomed in 2x, 0.5 = zoomed out 2x
+    private float zoom = 1.0f; // -------------------------------------------------------------------------------------
+
     // current map entities that are to be included in this frame's update/draw cycle
     private ArrayList<EnhancedMapTile> activeEnhancedMapTiles = new ArrayList<>();
     private ArrayList<NPC> activeNPCs = new ArrayList<>();
@@ -31,13 +35,28 @@ public class Camera extends Rectangle {
     private final int UPDATE_OFF_SCREEN_RANGE = 4;
 
     public Camera(int startX, int startY, int tileWidth, int tileHeight, Map map) {
-        super(startX, startY, ScreenManager.getScreenWidth() / tileWidth, ScreenManager.getScreenHeight() / tileHeight);
+        super(startX, startY, 0, 0); // width/height set below via setZoom
         this.map = map;
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
-        this.leftoverSpaceX = ScreenManager.getScreenWidth() % tileWidth;
-        this.leftoverSpaceY = ScreenManager.getScreenHeight() % tileHeight;
+        setZoom(2.0f); // establishes width, height, leftoverSpaceX/Y consistently
     }
+
+    // Sets zoom and recalculates how many tiles fit on screen at that zoom level ---------------------------------
+    public void setZoom(float zoom) {
+        this.zoom = zoom;
+
+        // how many world pixels are visible shrinks as zoom increases
+        float visibleWorldWidth  = ScreenManager.getScreenWidth() / zoom;
+        float visibleWorldHeight = ScreenManager.getScreenHeight() / zoom;
+
+        this.width = (int) (visibleWorldWidth / tileWidth);
+        this.height = (int) (visibleWorldHeight / tileHeight);
+
+        this.leftoverSpaceX = (int) visibleWorldWidth % tileWidth;
+        this.leftoverSpaceY = (int) visibleWorldHeight % tileHeight;
+    }
+
 
     // gets the tile index that the camera's x and y values are currently on (top left tile)
     // this is used to determine a starting place for the rectangle of area the camera currently contains on the map
@@ -158,14 +177,28 @@ public class Camera extends Rectangle {
     }
 
     public void draw(GraphicsHandler graphicsHandler) {
+        Graphics2D g2d = graphicsHandler.getGraphics();
+        AffineTransform originalTransform = g2d.getTransform();
+
+        g2d.scale(zoom, zoom); // Scale the graphics context based on the current zoom level
+
         drawMapTilesBottomLayer(graphicsHandler);
         drawMapTilesTopLayer(graphicsHandler);
-    }
 
+        g2d.setTransform(originalTransform); // Restore so nothing drawn after this is affected
+    }
+    //same thing but draws the player in between the bottom and top layers of map tiles
     public void draw(Player player, GraphicsHandler graphicsHandler) {
+        Graphics2D g2d = graphicsHandler.getGraphics();
+        AffineTransform originalTransform = g2d.getTransform();
+
+        g2d.scale(zoom, zoom); // // Scale the graphics context based on the current zoom level
+
         drawMapTilesBottomLayer(graphicsHandler);
         drawMapEntities(player, graphicsHandler);
         drawMapTilesTopLayer(graphicsHandler);
+
+        g2d.setTransform(originalTransform); // Restore so nothing drawn after this is affected
     }
 
     // draws the bottom layer of visible map tiles to the screen
@@ -289,5 +322,13 @@ public class Camera extends Rectangle {
 
     public boolean isAtBottomOfMap() {
         return this.getEndBoundY() >= map.getEndBoundY();
+    }
+
+    public float getVisibleWorldWidth() {
+    return width * tileWidth;
+}
+
+    public float getVisibleWorldHeight() {
+        return height * tileHeight;
     }
 }
