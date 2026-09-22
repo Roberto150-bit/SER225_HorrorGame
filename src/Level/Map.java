@@ -2,9 +2,8 @@ package Level;
 
 import Engine.Config;
 import Engine.GraphicsHandler;
-import Engine.ScreenManager;
-import Engine.UI; // ----------------------------------------------------------------------------------
-import GameObject.Book;
+import Engine.UI;
+import GameObject.Book; // ----------------------------------------------------------------------------------
 import GameObject.Rectangle;
 import Utils.Direction;
 import Utils.Point; 
@@ -13,7 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner; // ----------------------------------------------------------------------------------
+import java.util.Scanner;
 
 /*
     This class is for defining a map that is used for a specific level
@@ -45,7 +44,6 @@ public abstract class Map {
     // the location of the "mid point" of the screen
     // this is what tells the game that the player has reached the center of the screen, therefore the camera should move instead of the player
     // this goes into creating that "map scrolling" effect
-    protected int xMidPoint, yMidPoint;
 
     // in pixels, this basically creates a rectangle defining how big the map is
     // startX and Y will always be 0, endX and Y is the number of tiles multiplied by the number of pixels each tile takes up
@@ -93,8 +91,6 @@ public abstract class Map {
         this.startBoundY = 0;
         this.endBoundX = width * tileset.getScaledSpriteWidth();
         this.endBoundY = height * tileset.getScaledSpriteHeight();
-        this.xMidPoint = ScreenManager.getScreenWidth() / 2;
-        this.yMidPoint = (ScreenManager.getScreenHeight() / 2);
         this.playerStartPosition = new Point(0, 0);
     }
 
@@ -535,6 +531,8 @@ public abstract class Map {
     // based on the player's current X position (which in a level can potentially be updated each frame),
     // adjust the player's and camera's positions accordingly in order to properly create the map "scrolling" effect
     private void adjustMovementX(Player player) {
+        float xMidPoint = camera.getVisibleWorldWidth() / 2f;
+
         // if player goes past center screen (on the right side) and there is more map to show on the right side, push player back to center and move camera forward
         if ((player.getCalibratedXLocation() + (player.getWidth() / 2)) > xMidPoint && camera.getEndBoundX() < endBoundX) {
             float xMidPointDifference = xMidPoint - (player.getCalibratedXLocation() + (player.getWidth() / 2));
@@ -562,6 +560,7 @@ public abstract class Map {
     // based on the player's current Y position (which in a level can potentially be updated each frame),
     // adjust the player's and camera's positions accordingly in order to properly create the map "scrolling" effect
     private void adjustMovementY(Player player) {
+        float yMidPoint = camera.getVisibleWorldHeight() / 2f;
         // if player goes past center screen (below) and there is more map to show below, push player back to center and move camera upward
         if ((player.getCalibratedYLocation() + (player.getHeight() / 2)) > yMidPoint && camera.getEndBoundY() < endBoundY) {
             float yMidPointDifference = yMidPoint - (player.getCalibratedYLocation() + (player.getHeight() / 2));
@@ -606,6 +605,8 @@ public abstract class Map {
     
 
     }
+
+    
 
     public FlagManager getFlagManager() { return flagManager; }
 
