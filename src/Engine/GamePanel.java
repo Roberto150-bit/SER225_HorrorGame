@@ -15,7 +15,6 @@ public class GamePanel extends JPanel {
 	// each screen has its own update and draw methods defined to handle a "section" of the game.
 	private ScreenManager screenManager;
 
-	private Engine.UI ui; //Instaniate UI -----------------------------------------------------
 
 	// used to draw graphics to the panel
 	private GraphicsHandler graphicsHandler;
@@ -69,7 +68,6 @@ public class GamePanel extends JPanel {
 		GameLoop gameLoop = new GameLoop(this);
 		gameLoopProcess = new Thread(gameLoop.getGameLoopProcess());
 
-		ui = new Engine.UI(this); //Instantiate UI -----------------------------------------------------
 	}
 
 	// this is called later after instantiation, and will initialize screenManager
