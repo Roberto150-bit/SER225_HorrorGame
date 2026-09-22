@@ -4,6 +4,7 @@ import GameObject.Rectangle;
 import SpriteFont.SpriteFont;
 import Utils.Colors;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import javax.swing.*;
 
 /*
@@ -22,6 +23,7 @@ public class GamePanel extends JPanel {
 	private boolean isGamePaused = false;
 	private SpriteFont pauseLabel;
 	private KeyLocker keyLocker = new KeyLocker();
+	private Cursor hiddenCursor;
 	private final Key pauseKey = Key.P;
 	private Thread gameLoopProcess;
 
@@ -38,6 +40,17 @@ public class GamePanel extends JPanel {
 
 		// attaches Keyboard class's keyListener to this JPanel
 		this.addKeyListener(Keyboard.getKeyListener());
+
+		/*---------MOUSE UPDATE----------- */
+		// adding Mouse class's mouseListener to this JPanel
+		Mouse mouse = new Mouse();
+		this.addMouseListener(mouse);
+		this.addMouseMotionListener(mouse);
+
+		// making cursor invisible during gameplay
+		BufferedImage cursorImage = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+		hiddenCursor = Toolkit.getDefaultToolkit().createCustomCursor(cursorImage, new Point(0,0), "hiddenCursor");
+		hideMouseCursor();
 
 		graphicsHandler = new GraphicsHandler();
 
@@ -119,7 +132,7 @@ public class GamePanel extends JPanel {
 		// draw current game state
 		screenManager.draw(graphicsHandler);
 		// draw UI elements
-		ui.draw(graphicsHandler.getGraphics());    //Draw UI -----------------------------------------------------
+		//ui.draw(graphicsHandler.getGraphics());    //Draw UI -----------------------------------------------------
 
 		// if game is paused, draw pause gfx over Screen gfx
 		if (isGamePaused) {
@@ -141,5 +154,13 @@ public class GamePanel extends JPanel {
 			graphicsHandler.setGraphics((Graphics2D) g);
 			draw();
 		}
+	}
+
+	public void showMouseCursor() {
+		setCursor(Cursor.getDefaultCursor());
+	}
+
+	public void hideMouseCursor() {
+		setCursor(hiddenCursor);
 	}
 }
