@@ -1,14 +1,17 @@
 package Level;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-
 import ScriptActions.ConditionalScriptAction;
 import ScriptActions.ConditionalScriptActionGroup;
 import ScriptActions.LoopFixedScriptAction;
 import ScriptActions.LoopIndefiniteScriptAction;
 import ScriptActions.ScriptAction;
 import ScriptActions.ScriptActionOutputManager;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
+
+//A "script" here means a scripted sequence of events, like an NPC talking to you or a trap triggering when you step on a tile.
+
+//A script is a list of steps (ScriptActions) that happen one after another, like a to-do list. This class handles the machinery of walking through that list.
 
 // This class is a base class for all scripts in the game -- all scripts should extend from it
 // Scripts can be used to interact with map entities
