@@ -6,6 +6,7 @@ import GameObject.Frame;
 import GameObject.GameObject;
 import GameObject.SpriteSheet;
 import Level.EnhancedMapTile;
+import Level.MapEntityStatus;
 import Level.Player;
 import Level.TileType;
 import Utils.Point;
@@ -21,7 +22,7 @@ public class CollectibleObject extends EnhancedMapTile {
         super.update(player);
 
         if (player.touching(this)) {
-            System.out.println("Collectible touched");
+            setMapEntityStatus(MapEntityStatus.REMOVED);
         }
     }
 
