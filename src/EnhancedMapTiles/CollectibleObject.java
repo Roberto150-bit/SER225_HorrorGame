@@ -22,6 +22,7 @@ public class CollectibleObject extends EnhancedMapTile {
         super.update(player);
 
         if (player.touching(this)) {
+            player.collectItem();
             setMapEntityStatus(MapEntityStatus.REMOVED);
         }
     }

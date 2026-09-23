@@ -3,6 +3,7 @@ package Level;
 import Engine.Config;
 import Engine.GraphicsHandler;
 import Engine.UI;
+import Engine.HotbarUI;
 import Engine.PuzzleUI;
 import GameObject.Book; // ----------------------------------------------------------------------------------
 import GameObject.Rectangle;
@@ -75,6 +76,9 @@ public abstract class Map {
     
     // map's Puzzle instance
     protected PuzzleUI puzzleUI;
+    
+    // hotbar
+    protected HotbarUI hotbarUI;
 
     // Book's instance
     protected Book book; // ----------------------------------------------------------------------------------
@@ -105,6 +109,8 @@ public abstract class Map {
         animatedMapTiles = new ArrayList<>();
 
         loadMapFile();
+
+        this.hotbarUI = new HotbarUI();
 
         this.enhancedMapTiles = loadEnhancedMapTiles();
         for (EnhancedMapTile enhancedMapTile: this.enhancedMapTiles) {
@@ -601,6 +607,7 @@ public abstract class Map {
 
     public void draw(Player player, GraphicsHandler graphicsHandler) {
         camera.draw(player, graphicsHandler);
+        hotbarUI.draw(player, graphicsHandler);
         if (textbox.isActive()) {
             textbox.draw(graphicsHandler);
         }
