@@ -8,6 +8,11 @@ public class Mouse extends MouseAdapter {
     private static int mouseX;
     private static int mouseY;
     private static boolean leftClicked;
+    private static GamePanel gamePanel;
+
+    public Mouse(GamePanel gamePanel) {
+        Mouse.gamePanel = gamePanel;
+    }
 
     @Override
     public void mouseMoved(MouseEvent e) {
@@ -42,5 +47,17 @@ public class Mouse extends MouseAdapter {
 
     public static void resetClick() {
         leftClicked = false;
+    }
+
+    public static void showCursor() {
+        if (gamePanel != null) {
+            gamePanel.showMouseCursor();
+        }
+    }
+
+    public static void hideCursor() {
+        if (gamePanel != null) {
+            gamePanel.hideMouseCursor();
+        }
     }
 }

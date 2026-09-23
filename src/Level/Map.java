@@ -3,6 +3,7 @@ package Level;
 import Engine.Config;
 import Engine.GraphicsHandler;
 import Engine.UI;
+import Engine.PuzzleUI;
 import GameObject.Book; // ----------------------------------------------------------------------------------
 import GameObject.Rectangle;
 import Utils.Direction;
@@ -71,6 +72,9 @@ public abstract class Map {
 
     // map's textbox instance
     protected Textbox textbox;
+    
+    // map's Puzzle instance
+    protected PuzzleUI puzzleUI;
 
     // Book's instance
     protected Book book; // ----------------------------------------------------------------------------------
@@ -121,6 +125,7 @@ public abstract class Map {
 
         this.camera = new Camera(0, 0, tileset.getScaledSpriteWidth(), tileset.getScaledSpriteHeight(), this);
         this.textbox = new Textbox(this);
+        this.puzzleUI = new PuzzleUI();
         this.book = new Book();  // ----------------------------------------------------------------------------------
         this.ui = new UI(this.book); // ----------------------------------------------------------------------------------
     }
@@ -523,6 +528,7 @@ public abstract class Map {
             textbox.update();
         }
         // ------------------------------------------------------------------------------
+        puzzleUI.update(); //Updates puzzle state
         book.update(); //Updates book state every update
 
         
@@ -601,6 +607,8 @@ public abstract class Map {
         if (book.isActive()) {
             book.draw(graphicsHandler);
         }
+        
+        puzzleUI.draw(graphicsHandler);
         ui.draw(graphicsHandler);
     
 
@@ -615,6 +623,7 @@ public abstract class Map {
     }
 
     public Textbox getTextbox() { return textbox; }
+    public PuzzleUI getPuzzleUI() { return puzzleUI; }
 
     public int getEndBoundX() { return endBoundX; }
     public int getEndBoundY() { return endBoundY; }
