@@ -28,16 +28,16 @@ public abstract class Player extends GameObject {
     protected Direction facingDirection;
     protected Direction lastMovementDirection;
 
-    // define keys
+    // Keybinds for the player
     protected KeyLocker keyLocker = new KeyLocker();
-    protected Key MOVE_LEFT_KEY = Key.LEFT;
-    protected Key MOVE_RIGHT_KEY = Key.RIGHT;
-    protected Key MOVE_UP_KEY = Key.UP;
-    protected Key MOVE_DOWN_KEY = Key.DOWN;
+    protected Key MOVE_LEFT_KEY = Key.A;
+    protected Key MOVE_RIGHT_KEY = Key.D;
+    protected Key MOVE_UP_KEY = Key.W;
+    protected Key MOVE_DOWN_KEY = Key.S;
     protected Key INTERACT_KEY = Key.SPACE;
     protected Key DROP_KEY = Key.Q;
     protected Key PICKUP_KEY = Key.E;
-    protected Key OPEN_BOOK_KEY = Key.C; // -----------------------------------------------------------
+    protected Key OPEN_BOOK_KEY = Key.C; 
 
     protected boolean isLocked = false;
 
