@@ -6,6 +6,7 @@ import java.awt.Font;
 public class PuzzleUI {
     
     private boolean isOpen = false;
+    private boolean solved = false;
 
     private int x = 150;
     private int y = 100;
@@ -17,7 +18,13 @@ public class PuzzleUI {
     private int closeWidth = 25;
     private int closeHeight = 25;
 
+    private int activateX = 300;
+    private int activateY = 275;
+    private int activateWidth = 180;
+    private int activateHeight = 50;
+
     public void open() {
+        solved = false;
         isOpen = true;
         Mouse.showCursor();
     }
@@ -50,6 +57,16 @@ public class PuzzleUI {
             
             if (clickedCloseButton) {
                 close();
+            }
+            
+            boolean clickedActivateButton =
+                mouseX >= activateX &&
+                mouseX <= activateX + activateWidth &&
+                mouseY >= activateY &&
+                mouseY <= activateY + activateHeight;
+
+            if (clickedActivateButton) {
+                solved = true;
             }
 
             Mouse.resetClick();
@@ -92,7 +109,7 @@ public class PuzzleUI {
 
         // Puzzle text
         graphicsHandler.drawString(
-            "Puzzle content", 
+            "Restore power", 
             x + 50, 
             y + 150, 
             new Font("Arial", Font.PLAIN, 18),
@@ -115,5 +132,42 @@ public class PuzzleUI {
             new Font("Arial", Font.BOLD, 16),
             Color.WHITE
         );
+
+        graphicsHandler.drawFilledRectangle(
+            activateX,
+            activateY,
+            activateWidth,
+            activateHeight,
+            Color.GRAY
+        );
+
+        graphicsHandler.drawString(
+            "ACTIVATE",
+            activateX + 45,
+            activateY + 32,
+            new Font("Arial", Font.BOLD, 18),
+            Color.WHITE
+        );
+
+        if (solved) {
+
+            graphicsHandler.drawString(
+                "Status: COMPLETE",
+                x + 160,
+                y + 280,
+                new Font("Arial", Font.BOLD, 18),
+                Color.GREEN
+            );
+
+        } else {
+
+            graphicsHandler.drawString(
+                "Status: INCOMPLETE",
+                x + 160,
+                y + 280,
+                new Font("Arial", Font.BOLD, 18),
+                Color.WHITE
+            );
+        }
     }
 }
