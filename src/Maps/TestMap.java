@@ -29,6 +29,9 @@ public class TestMap extends Map {
         
         puzzleObject.setInteractScript(new PuzzleScript());
         enhancedMapTiles.add(puzzleObject);
+    
+        CollectibleObject collectibleObject = new CollectibleObject(getMapTile(5, 7).getLocation());
+        enhancedMapTiles.add(collectibleObject);
 
         return enhancedMapTiles;
     }

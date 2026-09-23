@@ -2,6 +2,7 @@
     // Project layout (portable, safe to share).
     "java.project.sourcePaths": ["src"],
     "java.project.outputPath": "bin",
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m -Xlog:disable",
 
     // This project runs on any JDK 8+ (see README), so no specific runtime is pinned here.
     // If VS Code can't auto-detect a JDK on your machine, point it at yours in your personal
