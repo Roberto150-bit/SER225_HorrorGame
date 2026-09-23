@@ -9,6 +9,7 @@ import NPCs.Walrus;
 import Scripts.SimpleTextScript;
 import Scripts.TestMap.*;
 import Tilesets.CommonTileset;
+import Scripts.PuzzleScript;
 
 import java.util.ArrayList;
 
@@ -26,8 +27,7 @@ public class TestMap extends Map {
 
         PuzzleObject puzzleObject = new PuzzleObject(getMapTile(2, 7).getLocation());
         
-        puzzleObject.setInteractScript(new SimpleTextScript("PUZZLE TEST"));
-        
+        puzzleObject.setInteractScript(new PuzzleScript());
         enhancedMapTiles.add(puzzleObject);
 
         return enhancedMapTiles;

@@ -19,10 +19,12 @@ public class PuzzleUI {
 
     public void open() {
         isOpen = true;
+        Mouse.showCursor();
     }
 
     public void close() {
         isOpen = false;
+        Mouse.hideCursor();
     }
 
     public boolean isOpen() {

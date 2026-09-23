@@ -42,7 +42,7 @@ public class GamePanel extends JPanel {
 
 		/*---------MOUSE UPDATE----------- */
 		// adding Mouse class's mouseListener to this JPanel
-		Mouse mouse = new Mouse();
+		Mouse mouse = new Mouse(this);
 		this.addMouseListener(mouse);
 		this.addMouseMotionListener(mouse);
 
