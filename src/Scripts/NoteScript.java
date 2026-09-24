@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 
-// script for the note object -- shows the note's message in a textbox when the player interacts with it
+// shows the note's message in a textbox when the player interacts with it
 public class NoteScript extends Script {
 
     private BufferedImage itemImage;

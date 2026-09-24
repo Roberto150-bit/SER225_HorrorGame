@@ -6,9 +6,8 @@ import Engine.GraphicsHandler;
 import Engine.ScreenManager;
 import GameObject.GameObject;
 import GameObject.Rectangle;
-import java.awt.geom.AffineTransform;
-
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 // This class represents a Map's "Camera", aka a piece of the map that is currently included in a level's update/draw logic based on what should be shown on screen.

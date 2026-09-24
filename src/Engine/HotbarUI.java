@@ -9,7 +9,6 @@ public class HotbarUI {
 
     private BufferedImage slotBackgroundImage;
 
-    private boolean isActive;
     private Key pickUpKey = Key.E; // key to pick up items
     private Key dropKey = Key.Q; // key to drop items
 
@@ -36,7 +35,6 @@ public class HotbarUI {
     public void update() {
         if (Keyboard.isKeyDown(pickUpKey) && !keyLocker.isKeyLocked(pickUpKey)) {
             keyLocker.lockKey(pickUpKey);
-            isActive = !isActive; // toggle open/closed
         }
         else if (Keyboard.isKeyUp(pickUpKey)) {
             keyLocker.unlockKey(pickUpKey);
@@ -44,20 +42,13 @@ public class HotbarUI {
 
         if (Keyboard.isKeyDown(dropKey) && !keyLocker.isKeyLocked(dropKey)) {
             keyLocker.lockKey(dropKey);
-            isActive = !isActive; // toggle open/closed
         }
         else if (Keyboard.isKeyUp(dropKey)) {
             keyLocker.unlockKey(dropKey);
         }
     }
 
-    public boolean isActive() {
-        return isActive;
-    }
 
-    public void setActive(boolean active) {
-        isActive = active;
-    }
 
     public boolean addItem(BufferedImage itemImage) {
         for (int i = 0; i < itemImages.length; i++) {
@@ -77,7 +68,7 @@ public class HotbarUI {
 
 
     public void draw(GraphicsHandler graphicsHandler){
-        if (isActive && slotBackgroundImage != null) {
+        if (slotBackgroundImage != null) {
             graphicsHandler.drawImage(slotBackgroundImage, 0, 490, 75,75); 
             graphicsHandler.drawImage(slotBackgroundImage, 65, 490, 75,75); 
             graphicsHandler.drawImage(slotBackgroundImage, 130, 490, 75,75); 
