@@ -43,7 +43,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         map.setPlayer(player);
 
         // let pieces of map know which button to listen for as the "interact" button
-        map.getTextbox().setInteractKey(player.getInteractKey());
+        //map.getTextbox().setInteractKey(player.getInteractKey()); //--------------------------------------------------------------
 
         // add this screen as a "game listener" so other areas of the game that don't normally have direct access to it (such as scripts) can "signal" to have it do something
         // this is used in the "onWin" method -- a script signals to this class that the game has been won by calling its "onWin" method
