@@ -98,7 +98,7 @@ public class MenuScreen extends Screen {
             if (menuItemSelected == 0) {
                 screenCoordinator.setGameState(GameState.LEVEL);
             } else if (menuItemSelected == 2) {
-                screenCoordinator.setGameState(null);
+                screenCoordinator.setGameState(GameState.SETTINGS);
             } else if (menuItemSelected == 1) {
                 screenCoordinator.setGameState(GameState.CREDITS);
             } else if (menuItemSelected == 2) {
@@ -111,6 +111,7 @@ public class MenuScreen extends Screen {
     public void draw(GraphicsHandler graphicsHandler) {
         background.draw(graphicsHandler);
         playGame.draw(graphicsHandler);
+        settings.draw(graphicsHandler);
         credits.draw(graphicsHandler);
         settings.draw(graphicsHandler);
         graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, new Color(49, 207, 240), Color.black, 2);
