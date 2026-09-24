@@ -29,12 +29,13 @@ public class TestMap extends Map {
 
         PuzzleObject puzzleObject = new PuzzleObject(getMapTile(2, 7).getLocation());// --------------------------------
         NoteObject noteObject = new NoteObject(getMapTile(4, 7).getLocation());// --------------------------------
-
+        CollectibleObject collectibleObject = new CollectibleObject(getMapTile(6, 7).getLocation());
         noteObject.setIsUncollidable(true);
 
         BufferedImage noteItemImage = ImageLoader.load("Note.png");
         noteObject.setInteractScript(new NoteScript(noteItemImage));
         puzzleObject.setInteractScript(new PuzzleScript());
+        enhancedMapTiles.add(collectibleObject);
         enhancedMapTiles.add(puzzleObject);
         enhancedMapTiles.add(noteObject);
 
