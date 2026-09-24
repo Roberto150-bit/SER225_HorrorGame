@@ -18,7 +18,7 @@ public class HotbarUI {
 
     private int[]xSlots = {0, 65, 130}; // X positions for each slot
 
-    private int ySlot = 490; // Y position for all slots
+    private int ySlot = 500; // Y position for all slots
 
 
 
@@ -82,7 +82,7 @@ public class HotbarUI {
             //}
             // draw the item on top, if this slot has one
             if (itemImages[i] != null) {
-                graphicsHandler.drawImage(itemImages[i], xSlots[i], ySlot, 75, 75);
+                graphicsHandler.drawImage(itemImages[i], xSlots[i], ySlot, 60, 60);
             }
         }
 
