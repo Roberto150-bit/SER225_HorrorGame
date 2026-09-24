@@ -9,10 +9,6 @@ public class HotbarUI {
 
     private BufferedImage slotBackgroundImage;
 
-    private BufferedImage slot1Image;
-    private BufferedImage slot2Image;
-    private BufferedImage slot3Image;
-
     private boolean isActive;
     private Key pickUpKey = Key.E; // key to pick up items
     private Key dropKey = Key.Q; // key to drop items
@@ -80,8 +76,6 @@ public class HotbarUI {
     }
 
 
-
-
     public void draw(GraphicsHandler graphicsHandler){
         if (isActive && slotBackgroundImage != null) {
             graphicsHandler.drawImage(slotBackgroundImage, 0, 490, 75,75); 
@@ -105,7 +99,3 @@ public class HotbarUI {
 
 
 }
-
-    
-
-

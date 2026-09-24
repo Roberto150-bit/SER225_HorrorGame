@@ -1,6 +1,7 @@
 package Maps;
 
 import Enemies.Ghost;
+import Engine.ImageLoader;
 import EnhancedMapTiles.*;
 import Level.*;
 import NPCs.Bug;
@@ -8,12 +9,11 @@ import NPCs.Dinosaur;
 import NPCs.Walrus;
 import Scripts.NoteScript;
 import Scripts.PuzzleScript;
-import Scripts.SimpleTextScript;
-import Scripts.TestMap.*; //---------------------------------------------
+import Scripts.SimpleTextScript; //---------------------------------------------
+import Scripts.TestMap.*;
 import Tilesets.CommonTileset;
-import java.util.ArrayList;
 import java.awt.image.BufferedImage;
-import Engine.ImageLoader;
+import java.util.ArrayList;
 
 // Represents a test map to be used in a level
 public class TestMap extends Map {

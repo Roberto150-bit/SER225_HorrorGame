@@ -40,6 +40,8 @@ public abstract class Player extends GameObject {
     protected Key OPEN_BOOK_KEY = Key.C; 
 
     protected boolean isLocked = false;
+    
+    private boolean hasCollectible = false;
 
     public Player(SpriteSheet spriteSheet, float x, float y, String startingAnimationName) {
         super(spriteSheet, x, y, startingAnimationName);
@@ -254,6 +256,15 @@ public abstract class Player extends GameObject {
         else if (direction == Direction.RIGHT) {
             moveX(speed);
         }
+    }
+
+    public void collectItem() {
+        hasCollectible = true;
+        System.out.println("Item collected");
+    }
+
+    public boolean hasCollectible() {
+        return hasCollectible;
     }
 
     // Uncomment this to have game draw player's bounds to make it easier to visualize
