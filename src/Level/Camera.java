@@ -1,5 +1,7 @@
 package Level;
 
+// IN ORDER TO CHANGE THE ZOOM, FIND "setZoom(2.0f);" in the constructor and change the value. 1.0 is normal and anything above is zoomed in."
+
 import Engine.GraphicsHandler;
 import Engine.ScreenManager;
 import GameObject.GameObject;

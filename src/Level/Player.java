@@ -11,8 +11,8 @@ import Utils.Direction;
 public abstract class Player extends GameObject {
     // values that affect player movement
     // these should be set in a subclass
-    protected float walkSpeed = 0;
-    protected int interactionRange = 1;
+    protected float walkSpeed = 1;
+    protected int interactionRange = 20;
     protected Direction currentWalkingXDirection;
     protected Direction currentWalkingYDirection;
     protected Direction lastWalkingXDirection;
@@ -194,7 +194,7 @@ public abstract class Player extends GameObject {
     }
 
     public Rectangle getInteractionRange() {
-        return new Rectangle(
+        return new Rectangle(   
                 getBounds().getX1() - interactionRange,
                 getBounds().getY1() - interactionRange,
                 getBounds().getWidth() + (interactionRange * 2),
