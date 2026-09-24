@@ -2,9 +2,10 @@ package Level;
 
 import Engine.Config;
 import Engine.GraphicsHandler;
-import Engine.UI;
+import Engine.HotbarUI;
 import Engine.PuzzleUI;
-import GameObject.Book; // ----------------------------------------------------------------------------------
+import Engine.UI; // ----------------------------------------------------------------------------------
+import GameObject.Book;
 import GameObject.Rectangle;
 import Utils.Direction;
 import Utils.Point; 
@@ -13,7 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.Scanner; // ----------------------------------------------------------------------------------
 
 /*
     This class is for defining a map that is used for a specific level
@@ -75,6 +76,9 @@ public abstract class Map {
     
     // map's Puzzle instance
     protected PuzzleUI puzzleUI;
+    
+    // hotbar
+    protected HotbarUI hotbarUI;
 
     // Book's instance
     protected Book book; // ----------------------------------------------------------------------------------
@@ -128,6 +132,7 @@ public abstract class Map {
         this.puzzleUI = new PuzzleUI();
         this.book = new Book();  // ----------------------------------------------------------------------------------
         this.ui = new UI(this.book); // ----------------------------------------------------------------------------------
+        this.hotbarUI = new HotbarUI(); // ----------------------------------------------------------------------------------
     }
 
     // reads in a map file to create the map's tilemap
@@ -530,8 +535,13 @@ public abstract class Map {
         // ------------------------------------------------------------------------------
         puzzleUI.update(); //Updates puzzle state
         book.update(); //Updates book state every update
+        hotbarUI.update(); //Updates hotbar state
 
         
+    }
+
+    public HotbarUI getHotbarUI() {
+        return hotbarUI;
     }
 
     // based on the player's current X position (which in a level can potentially be updated each frame),
@@ -610,6 +620,7 @@ public abstract class Map {
         
         puzzleUI.draw(graphicsHandler);
         ui.draw(graphicsHandler);
+        hotbarUI.draw(graphicsHandler);
     
 
     }

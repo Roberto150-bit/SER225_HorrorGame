@@ -1,16 +1,18 @@
 package Maps;
 
-import EnhancedMapTiles.*;
 import Enemies.Ghost;
+import Engine.ImageLoader;
+import EnhancedMapTiles.*;
 import Level.*;
 import NPCs.Bug;
 import NPCs.Dinosaur;
 import NPCs.Walrus;
-import Scripts.SimpleTextScript;
+import Scripts.NoteScript;
+import Scripts.PuzzleScript;
+import Scripts.SimpleTextScript; //---------------------------------------------
 import Scripts.TestMap.*;
 import Tilesets.CommonTileset;
-import Scripts.PuzzleScript;
-
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 // Represents a test map to be used in a level
@@ -25,10 +27,16 @@ public class TestMap extends Map {
     public ArrayList<EnhancedMapTile> loadEnhancedMapTiles() {
         ArrayList<EnhancedMapTile> enhancedMapTiles = new ArrayList<>();
 
-        PuzzleObject puzzleObject = new PuzzleObject(getMapTile(2, 7).getLocation());
-        
+        PuzzleObject puzzleObject = new PuzzleObject(getMapTile(2, 7).getLocation());// --------------------------------
+        NoteObject noteObject = new NoteObject(getMapTile(4, 7).getLocation());// --------------------------------
+
+        noteObject.setIsUncollidable(true);
+
+        BufferedImage noteItemImage = ImageLoader.load("Note.png");
+        noteObject.setInteractScript(new NoteScript(noteItemImage));
         puzzleObject.setInteractScript(new PuzzleScript());
         enhancedMapTiles.add(puzzleObject);
+        enhancedMapTiles.add(noteObject);
 
         return enhancedMapTiles;
     }

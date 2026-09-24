@@ -11,8 +11,8 @@ import Utils.Direction;
 public abstract class Player extends GameObject {
     // values that affect player movement
     // these should be set in a subclass
-    protected float walkSpeed = 0;
-    protected int interactionRange = 1;
+    protected float walkSpeed = 1;
+    protected int interactionRange = 20;
     protected Direction currentWalkingXDirection;
     protected Direction currentWalkingYDirection;
     protected Direction lastWalkingXDirection;
@@ -34,12 +34,14 @@ public abstract class Player extends GameObject {
     protected Key MOVE_RIGHT_KEY = Key.D;
     protected Key MOVE_UP_KEY = Key.W;
     protected Key MOVE_DOWN_KEY = Key.S;
-    protected Key INTERACT_KEY = Key.SPACE;
+    protected Key INTERACT_KEY = Key.E;
     protected Key DROP_KEY = Key.Q;
     protected Key PICKUP_KEY = Key.E;
     protected Key OPEN_BOOK_KEY = Key.C; 
 
     protected boolean isLocked = false;
+    
+    private boolean hasCollectible = false;
 
     public Player(SpriteSheet spriteSheet, float x, float y, String startingAnimationName) {
         super(spriteSheet, x, y, startingAnimationName);
@@ -194,7 +196,7 @@ public abstract class Player extends GameObject {
     }
 
     public Rectangle getInteractionRange() {
-        return new Rectangle(
+        return new Rectangle(   
                 getBounds().getX1() - interactionRange,
                 getBounds().getY1() - interactionRange,
                 getBounds().getWidth() + (interactionRange * 2),
@@ -254,6 +256,15 @@ public abstract class Player extends GameObject {
         else if (direction == Direction.RIGHT) {
             moveX(speed);
         }
+    }
+
+    public void collectItem() {
+        hasCollectible = true;
+        System.out.println("Item collected");
+    }
+
+    public boolean hasCollectible() {
+        return hasCollectible;
     }
 
     // Uncomment this to have game draw player's bounds to make it easier to visualize

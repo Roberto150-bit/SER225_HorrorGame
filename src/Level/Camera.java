@@ -1,12 +1,13 @@
 package Level;
 
+// IN ORDER TO CHANGE THE ZOOM, FIND "setZoom(2.0f);" in the constructor and change the value. 1.0 is normal and anything above is zoomed in."
+
 import Engine.GraphicsHandler;
 import Engine.ScreenManager;
 import GameObject.GameObject;
 import GameObject.Rectangle;
-import java.awt.geom.AffineTransform;
-
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 // This class represents a Map's "Camera", aka a piece of the map that is currently included in a level's update/draw logic based on what should be shown on screen.
@@ -39,7 +40,7 @@ public class Camera extends Rectangle {
         this.map = map;
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
-        setZoom(2.0f); // establishes width, height, leftoverSpaceX/Y consistently
+        setZoom(1.0f); // establishes width, height, leftoverSpaceX/Y consistently
     }
 
     // Sets zoom and recalculates how many tiles fit on screen at that zoom level ---------------------------------
