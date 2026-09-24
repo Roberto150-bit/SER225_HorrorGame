@@ -15,6 +15,7 @@ public class MenuScreen extends Screen {
     protected int currentMenuItemHovered = 0; // current menu item being "hovered" over
     protected int menuItemSelected = -1;
     protected SpriteFont playGame;
+    protected SpriteFont settings;
     protected SpriteFont credits;
     protected Map background;
     protected int keyPressTimer;
@@ -30,7 +31,10 @@ public class MenuScreen extends Screen {
         playGame = new SpriteFont("PLAY GAME", 200, 123, "Arial", 30, new Color(49, 207, 240));
         playGame.setOutlineColor(Color.black);
         playGame.setOutlineThickness(3);
-        credits = new SpriteFont("CREDITS", 200, 223, "Arial", 30, new Color(49, 207, 240));
+        settings = new SpriteFont("SETTINGS", 200, 223, "Arial", 30, new Color(49, 207, 240));
+        settings.setOutlineColor(Color.black);
+        settings.setOutlineThickness(3);
+        credits = new SpriteFont("CREDITS", 200, 323, "Arial", 30, new Color(49, 207, 240));
         credits.setOutlineColor(Color.black);
         credits.setOutlineThickness(3);
         background = new TitleScreenMap();
@@ -85,6 +89,8 @@ public class MenuScreen extends Screen {
             menuItemSelected = currentMenuItemHovered;
             if (menuItemSelected == 0) {
                 screenCoordinator.setGameState(GameState.LEVEL);
+            } else if (menuItemSelected == 2) {
+                screenCoordinator.setGameState(null);
             } else if (menuItemSelected == 1) {
                 screenCoordinator.setGameState(GameState.CREDITS);
             }
