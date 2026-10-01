@@ -27,13 +27,13 @@ public class MenuScreen extends Screen {
 
     @Override
     public void initialize() {
-        playGame = new SpriteFont("PLAY GAME", 200, 123, "Arial", 30, new Color(49, 207, 240));
+        playGame = new SpriteFont("PLAY GAME", 200, 123, "Chalkduster", 30, new Color(49, 207, 240));
         playGame.setOutlineColor(Color.black);
         playGame.setOutlineThickness(3);
-        settings = new SpriteFont("SETTINGS", 200, 223, "Arial", 30, new Color(49, 207, 240));
+        settings = new SpriteFont("SETTINGS", 200, 223, "Chalkduster", 30, new Color(49, 207, 240));
         settings.setOutlineColor(Color.black);
         settings.setOutlineThickness(3);
-        credits = new SpriteFont("CREDITS", 200, 323, "Arial", 30, new Color(49, 207, 240));
+        credits = new SpriteFont("CREDITS", 200, 323, "Chalkduster", 30, new Color(49, 207, 240));
         credits.setOutlineColor(Color.black);
         credits.setOutlineThickness(3);
         

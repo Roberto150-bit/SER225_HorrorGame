@@ -30,13 +30,13 @@ public class CreditsScreen extends Screen {
         // setup graphics on screen (background map, spritefont text)
         background = new TitleScreenMap();
         background.setAdjustCamera(false);
-        creditsLabel = new SpriteFont("Credits", 350, 25, "Arial", 30, Color.white);
-        createdByLabel = new SpriteFont("Developed by", 320, 75, "Arial", 30, Color.white);
-        griffinCredit = new SpriteFont("Griffin", 360, 125, "Arial", 30, Color.white);
-        hernestCredit = new SpriteFont("Hernest", 360, 175, "Arial", 30, Color.white);
-        laurenCredit = new SpriteFont("Lauren", 360, 225, "Arial", 30, Color.white);
-        robertoCredit = new SpriteFont("Roberto", 360, 275, "Arial", 30, Color.white);
-        returnInstructionsLabel = new SpriteFont("Press [ESC] to return to the menu", 20, 532, "Arial", 30, Color.white);
+        creditsLabel = new SpriteFont("Credits", 350, 25, "Chalkduster", 30, Color.white);
+        createdByLabel = new SpriteFont("Developed by", 320, 75, "Chalkduster", 30, Color.white);
+        griffinCredit = new SpriteFont("Griffin", 360, 125, "Chalkduster", 30, Color.white);
+        hernestCredit = new SpriteFont("Hernest", 360, 175, "Chalkduster", 30, Color.white);
+        laurenCredit = new SpriteFont("Lauren", 360, 225, "Chalkduster", 30, Color.white);
+        robertoCredit = new SpriteFont("Roberto", 360, 275, "Chalkduster", 30, Color.white);
+        returnInstructionsLabel = new SpriteFont("Press [ESC] to return to the menu", 20, 532, "Chalkduster", 30, Color.white);
         keyLocker.lockKey(Key.SPACE);
     }
 
