@@ -5,7 +5,6 @@ import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
 import SpriteFont.SpriteFont;
-
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -179,7 +178,7 @@ public class Textbox {
                 // if camera is at bottom of screen, textbox is drawn at top of screen instead of the bottom like usual
                 // to prevent it from covering the player
                 int optionY = !map.getCamera().isAtBottomOfMap() ? optionBottomY : optionTopY;
-                graphicsHandler.drawFilledRectangleWithBorder(optionX, optionY, optionWidth, optionHeight, Color.white, Color.black, 2);
+                graphicsHandler.drawFilledRectangleWithBorder(optionX, optionY, optionWidth, optionHeight, Color.black, Color.white, 2);
 
                 // draw each option text
                 for (SpriteFont option : options) {
