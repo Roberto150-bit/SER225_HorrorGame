@@ -10,12 +10,12 @@ public class UI {
 
     public UI (Book book) {
         this.book = book;
-        this.arial_40 = new Font("Arial", Font.PLAIN, 20);
+        this.arial_40 = new Font("Chalkduster", Font.PLAIN, 20);
     }
 
     public void draw(GraphicsHandler graphicsHandler) {
         if (book.isActive()) {            
-            graphicsHandler.drawString("Spooky Book", 140,100, arial_40, Color.black);
+            graphicsHandler.drawString("A spooky book", 140,100, arial_40, Color.black);
         }
     }
 
