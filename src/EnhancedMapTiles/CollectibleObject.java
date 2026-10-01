@@ -1,5 +1,6 @@
 package EnhancedMapTiles;
 
+import java.awt.image.BufferedImage;
 import Builders.FrameBuilder;
 import Engine.ImageLoader;
 import GameObject.Frame;
@@ -11,10 +12,13 @@ import Level.Player;
 import Level.TileType;
 import Utils.Point;
 
+
 public class CollectibleObject extends EnhancedMapTile {
     
+    private BufferedImage itemImage = ImageLoader.load("Rock.png");
+
     public CollectibleObject(Point location) {
-        super(location.x, location.y, new SpriteSheet(ImageLoader.load("Rock.png"), 16, 16), TileType.PASSABLE);
+        super(location.x, location.y, new SpriteSheet(ImageLoader.load("Rock.png"), 14, 14), TileType.PASSABLE);
     }
 
     @Override
@@ -22,8 +26,14 @@ public class CollectibleObject extends EnhancedMapTile {
         super.update(player);
 
         if (player.touching(this)) {
-            player.collectItem();
-            setMapEntityStatus(MapEntityStatus.REMOVED);
+
+            boolean addedToHotbar = map.getHotbarUI().addItem(itemImage);
+
+            if (addedToHotbar) {
+                player.collectItem();
+                setMapEntityStatus(MapEntityStatus.REMOVED);
+            }
+            
         }
     }
 
