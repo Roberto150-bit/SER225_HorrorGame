@@ -42,6 +42,12 @@ public class MenuScreen extends Screen {
         keyPressTimer = 0;
         menuItemSelected = -1;
         keyLocker.lockKey(Key.SPACE);
+        
+        // Get array of all available font family names
+        String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+        for (int i = 0; i < fontNames.length; i++) {
+            System.out.println(fontNames[i]);
+        }
     }
 
     public void update() {

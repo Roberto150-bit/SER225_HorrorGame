@@ -18,7 +18,6 @@ public class SettingsScreen extends Screen {
 
     public SettingsScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
-        initialize();
     }
 
     @Override
@@ -29,6 +28,10 @@ public class SettingsScreen extends Screen {
         options = new SpriteFont("Developed by Griffin, Hernest, Lauren, and Robert", 130, 121, "Times New Roman", 20, Color.white);
         returnInstructionsLabel = new SpriteFont("Press [ESC] to return to the menu", 20, 532, "Times New Roman", 30, Color.white);
         keyLocker.lockKey(Key.SPACE);
+
+        
+        keyLocker.lockKey(Key.SPACE);
+        
     }
 
     public void update() {
