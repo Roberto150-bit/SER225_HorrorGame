@@ -544,11 +544,6 @@ public abstract class Map {
         return hotbarUI;
     }
 
-    // used when changing maps so the player's held items carry over to the new map
-    public void setHotbarUI(HotbarUI hotbarUI) {
-        this.hotbarUI = hotbarUI;
-    }
-
     // based on the player's current X position (which in a level can potentially be updated each frame),
     // adjust the player's and camera's positions accordingly in order to properly create the map "scrolling" effect
     private void adjustMovementX(Player player) {
