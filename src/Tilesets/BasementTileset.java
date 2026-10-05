@@ -6,17 +6,18 @@ import Engine.ImageLoader;
 import Level.TileType;
 import Level.Tileset;
 import java.util.ArrayList;
+//Its not possible to have a background with less than 9x9 tiles.
 
-//Total number of tiles in the tileset: 14 x 11 = 154
+//Total number of tiles in the tileset: 14 x 7 = 98
 
 public class BasementTileset extends Tileset {
 
     private static final int COLUMNS = 14;
-    private static final int ROWS = 11;
+    private static final int ROWS = 9;
     private static final int TOTAL_TILES = COLUMNS * ROWS;
 
     public BasementTileset() { //32 by 32 pixels, scaled by 3 for a total of 96 by 96 pixels 
-        super(ImageLoader.load("BasementTileset.png"), 32, 32, 2);
+        super(ImageLoader.load("BasementTilesetVersion4_grid.png"), 32, 32, 2);
     }
 
     @Override
@@ -51,6 +52,11 @@ public class BasementTileset extends Tileset {
             if (i < COLUMNS && i % COLUMNS != 0 && i % COLUMNS != COLUMNS - 1) {
                 cornerTiles.add(i);
             }
+            //Specific tiles here:
+            if (i == 43){
+                solidTiles.add(i);
+            }
+
         }
 // need to add        .withBounds(1, 2, 14, 14)
 
