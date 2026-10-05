@@ -7,11 +7,13 @@ import Level.*;
 import NPCs.Bug;
 import NPCs.Dinosaur;
 import NPCs.Walrus;
+import Scripts.DoorScript;
 import Scripts.NoteScript;
 import Scripts.PuzzleScript;
 import Scripts.SimpleTextScript; //---------------------------------------------
 import Scripts.TestMap.*;
 import Tilesets.CommonTileset;
+import Utils.Direction;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -38,6 +40,11 @@ public class TestMap extends Map {
         enhancedMapTiles.add(collectibleObject);
         enhancedMapTiles.add(puzzleObject);
         enhancedMapTiles.add(noteObject);
+
+        // temporary: cellar door leading back to the basement's left door, for testing map transitions
+        CellarDoor cellarDoor = new CellarDoor(getMapTile(22, 19).getLocation());
+        cellarDoor.setInteractScript(new DoorScript(() -> new BasementMap(), 1, 7, Direction.RIGHT));
+        enhancedMapTiles.add(cellarDoor);
 
         return enhancedMapTiles;
     }
