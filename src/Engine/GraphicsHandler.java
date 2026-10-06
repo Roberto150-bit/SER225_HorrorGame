@@ -1,7 +1,6 @@
 package Engine;
 
 import GameObject.ImageEffect;
-
 import java.awt.*;
 import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
@@ -68,7 +67,14 @@ public class GraphicsHandler {
     public void drawString(String text, int x, int y, Font font, Color color) {
         g.setFont(font);
         g.setColor(color);
-        g.drawString(text, x, y);
+        FontMetrics fm = g.getFontMetrics();
+        int lineHeight = fm.getHeight();
+
+        // \R matches \n, \r\n, and \r; -1 keeps trailing empty lines
+        for (String line : text.split("\\R", -1)) {
+            g.drawString(line, x, y);
+            y += lineHeight;
+        }
     }
 
     // https://stackoverflow.com/a/35222059 and https://stackoverflow.com/a/31831120
