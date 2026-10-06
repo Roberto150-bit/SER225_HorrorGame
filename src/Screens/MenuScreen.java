@@ -76,8 +76,6 @@ public class MenuScreen extends Screen {
 
         // sets location for blue square in front of text (pointerLocation) and also sets color of spritefont text based on which menu item is being hovered
         // Original coler values
-        // Selected Color (255, 215, 0)
-        // Non-selected (49, 207, 240)
         if (currentMenuItemHovered == 0) {
             playGame.setColor(new Color(255, 0, 0));
             settings.setColor(new Color(255, 255, 255));
