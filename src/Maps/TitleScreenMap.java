@@ -16,11 +16,17 @@ public class TitleScreenMap extends Map {
 
     public TitleScreenMap() {
         super("title_screen_map.txt", new CommonTileset());
-        Point catLocation = getMapTile(8, 5).getLocation().subtractX(6).subtractY(7);
-        cat = new Sprite(ImageLoader.loadSubImage("Cat.png", Colors.MAGENTA, 0, 0, 24, 24));
+        //Point catLocation = getMapTile(8, 5).getLocation().subtractX(6).subtractY(7);
+        // cat = new Sprite(ImageLoader.loadSubImage("Cat.png", Colors.MAGENTA, 0, 0, 24, 24));
+        // cat.setScale(3);
+        // cat.setImageEffect(ImageEffect.FLIP_HORIZONTAL);
+        // cat.setLocation(catLocation.x, catLocation.y);
+
+        // Dean idle frame (row 8 of Dean.png); the art already faces left so no flip is needed
+        Point deanLocation = getMapTile(8, 5).getLocation().subtractX(24).subtractY(42);
+        cat = new Sprite(ImageLoader.loadSubImage("Dean.png", Colors.MAGENTA, 0, 264, 32, 32));
         cat.setScale(3);
-        cat.setImageEffect(ImageEffect.FLIP_HORIZONTAL);
-        cat.setLocation(catLocation.x, catLocation.y);
+        cat.setLocation(deanLocation.x, deanLocation.y);
     }
 
     @Override

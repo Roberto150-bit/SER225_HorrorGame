@@ -1,7 +1,9 @@
 package Maps;
 
 import Level.*;
+import Scripts.DoorScript;
 import Tilesets.BasementTileset;
+import Utils.Direction;
 
 
 public class BasementMap extends Map {
@@ -17,6 +19,10 @@ public class BasementMap extends Map {
         // TestMap is a placeholder destination until the next room is built
         getMapTile(0, 7).setInteractScript(new DoorScript(() -> new TestMap(), 22, 20, Direction.RIGHT));
         getMapTile(0, 8).setInteractScript(new DoorScript(() -> new TestMap(), 22, 20, Direction.RIGHT));
+
+        // door on the right wall next to the stairs stand on the stairs at (12, 4), face right, and press E to go through
+        // TestMap is a placeholder destination until the next room is built
+        getMapTile(13, 4).setInteractScript(new DoorScript(() -> new TestMap(), 22, 20, Direction.RIGHT));
     }
 
 }
