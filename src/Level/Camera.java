@@ -43,6 +43,10 @@ public class Camera extends Rectangle {
         setZoom(1.0f); // establishes width, height, leftoverSpaceX/Y consistently
     }
 
+    public float getZoom() {
+        return zoom;
+    }
+    
     // Sets zoom and recalculates how many tiles fit on screen at that zoom level ---------------------------------
     public void setZoom(float zoom) {
         this.zoom = zoom;

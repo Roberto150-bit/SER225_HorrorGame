@@ -8,6 +8,7 @@ import Level.*;
 import Maps.TestMap;
 import Players.Cat;
 import Utils.Direction;
+import Lighting.DarknessManager;
 
 // This class is for when the RPG game is actually being played
 public class PlayLevelScreen extends Screen implements GameListener {
@@ -17,6 +18,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
     protected PlayLevelScreenState playLevelScreenState;
     protected WinScreen winScreen;
     protected FlagManager flagManager;
+    private DarknessManager darknessManager;
 
     public PlayLevelScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -52,7 +54,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // preloads all scripts ahead of time rather than loading them dynamically
         // both are supported, however preloading is recommended
         map.preloadScripts();
-
+        
+        darknessManager = new DarknessManager(180.0f);
+    
         winScreen = new WinScreen(this);
     }
 
@@ -63,6 +67,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
             case RUNNING:
                 player.update();
                 map.update(player);
+                darknessManager.update();
                 break;
             // if level has been completed, bring up level cleared screen
             case LEVEL_COMPLETED:
@@ -82,6 +87,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         switch (playLevelScreenState) {
             case RUNNING:
                 map.draw(player, graphicsHandler);
+                darknessManager.draw(graphicsHandler, player, map.getCamera());
                 break;
             case LEVEL_COMPLETED:
                 winScreen.draw(graphicsHandler);
