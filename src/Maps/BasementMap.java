@@ -1,9 +1,11 @@
 package Maps;
 
+import EnhancedMapTiles.CollectibleObject;
 import Level.*;
 import Scripts.DoorScript;
 import Tilesets.BasementTileset;
 import Utils.Direction;
+import java.util.ArrayList;
 
 
 public class BasementMap extends Map {
@@ -11,6 +13,17 @@ public class BasementMap extends Map {
     public BasementMap() {
         super("BasementMap.txt", new BasementTileset());
         this.playerStartPosition = getMapTile(6, 4).getLocation();
+    }
+
+    @Override
+    public ArrayList<EnhancedMapTile> loadEnhancedMapTiles() {
+        ArrayList<EnhancedMapTile> enhancedMapTiles = new ArrayList<>();
+
+        // source images are 256x256, scaled down to 32x32 in the world
+        enhancedMapTiles.add(new CollectibleObject(getMapTile(3, 3).getLocation(), "BloodyEye.gif", 256));
+        enhancedMapTiles.add(new CollectibleObject(getMapTile(9, 6).getLocation(), "ear.png", 256));
+
+        return enhancedMapTiles;
     }
 
     @Override
