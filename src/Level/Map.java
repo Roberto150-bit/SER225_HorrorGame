@@ -649,6 +649,11 @@ public abstract class Map {
         return book.isActive();
     }
 
+    // Allows the game to controle whether the book is open
+    public void setBookOpen(boolean open) {
+        book.setActive(open);
+    }
+
     public Player getPlayer() {
         return this.player;
     }

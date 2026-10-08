@@ -5,6 +5,7 @@ import Level.ScriptState;
 import Puzzles.PuzzleConfig;
 import Puzzles.PuzzleManager;
 import Puzzles.PuzzleResult;
+import Level.PlayerProgressManager;
 
 public class PuzzleScriptAction extends ScriptAction {
 
@@ -28,9 +29,26 @@ public class PuzzleScriptAction extends ScriptAction {
         // Check whether the puzzle has produced a completion result.
         PuzzleResult result = map.getPuzzleUI().takeResult();
 
+
         if (result != null) {
-            PuzzleManager.recordResult(result);
+
+            // Only award XP for a puzzle's first completion.
+            boolean firstCompletion = PuzzleManager.recordResult(result);
+
+            if (firstCompletion) {
+                PlayerProgressManager.awardXP(50);
+
+                System.out.println(
+                    "Puzzle completed! +50 XP | Level: "
+                    + PlayerProgressManager.getLevel()
+                    + " | XP: "
+                    + PlayerProgressManager.getCurrentXP()
+                    + "/"
+                    + PlayerProgressManager.getXPRequired()
+                );
+            }
         }
+
 
         // Keep the interaction active while the UI is open.
         if (map.getPuzzleUI().isOpen()) {

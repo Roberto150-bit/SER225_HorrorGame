@@ -2,18 +2,14 @@ package Screens;
 
 import Engine.GraphicsHandler;
 import Engine.Screen;
-import Engine.ScreenManager;
 import Game.GameState;
 import Game.ScreenCoordinator;
 import Level.*;
+import Lighting.DarknessManager;
 import Maps.BasementMap;
-import Players.Cat;
 import Players.DeanPlayer;
 import Utils.Direction;
 import Utils.Point;
-
-import java.awt.Color;
-import Lighting.DarknessManager;
 
 // This class is for when the RPG game is actually being played
 public class PlayLevelScreen extends Screen implements GameListener {
@@ -32,6 +28,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
     protected Point pendingSpawnPosition;
     protected Direction pendingFacingDirection;
     private DarknessManager darknessManager;
+    
+    // Displays the player's current level and XP.
+    private final LevelProgressHUD levelProgressHUD = new LevelProgressHUD();
 
     public PlayLevelScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -143,6 +142,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // carry shared state (flags, held items, listeners) over to the new map
         pendingMap.setFlagManager(flagManager);
         pendingMap.setHotbarUI(map.getHotbarUI());
+        pendingMap.setBookOpen(false);
         pendingMap.setPlayer(player);
         pendingMap.addListener(this);
 
@@ -166,14 +166,14 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 map.drawWorld(player, graphicsHandler);
                 
                 if (!map.isBookOpen()) {
-                    darknessManager.setTargetRadius(180);
+                    darknessManager.setTargetRadius(180);//180
                     darknessManager.draw(
                             graphicsHandler,
                             player,
                             map.getCamera()
                     );
                 } else {
-                    darknessManager.setTargetRadius(380);
+                    darknessManager.setTargetRadius(500);//originally 380 but changed to 500 to make it easier to see the book
                     darknessManager.draw(
                             graphicsHandler,
                             player,
@@ -182,6 +182,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 }
 
                 map.drawUI(graphicsHandler);
+
+                // Display the XP bar above the game world.
+                levelProgressHUD.draw(graphicsHandler);
 
                 break;
             case LEVEL_COMPLETED:
