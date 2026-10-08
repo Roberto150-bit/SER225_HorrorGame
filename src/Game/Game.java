@@ -1,5 +1,7 @@
 package Game;
 
+import javax.swing.JPanel;
+import javax.swing.ImageIcon;
 import Engine.GameWindow;
 import Engine.ScreenManager;
 
@@ -16,6 +18,8 @@ public class Game {
 
     public Game() {
         GameWindow gameWindow = new GameWindow();
+        ImageIcon darkForest = new ImageIcon("src/Resources/dark_forest.webp");
+
         ScreenManager screenManager = gameWindow.getScreenManager();
         screenManager.setCurrentScreen(new ScreenCoordinator());
         gameWindow.startGame();

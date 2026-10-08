@@ -23,11 +23,8 @@ public class MenuScreen extends Screen {
     protected Map background;
     protected int keyPressTimer;
     protected int pointerLocationX, pointerLocationY;
-    protected KeyLocker keyLocker = new KeyLocker(); //FontFormatException 
+    protected KeyLocker keyLocker = new KeyLocker(); 
     
-    
-
-
     public MenuScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
     }
@@ -41,13 +38,13 @@ public class MenuScreen extends Screen {
             playGame = new SpriteFont("PLAY GAME", 200, 123, secretSolver, new Color(49, 207, 240));
             settings = new SpriteFont("SETTINGS", 200, 223, secretSolver, new Color(49, 207, 240));
             credits = new SpriteFont("CREDITS", 200, 323, secretSolver, new Color(49, 207, 240));
-        } catch (IOException | FontFormatException e) {
+        } catch (IOException | FontFormatException | NullPointerException e) {
             System.out.println("ERROR: TEXT FILE NOT FOUND");
         }
         
         playGame.setOutlineColor(Color.black);
         playGame.setOutlineThickness(3);
-        
+
         settings.setOutlineColor(Color.black);
         settings.setOutlineThickness(3);
         

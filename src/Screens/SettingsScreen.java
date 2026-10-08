@@ -8,6 +8,9 @@ import Level.Map;
 import Maps.TitleScreenMap;
 import SpriteFont.SpriteFont;
 import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 public class SettingsScreen extends Screen {
     protected ScreenCoordinator screenCoordinator;
@@ -29,14 +32,21 @@ public class SettingsScreen extends Screen {
     public void initialize() {
         background = new TitleScreenMap();
         background.setAdjustCamera(false);
-        settingsLabel = new SpriteFont("Settings", 350, 25, "Chalkduster", 30, Color.white);
-        options = new SpriteFont("Movement", 130, 120, "Chalkduster", 30, Color.white);
-        walkForward = new SpriteFont("Keybind: W", 130, 170, "Chalkduster", 30, Color.white);
-        walkLeft = new SpriteFont("Keybind: A", 130, 220, "Chalkduster", 30, Color.white);
-        walkRight = new SpriteFont("Keybind: D", 130, 270, "Chalkduster", 30, Color.white);
-        walkBehind = new SpriteFont("Keybind: D", 130, 320, "Chalkduster", 30, Color.white);
-        returnInstructionsLabel = new SpriteFont("Press [ESC] to return to the menu", 20, 532, "Chalkduster", 30, Color.white);
-        keyLocker.lockKey(Key.SPACE);
+        try {
+            Font secretSolver = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(new File("src/Resources/secret_solver.ttf"))).deriveFont(50f);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(secretSolver);
+            settingsLabel = new SpriteFont("Settings", 350, 25, secretSolver, Color.white);
+            options = new SpriteFont("Movement", 130, 120, secretSolver, Color.white);
+            walkForward = new SpriteFont("Keybind: W", 130, 170, secretSolver, Color.white);
+            walkLeft = new SpriteFont("Keybind: A", 130, 220, secretSolver, Color.white);
+            walkRight = new SpriteFont("Keybind: S", 130, 270, secretSolver, Color.white);
+            walkBehind = new SpriteFont("Keybind: D", 130, 320, secretSolver, Color.white);
+            returnInstructionsLabel = new SpriteFont("Press [ESC] to return to the menu", 20, 532, secretSolver, Color.white);
+            keyLocker.lockKey(Key.SPACE);
+        } catch(IOException | FontFormatException e) {
+            System.out.println("ERROR: SETTINGS FONT NOT FOUND");
+        }
     }
 
     public void update() {
