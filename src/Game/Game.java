@@ -21,3 +21,7 @@ public class Game {
         gameWindow.startGame();
     }
 }
+//
+
+// I will excercise at the gym twice a week
+// I will not buy candy as a snack for the next 2 weeks
