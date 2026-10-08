@@ -1,7 +1,13 @@
 {
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "type": "java",
+            "name": "Game",
+            "request": "launch",
+            "mainClass": "Game.Game",
+            "projectName": "SER-225-Game-RPG_268fd107"
+        },
         {
             "type": "java",
             "name": "MapEditor",
@@ -9,7 +15,6 @@
             "mainClass": "MapEditor.MapEditor",
             "projectName": "SER225_HorrorGame_3b632c40"
         },
-      
         {
             "type": "java",
             "name": "Launch Game",

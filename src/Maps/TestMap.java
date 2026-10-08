@@ -9,7 +9,7 @@ import NPCs.Dinosaur;
 import NPCs.Walrus;
 import Scripts.DoorScript;
 import Scripts.NoteScript;
-import Scripts.PuzzleScript;
+// import Scripts.PuzzleScript;
 import Scripts.SimpleTextScript; //---------------------------------------------
 import Scripts.TestMap.*;
 import Tilesets.CommonTileset;
@@ -29,16 +29,16 @@ public class TestMap extends Map {
     public ArrayList<EnhancedMapTile> loadEnhancedMapTiles() {
         ArrayList<EnhancedMapTile> enhancedMapTiles = new ArrayList<>();
 
-        PuzzleObject puzzleObject = new PuzzleObject(getMapTile(2, 7).getLocation());// --------------------------------
+        // PuzzleObject puzzleObject = new PuzzleObject(getMapTile(2, 7).getLocation());// --------------------------------
         NoteObject noteObject = new NoteObject(getMapTile(4, 7).getLocation());// --------------------------------
         CollectibleObject collectibleObject = new CollectibleObject(getMapTile(6, 7).getLocation());
         noteObject.setIsUncollidable(true);
 
         BufferedImage noteItemImage = ImageLoader.load("Note.png");
         noteObject.setInteractScript(new NoteScript(noteItemImage));
-        puzzleObject.setInteractScript(new PuzzleScript());
+        // puzzleObject.setInteractScript(new PuzzleScript());
         enhancedMapTiles.add(collectibleObject);
-        enhancedMapTiles.add(puzzleObject);
+        // enhancedMapTiles.add(puzzleObject);
         enhancedMapTiles.add(noteObject);
 
         // temporary: cellar door leading back to the basement's left door, for testing map transitions
