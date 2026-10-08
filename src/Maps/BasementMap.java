@@ -28,30 +28,39 @@ public class BasementMap extends Map {
         enhancedMapTiles.add(new CollectibleObject(getMapTile(3, 3).getLocation(), "BloodyEye.gif", 256));
         enhancedMapTiles.add(new CollectibleObject(getMapTile(9, 6).getLocation(), "ear.png", 256));
 
-        
-        // Configuration for the first basement puzzle.
+
         PuzzleConfig symbolConfig = new PuzzleConfig(
             "basement_fuse_01",
             PuzzleId.SYMBOL_LOCK,
             PuzzleDifficulty.EASY
         );
 
-        // Creates the puzzle object and assigns its configuration.
         PuzzleObject symbolLock = new PuzzleObject(
             getMapTile(2, 7).getLocation()
         );
 
-        // Configuration for the basement radio puzzle.
         PuzzleConfig radioConfig = new PuzzleConfig(
             "basement_radio_01",
             PuzzleId.TUNE_RADIO,
             PuzzleDifficulty.EASY
         );
 
-        // Add a second interactable object for Tune Radio.
         PuzzleObject radioObject = new PuzzleObject(
             getMapTile(4, 7).getLocation()
         );
+
+        PuzzleConfig clockConfig = new PuzzleConfig(
+            "basement_clock_01",
+            PuzzleId.HAUNTED_CLOCK,
+            PuzzleDifficulty.EASY
+        );
+
+        PuzzleObject clockObject = new PuzzleObject(
+            getMapTile(6, 7).getLocation()
+        );
+
+        clockObject.setInteractScript(new PuzzleScript(clockConfig));
+        enhancedMapTiles.add(clockObject);
 
         radioObject.setInteractScript(new PuzzleScript(radioConfig));
         enhancedMapTiles.add(radioObject);
