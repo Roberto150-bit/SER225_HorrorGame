@@ -2,11 +2,17 @@ package Engine;
 
 import java.awt.Color;
 import java.awt.Font;
+import Puzzles.PuzzleConfig;
+import Puzzles.PuzzleResult;
 
 public class PuzzleUI {
     
     private boolean isOpen = false;
     private boolean solved = false;
+
+    // Stores the configuration of the currently opened puzzle.
+    private PuzzleConfig currentPuzzle;
+    private PuzzleResult pendingResult;
 
     private int x = 150;
     private int y = 100;
@@ -28,6 +34,39 @@ public class PuzzleUI {
         isOpen = true;
         Mouse.showCursor();
     }
+
+    // Opens a specific puzzle using its configuration.
+    public void open(PuzzleConfig config) {
+        if (config == null) {
+            throw new IllegalArgumentException("Puzzle config cannot be null");
+        }
+
+        currentPuzzle = config;
+        pendingResult = null;
+        open();
+    }
+
+    // Returns the configuration of the currently selected puzzle.
+    public PuzzleConfig getCurrentPuzzle() {
+        return currentPuzzle;
+    }
+
+    
+    // Called only after the player actually solves a minigame.
+    public void completePuzzle() {
+        if (isOpen && currentPuzzle != null && pendingResult == null) {
+            pendingResult = new PuzzleResult(currentPuzzle, true);
+            solved = true;
+        }
+    }
+
+    // Returns the completed result once, then clears it.
+    public PuzzleResult takeResult() {
+        PuzzleResult result = pendingResult;
+        pendingResult = null;
+        return result;
+    }
+
 
     public void close() {
         isOpen = false;

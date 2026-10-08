@@ -6,6 +6,11 @@ import Scripts.DoorScript;
 import Tilesets.BasementTileset;
 import Utils.Direction;
 import java.util.ArrayList;
+import EnhancedMapTiles.PuzzleObject;
+import Scripts.PuzzleScript;
+import Puzzles.PuzzleConfig;
+import Puzzles.PuzzleId;
+import Puzzles.PuzzleDifficulty;
 
 
 public class BasementMap extends Map {
@@ -22,6 +27,22 @@ public class BasementMap extends Map {
         // source images are 256x256, scaled down to 32x32 in the world
         enhancedMapTiles.add(new CollectibleObject(getMapTile(3, 3).getLocation(), "BloodyEye.gif", 256));
         enhancedMapTiles.add(new CollectibleObject(getMapTile(9, 6).getLocation(), "ear.png", 256));
+
+        
+        // Configuration for the first basement puzzle.
+        PuzzleConfig config = new PuzzleConfig(
+            "basement_fuse_01",
+            PuzzleId.RESTORE_POWER,
+            PuzzleDifficulty.EASY
+        );
+
+        // Creates the puzzle object and assigns its configuration.
+        PuzzleObject puzzleObject = new PuzzleObject(
+            getMapTile(2, 7).getLocation()
+        );
+
+        puzzleObject.setInteractScript(new PuzzleScript(config));
+        enhancedMapTiles.add(puzzleObject);
 
         return enhancedMapTiles;
     }
