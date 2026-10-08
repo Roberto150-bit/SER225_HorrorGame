@@ -27,7 +27,7 @@ public class BasementMap extends Map {
         // source images are 256x256, scaled down to 32x32 in the world
         enhancedMapTiles.add(new CollectibleObject(getMapTile(3, 3).getLocation(), "BloodyEye.gif", 256));
         enhancedMapTiles.add(new CollectibleObject(getMapTile(9, 6).getLocation(), "ear.png", 256));
-
+        enhancedMapTiles.add(new CollectibleObject(getMapTile(11, 6).getLocation(), "crucifix.gif", 256));
 
         PuzzleConfig symbolConfig = new PuzzleConfig(
             "basement_fuse_01",
