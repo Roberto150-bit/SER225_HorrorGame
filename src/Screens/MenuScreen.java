@@ -7,6 +7,10 @@ import Level.Map;
 import Maps.TitleScreenMap;
 import SpriteFont.SpriteFont;
 import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 // This is the class for the main menu screen
 public class MenuScreen extends Screen {
@@ -19,7 +23,10 @@ public class MenuScreen extends Screen {
     protected Map background;
     protected int keyPressTimer;
     protected int pointerLocationX, pointerLocationY;
-    protected KeyLocker keyLocker = new KeyLocker();
+    protected KeyLocker keyLocker = new KeyLocker(); //FontFormatException 
+    
+    
+
 
     public MenuScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -27,13 +34,23 @@ public class MenuScreen extends Screen {
 
     @Override
     public void initialize() {
-        playGame = new SpriteFont("PLAY GAME", 200, 123, "Zapfino", 30, new Color(49, 207, 240));
+        try {
+            Font secretSolver = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(new File("src/Resources/secret_solver.ttf"))).deriveFont(50f);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            ge.registerFont(secretSolver);
+            playGame = new SpriteFont("PLAY GAME", 200, 123, secretSolver, new Color(49, 207, 240));
+            settings = new SpriteFont("SETTINGS", 200, 223, secretSolver, new Color(49, 207, 240));
+            credits = new SpriteFont("CREDITS", 200, 323, secretSolver, new Color(49, 207, 240));
+        } catch (IOException | FontFormatException e) {
+            System.out.println("ERROR: TEXT FILE NOT FOUND");
+        }
+        
         playGame.setOutlineColor(Color.black);
         playGame.setOutlineThickness(3);
-        settings = new SpriteFont("SETTINGS", 200, 223, "Chalkduster", 30, new Color(49, 207, 240));
+        
         settings.setOutlineColor(Color.black);
         settings.setOutlineThickness(3);
-        credits = new SpriteFont("CREDITS", 200, 323, "Chalkduster", 30, new Color(49, 207, 240));
+        
         credits.setOutlineColor(Color.black);
         credits.setOutlineThickness(3);
         
