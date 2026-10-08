@@ -71,6 +71,21 @@ public class BasementMap extends Map {
             getMapTile(8, 7).getLocation()
         );
 
+        // Configuration for the basement Spirit Mirror puzzle.
+        PuzzleConfig mirrorConfig = new PuzzleConfig(
+            "basement_mirror_01",
+            PuzzleId.SPIRIT_MIRROR,
+            PuzzleDifficulty.EASY
+        );
+
+        // Temporary interactable object for Spirit Mirror.
+        PuzzleObject mirrorObject = new PuzzleObject(
+            getMapTile(10, 7).getLocation()
+        );
+
+        mirrorObject.setInteractScript(new PuzzleScript(mirrorConfig));
+        enhancedMapTiles.add(mirrorObject);
+
         ritualObject.setInteractScript(new PuzzleScript(ritualConfig));
         enhancedMapTiles.add(ritualObject);
 
