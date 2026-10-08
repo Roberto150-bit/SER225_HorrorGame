@@ -18,6 +18,7 @@ public class Keyboard {
 
 	// maps a Key enum type to its key code
 	private static final EnumMap<Key, Integer> keyMap = buildKeyMap();
+	private static volatile Key lastPressedKey;
 
 	private static final KeyListener keyListener = new KeyListener() {
         @Override
@@ -27,6 +28,16 @@ public class Keyboard {
         public void keyPressed(KeyEvent e) {
         	// when key is pressed, set its keyDown state to true and its keyUp state to false
             int keyCode = e.getKeyCode();
+
+			if (!keyDown.getOrDefault(keyCode, false)) {
+				for (Key key : Key.values()) {
+					if (keyMap.get(key) == keyCode) {
+						lastPressedKey = key;
+						break;
+					}
+				}
+			}
+
             keyDown.put(keyCode, true);
             keyUp.put(keyCode, false);
         }
@@ -45,6 +56,16 @@ public class Keyboard {
     
     public static KeyListener getKeyListener() {
     	return keyListener;
+    }
+
+	// Clear stale key events before beginning to listen for a new binding.
+    public static void clearLastPressedKey() { lastPressedKey = null; }
+
+    // Read the most recent NEW keypress, then consume it.
+    public static Key pollLastPressedKey() {
+        Key key = lastPressedKey;
+        lastPressedKey = null;
+        return key;
     }
 
     // returns if a key is currently being pressed
