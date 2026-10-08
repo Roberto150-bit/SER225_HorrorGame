@@ -7,7 +7,6 @@ import GameObject.Frame;
 import GameObject.ImageEffect;
 import Level.TileType;
 import Level.Tileset;
-
 import java.util.ArrayList;
 
 // This class represents a "common" tileset of standard tiles defined in the CommonTileset.png file
@@ -33,7 +32,7 @@ public class CommonTileset extends Tileset {
         // sign
         Frame signFrame = new FrameBuilder(getSubImage(3, 0))
                 .withScale(tileScale)
-                .withBounds(1, 2, 14, 14)
+                .withBounds(4, 4, 1, 12)
                 .build();
 
         MapTileBuilder signTile = new MapTileBuilder(signFrame)

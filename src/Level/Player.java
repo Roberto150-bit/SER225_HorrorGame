@@ -28,6 +28,10 @@ public abstract class Player extends GameObject {
     protected Direction facingDirection;
     protected Direction lastMovementDirection;
 
+    // which way the player is drawn facing -- unlike facingDirection this can also be UP or DOWN
+    // only used for animations, so characters without UP/DOWN animations (like Cat) behave the same as before
+    protected Direction animationDirection;
+
     // Keybinds for the player
     protected KeyLocker keyLocker = new KeyLocker();
 
@@ -48,6 +52,7 @@ public abstract class Player extends GameObject {
     public Player(SpriteSheet spriteSheet, float x, float y, String startingAnimationName) {
         super(spriteSheet, x, y, startingAnimationName);
         facingDirection = Direction.RIGHT;
+        animationDirection = Direction.RIGHT;
         playerState = PlayerState.STANDING;
         previousPlayerState = playerState;
         this.affectedByTriggers = true;
@@ -148,6 +153,14 @@ public abstract class Player extends GameObject {
             lastWalkingYDirection = Direction.NONE;
         }
 
+        // walking straight up or down shows the UP/DOWN animations, anything with a left/right component shows LEFT/RIGHT
+        if (currentWalkingXDirection != Direction.NONE) {
+            animationDirection = currentWalkingXDirection;
+        }
+        else if (currentWalkingYDirection != Direction.NONE) {
+            animationDirection = currentWalkingYDirection;
+        }
+
         if ((currentWalkingYDirection == Direction.UP || currentWalkingYDirection == Direction.DOWN) && currentWalkingXDirection == Direction.NONE) {
             lastWalkingXDirection = Direction.NONE;
         }
@@ -167,12 +180,26 @@ public abstract class Player extends GameObject {
     protected void handlePlayerAnimation() {
         if (playerState == PlayerState.STANDING) {
             // sets animation to a STAND animation based on which way player is facing
-            this.currentAnimationName = facingDirection == Direction.RIGHT ? "STAND_RIGHT" : "STAND_LEFT";
+            // this.currentAnimationName = facingDirection == Direction.RIGHT ? "STAND_RIGHT" : "STAND_LEFT";
+            this.currentAnimationName = getDirectionalAnimationName("STAND");
         }
         else if (playerState == PlayerState.WALKING) {
             // sets animation to a WALK animation based on which way player is facing
-            this.currentAnimationName = facingDirection == Direction.RIGHT ? "WALK_RIGHT" : "WALK_LEFT";
+            // this.currentAnimationName = facingDirection == Direction.RIGHT ? "WALK_RIGHT" : "WALK_LEFT";
+            this.currentAnimationName = getDirectionalAnimationName("WALK");
         }
+    }
+
+    // returns e.g. "STAND_UP" when the player is drawn facing up and this character has that animation
+    // otherwise falls back to the original LEFT/RIGHT behavior based on facingDirection
+    protected String getDirectionalAnimationName(String action) {
+        if (animationDirection == Direction.UP && animations.containsKey(action + "_UP")) {
+            return action + "_UP";
+        }
+        if (animationDirection == Direction.DOWN && animations.containsKey(action + "_DOWN")) {
+            return action + "_DOWN";
+        }
+        return facingDirection == Direction.RIGHT ? action + "_RIGHT" : action + "_LEFT";
     }
 
     @Override
@@ -195,6 +222,7 @@ public abstract class Player extends GameObject {
 
     public void setFacingDirection(Direction facingDirection) {
         this.facingDirection = facingDirection;
+        this.animationDirection = facingDirection;
     }
 
     public Rectangle getInteractionRange() {
@@ -215,19 +243,22 @@ public abstract class Player extends GameObject {
     public void lock() {
         isLocked = true;
         playerState = PlayerState.STANDING;
-        this.currentAnimationName = facingDirection == Direction.RIGHT ? "STAND_RIGHT" : "STAND_LEFT";
+        // this.currentAnimationName = facingDirection == Direction.RIGHT ? "STAND_RIGHT" : "STAND_LEFT";
+        this.currentAnimationName = getDirectionalAnimationName("STAND");
     }
 
     public void unlock() {
         isLocked = false;
         playerState = PlayerState.STANDING;
-        this.currentAnimationName = facingDirection == Direction.RIGHT ? "STAND_RIGHT" : "STAND_LEFT";
+        // this.currentAnimationName = facingDirection == Direction.RIGHT ? "STAND_RIGHT" : "STAND_LEFT";
+        this.currentAnimationName = getDirectionalAnimationName("STAND");
     }
 
     // used by other files or scripts to force player to stand
     public void stand(Direction direction) {
         playerState = PlayerState.STANDING;
         facingDirection = direction;
+        animationDirection = direction;
         if (direction == Direction.RIGHT) {
             this.currentAnimationName = "STAND_RIGHT";
         }
@@ -240,6 +271,7 @@ public abstract class Player extends GameObject {
     public void walk(Direction direction, float speed) {
         playerState = PlayerState.WALKING;
         facingDirection = direction;
+        animationDirection = direction;
         if (direction == Direction.RIGHT) {
             this.currentAnimationName = "WALK_RIGHT";
         }

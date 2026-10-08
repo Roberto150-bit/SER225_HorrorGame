@@ -40,7 +40,7 @@ public class Camera extends Rectangle {
         this.map = map;
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
-        setZoom(1.0f); // establishes width, height, leftoverSpaceX/Y consistently
+        setZoom(1.5f); // establishes width, height, leftoverSpaceX/Y consistently
     }
 
     public float getZoom() {

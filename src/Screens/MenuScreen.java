@@ -27,7 +27,7 @@ public class MenuScreen extends Screen {
 
     @Override
     public void initialize() {
-        playGame = new SpriteFont("PLAY GAME", 200, 123, "Chalkduster", 30, new Color(49, 207, 240));
+        playGame = new SpriteFont("PLAY GAME", 200, 123, "Zapfino", 30, new Color(49, 207, 240));
         playGame.setOutlineColor(Color.black);
         playGame.setOutlineThickness(3);
         settings = new SpriteFont("SETTINGS", 200, 223, "Chalkduster", 30, new Color(49, 207, 240));
@@ -42,12 +42,12 @@ public class MenuScreen extends Screen {
         keyPressTimer = 0;
         menuItemSelected = -1;
         keyLocker.lockKey(Key.SPACE);
-        
-        // Get array of all available font family names
-        String[] fontNames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-        for (int i = 0; i < fontNames.length; i++) {
-            System.out.println(fontNames[i]);
+        /* 
+        String[] fontNsames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
+        for (String fontName : fontNsames) {
+            System.out.println(fontName);
         }
+        */
     }
 
     public void update() {
@@ -76,8 +76,6 @@ public class MenuScreen extends Screen {
 
         // sets location for blue square in front of text (pointerLocation) and also sets color of spritefont text based on which menu item is being hovered
         // Original coler values
-        // Selected Color (255, 215, 0)
-        // Non-selected (49, 207, 240)
         if (currentMenuItemHovered == 0) {
             playGame.setColor(new Color(255, 0, 0));
             settings.setColor(new Color(255, 255, 255));

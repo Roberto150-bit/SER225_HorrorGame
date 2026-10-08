@@ -15,7 +15,8 @@ public class UI {
 
     public void draw(GraphicsHandler graphicsHandler) {
         if (book.isActive()) {            
-            graphicsHandler.drawString("A spooky book", 140,100, arial_40, Color.black);
+            graphicsHandler.drawString("WASD to Move \nSPACE to Continue\nE to Interact \nC to Open/Close Journal", 120,100, arial_40, Color.black);
+            
         }
     }
 

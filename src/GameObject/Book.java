@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
 public class Book {
 
     private BufferedImage image;
-    private boolean isActive;
+    private boolean isActive = true;
     private Key interactKey = Key.C; // key to interact with the book
     private KeyLocker keyLocker = new KeyLocker();
 
@@ -38,7 +38,7 @@ public class Book {
         loadFrames("src/Resources/BookFramesPNG/Intensity", FRAME_COUNT);        buildPingPongOrder();
     }
 
-    // Goes through images 1,2,3,4,5,6,7,8,7,6,5,4,3,2,1 for animation
+    // Goes through images 1,2,3,4,5,6,7,6,5,4,3,2,1 for animation
     private void buildPingPongOrder() {
         playOrder.clear();
         for (int i = 0; i < frames.size(); i++) {
@@ -114,7 +114,3 @@ public class Book {
 
 
 }
-
-    
-
-

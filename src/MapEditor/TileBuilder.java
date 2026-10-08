@@ -1,14 +1,14 @@
 package MapEditor;
 
+import Builders.MapTileBuilder;
 import Engine.GraphicsHandler;
 import Level.*;
 import Utils.Colors;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
+import javax.swing.*;
 
 public class TileBuilder extends JPanel {
     private Map map;
@@ -110,7 +110,7 @@ public class TileBuilder extends JPanel {
         graphicsHandler.setGraphics((Graphics2D) g);
         draw();
     }
-
+    /* 
     public void tileSelected(Point selectedPoint) {
         int selectedTileIndex = getSelectedTileIndex(selectedPoint);
         if (selectedTileIndex != -1) {
@@ -119,6 +119,25 @@ public class TileBuilder extends JPanel {
             newMapTile.setMap(map);
             map.getMapTiles()[selectedTileIndex] = newMapTile;
 
+        }
+        repaint();
+    }
+    */
+    public void tileSelected(Point selectedPoint) {
+        int selectedTileIndex = getSelectedTileIndex(selectedPoint);
+        System.out.println("map slot=" + selectedTileIndex
+                + ", picker index=" + controlPanelHolder.getSelectedTileIndex());
+        if (selectedTileIndex != -1) {
+            MapTile oldMapTile = map.getMapTiles()[selectedTileIndex];
+            MapTileBuilder builder = map.getTileset().getTile(controlPanelHolder.getSelectedTileIndex());
+            System.out.println("builder=" + builder);
+            MapTile newMapTile = builder.build(oldMapTile.getX(), oldMapTile.getY());
+            newMapTile.setMap(map);
+            map.getMapTiles()[selectedTileIndex] = newMapTile;
+            MapTile check = map.getMapTiles()[selectedTileIndex];
+            System.out.println("stored index=" + check.getTileIndex()
+                    + " x=" + check.getX() + " y=" + check.getY()
+                    + " w=" + check.getWidth() + " h=" + check.getHeight());
         }
         repaint();
     }
