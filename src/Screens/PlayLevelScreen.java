@@ -28,6 +28,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
     protected Point pendingSpawnPosition;
     protected Direction pendingFacingDirection;
     private DarknessManager darknessManager;
+    
+    // Displays the player's current level and XP.
+    private final LevelProgressHUD levelProgressHUD = new LevelProgressHUD();
 
     public PlayLevelScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -178,6 +181,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 }
 
                 map.drawUI(graphicsHandler);
+
+                // Display the XP bar above the game world.
+                levelProgressHUD.draw(graphicsHandler);
 
                 break;
             case LEVEL_COMPLETED:

@@ -12,10 +12,19 @@ public class LevelProgressHUD {
     private static final int WIDTH = 180;
     private static final int HEIGHT = 12;
 
+    private int lastDisplayedLevel = PlayerProgressManager.getLevel();
+    private long levelUpTime = 0;
+    private static final long NOTIFICATION_DURATION = 2500;
+
     // Draw the player's current level and XP progress.
     public void draw(GraphicsHandler graphicsHandler) {
 
         int level = PlayerProgressManager.getLevel();
+        if (level > lastDisplayedLevel) {
+            levelUpTime = System.currentTimeMillis();
+        }
+
+        lastDisplayedLevel = level;
         int currentXP = PlayerProgressManager.getCurrentXP();
         int requiredXP = PlayerProgressManager.getXPRequired();
 
@@ -56,5 +65,14 @@ public class LevelProgressHUD {
             X, Y + 25, WIDTH, HEIGHT,
             new Color(195, 165, 205)
         );
+
+        if (System.currentTimeMillis() - levelUpTime < NOTIFICATION_DURATION) {
+            graphicsHandler.drawString(
+                "LEVEL UP!  LEVEL " + level,
+                X, Y + 70,
+                new Font("Serif", Font.BOLD, 22),
+                new Color(230, 190, 130)
+            );
+        }
     }
 }
