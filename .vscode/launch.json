@@ -3,6 +3,48 @@
     "configurations": [
         {
             "type": "java",
+            "name": "PlayerProgressTest",
+            "request": "launch",
+            "mainClass": "Level.PlayerProgressTest",
+            "projectName": "SER-225-Game-RPG_268fd107"
+        },
+        {
+            "type": "java",
+            "name": "SpiritMirrorLogicTest",
+            "request": "launch",
+            "mainClass": "Puzzles.SpiritMirrorLogicTest",
+            "projectName": "SER-225-Game-RPG_268fd107"
+        },
+        {
+            "type": "java",
+            "name": "RitualSequenceLogicTest",
+            "request": "launch",
+            "mainClass": "Puzzles.RitualSequenceLogicTest",
+            "projectName": "SER-225-Game-RPG_268fd107"
+        },
+        {
+            "type": "java",
+            "name": "HauntedClockLogicTest",
+            "request": "launch",
+            "mainClass": "Puzzles.HauntedClockLogicTest",
+            "projectName": "SER-225-Game-RPG_268fd107"
+        },
+        {
+            "type": "java",
+            "name": "TuneRadioLogicTest",
+            "request": "launch",
+            "mainClass": "Puzzles.TuneRadioLogicTest",
+            "projectName": "SER-225-Game-RPG_268fd107"
+        },
+        {
+            "type": "java",
+            "name": "SymbolLockLogicTest",
+            "request": "launch",
+            "mainClass": "Puzzles.SymbolLockLogicTest",
+            "projectName": "SER-225-Game-RPG_268fd107"
+        },
+        {
+            "type": "java",
             "name": "Game",
             "request": "launch",
             "mainClass": "Game.Game",
