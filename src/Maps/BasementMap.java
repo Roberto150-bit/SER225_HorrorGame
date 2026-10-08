@@ -32,7 +32,7 @@ public class BasementMap extends Map {
         // Configuration for the first basement puzzle.
         PuzzleConfig config = new PuzzleConfig(
             "basement_fuse_01",
-            PuzzleId.RESTORE_POWER,
+            PuzzleId.SYMBOL_LOCK,
             PuzzleDifficulty.EASY
         );
 
