@@ -16,6 +16,9 @@ public class HotbarUI {
 
     private BufferedImage[] itemImages = new BufferedImage[3]; 
 
+    private BufferedImage[][] itemFrames = new BufferedImage[3][]; // animation frames, null for static items
+    private int[] frameDelays = new int[3]; // milliseconds per frame
+
     private int[]xSlots = {0, 65, 130}; // X positions for each slot
 
     private int ySlot = 500; // Y position for all slots
@@ -60,9 +63,23 @@ public class HotbarUI {
         return false; // hotbar full
     }
 
+    // adds an item that animates while in the hotbar
+    public boolean addAnimatedItem(BufferedImage[] frames, int frameDelay) {
+        for (int i = 0; i < itemImages.length; i++) {
+            if (itemImages[i] == null) {
+                itemImages[i] = frames[0];
+                itemFrames[i] = frames;
+                frameDelays[i] = frameDelay;
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void removeItem(int slotIndex) {
         if (slotIndex >= 0 && slotIndex < itemImages.length) {
             itemImages[slotIndex] = null;
+            itemFrames[slotIndex] = null;
         }
     }
 
@@ -82,7 +99,12 @@ public class HotbarUI {
             //}
             // draw the item on top, if this slot has one
             if (itemImages[i] != null) {
-                graphicsHandler.drawImage(itemImages[i], xSlots[i], ySlot, 60, 60);
+                BufferedImage image = itemImages[i];
+                if (itemFrames[i] != null) {
+                    int frame = (int) ((System.currentTimeMillis() / frameDelays[i]) % itemFrames[i].length);
+                    image = itemFrames[i][frame];
+                }
+                graphicsHandler.drawImage(image, xSlots[i], ySlot, 60, 60);
             }
         }
 
