@@ -9,6 +9,11 @@ public class PuzzleFactory {
     // Associates each puzzle type with its creation method.
     private static final Map<PuzzleId, Function<PuzzleConfig, PuzzleMinigame>>
             puzzleTypes = new EnumMap<>(PuzzleId.class);
+    
+    // Register available puzzle minigames.
+    static {
+        register(PuzzleId.SYMBOL_LOCK, SymbolLockMinigame::new);
+    }
 
     // Registers how a particular minigame should be created.
     public static void register(

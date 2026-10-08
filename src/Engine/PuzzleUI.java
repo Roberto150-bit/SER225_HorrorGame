@@ -8,6 +8,8 @@ import Puzzles.PuzzleResult;
 import Puzzles.PuzzleController;
 import Puzzles.PuzzleFactory;
 import Puzzles.PuzzleManager;
+import Puzzles.PuzzleId;
+import Puzzles.PuzzleAssets;
 
 public class PuzzleUI {
     
@@ -54,6 +56,13 @@ public class PuzzleUI {
         pendingResult = null;
         backgroundImage = null;
         controller = null;
+
+        // Load the custom artwork for Symbol Lock puzzles.
+        if (config.getPuzzleType() == PuzzleId.SYMBOL_LOCK) {
+            backgroundImage = PuzzleAssets.get(
+                "SymbolLock/symbol_lock_panel.png"
+            );
+        }
 
         // Check whether this specific puzzle was solved before.
         alreadyCompleted = PuzzleManager.isCompleted(
