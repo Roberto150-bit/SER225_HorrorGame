@@ -30,19 +30,34 @@ public class BasementMap extends Map {
 
         
         // Configuration for the first basement puzzle.
-        PuzzleConfig config = new PuzzleConfig(
+        PuzzleConfig symbolConfig = new PuzzleConfig(
             "basement_fuse_01",
             PuzzleId.SYMBOL_LOCK,
             PuzzleDifficulty.EASY
         );
 
         // Creates the puzzle object and assigns its configuration.
-        PuzzleObject puzzleObject = new PuzzleObject(
+        PuzzleObject symbolLock = new PuzzleObject(
             getMapTile(2, 7).getLocation()
         );
 
-        puzzleObject.setInteractScript(new PuzzleScript(config));
-        enhancedMapTiles.add(puzzleObject);
+        // Configuration for the basement radio puzzle.
+        PuzzleConfig radioConfig = new PuzzleConfig(
+            "basement_radio_01",
+            PuzzleId.TUNE_RADIO,
+            PuzzleDifficulty.EASY
+        );
+
+        // Add a second interactable object for Tune Radio.
+        PuzzleObject radioObject = new PuzzleObject(
+            getMapTile(4, 7).getLocation()
+        );
+
+        radioObject.setInteractScript(new PuzzleScript(radioConfig));
+        enhancedMapTiles.add(radioObject);
+
+        symbolLock.setInteractScript(new PuzzleScript(symbolConfig));
+        enhancedMapTiles.add(symbolLock);
 
         return enhancedMapTiles;
     }

@@ -13,6 +13,7 @@ public class PuzzleFactory {
     // Register available puzzle minigames.
     static {
         register(PuzzleId.SYMBOL_LOCK, SymbolLockMinigame::new);
+        register(PuzzleId.TUNE_RADIO, TuneRadioMinigame::new);
     }
 
     // Registers how a particular minigame should be created.
