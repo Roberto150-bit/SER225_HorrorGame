@@ -58,6 +58,22 @@ public class BasementMap extends Map {
         PuzzleObject clockObject = new PuzzleObject(
             getMapTile(6, 7).getLocation()
         );
+        
+        // Configuration for the basement Ritual Sequence puzzle.
+        PuzzleConfig ritualConfig = new PuzzleConfig(
+            "basement_ritual_01",
+            PuzzleId.RITUAL_SEQUENCE,
+            PuzzleDifficulty.EASY
+        );
+
+        // Temporary interactable object for Ritual Sequence.
+        PuzzleObject ritualObject = new PuzzleObject(
+            getMapTile(8, 7).getLocation()
+        );
+
+        ritualObject.setInteractScript(new PuzzleScript(ritualConfig));
+        enhancedMapTiles.add(ritualObject);
+
 
         clockObject.setInteractScript(new PuzzleScript(clockConfig));
         enhancedMapTiles.add(clockObject);
