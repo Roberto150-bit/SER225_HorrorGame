@@ -55,7 +55,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // both are supported, however preloading is recommended
         map.preloadScripts();
         
-        darknessManager = new DarknessManager(180.0f);
+        darknessManager = new DarknessManager(90.0f);
     
         winScreen = new WinScreen(this);
     }
