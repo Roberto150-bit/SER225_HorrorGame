@@ -614,7 +614,7 @@ public abstract class Map {
         camera.draw(graphicsHandler);
     }
 
-    public void draw(Player player, GraphicsHandler graphicsHandler) {
+    public void drawWorld(Player player, GraphicsHandler graphicsHandler) {
         camera.draw(player, graphicsHandler);
         if (textbox.isActive()) {
             textbox.draw(graphicsHandler);
@@ -622,12 +622,12 @@ public abstract class Map {
         if (book.isActive()) {
             book.draw(graphicsHandler);
         }
-        
+    }
+
+    public void drawUI(GraphicsHandler graphicsHandler){      
         puzzleUI.draw(graphicsHandler);
         ui.draw(graphicsHandler);
         hotbarUI.draw(graphicsHandler);
-    
-
     }
 
     
@@ -643,6 +643,11 @@ public abstract class Map {
 
     public int getEndBoundX() { return endBoundX; }
     public int getEndBoundY() { return endBoundY; }
+
+
+    public boolean isBookOpen(){
+        return book.isActive();
+    }
 
     public Player getPlayer() {
         return this.player;

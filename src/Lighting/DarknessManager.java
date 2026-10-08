@@ -54,18 +54,8 @@ public class DarknessManager {
     }
 
 
-    public void expandTo(float radius) {
-        darknessController.expandTo(radius);
-    }
-
-
-    public void contractTo(float radius) {
-        darknessController.contractTo(radius);
-    }
-
-
-    public void transitionTo(float radius) {
-        darknessController.transitionTo(radius);
+    public void setTargetRadius(float radius) {
+        darknessController.setTargetRadius(radius);
     }
 
 

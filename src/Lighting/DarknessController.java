@@ -85,20 +85,9 @@ public class DarknessController {
     }
 
 
-    public void expandTo(float radius) {
+    public void setTargetRadius(float radius) {
         targetRadius = radius;
     }
-
-
-    public void contractTo(float radius) {
-        targetRadius = radius;
-    }
-
-
-    public void transitionTo(float radius) {
-        targetRadius = radius;
-    }
-
 
     public boolean isEnabled() {
         return enabled;
