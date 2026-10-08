@@ -142,6 +142,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // carry shared state (flags, held items, listeners) over to the new map
         pendingMap.setFlagManager(flagManager);
         pendingMap.setHotbarUI(map.getHotbarUI());
+        pendingMap.setBookOpen(false);
         pendingMap.setPlayer(player);
         pendingMap.addListener(this);
 
