@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.awt.image.BufferedImage;
 
 // This class is for the credits screen
 public class CreditsScreen extends Screen {
@@ -23,7 +24,7 @@ public class CreditsScreen extends Screen {
     protected SpriteFont laurenCredit;
     protected SpriteFont robertoCredit;
     protected SpriteFont returnInstructionsLabel;
-
+    protected BufferedImage menuImage;
     public CreditsScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
     }
@@ -31,6 +32,7 @@ public class CreditsScreen extends Screen {
     @Override
     public void initialize() {
         // setup graphics on screen (background map, spritefont text)
+        menuImage = ImageLoader.loadWithAlpha("dark_forest.png");
         background = new TitleScreenMap();
         background.setAdjustCamera(false);
         try {
@@ -65,6 +67,7 @@ public class CreditsScreen extends Screen {
 
     public void draw(GraphicsHandler graphicsHandler) {
         background.draw(graphicsHandler);
+        graphicsHandler.drawImage(menuImage, 0, 0, 800, 1000);
         creditsLabel.draw(graphicsHandler);
         createdByLabel.draw(graphicsHandler);
         griffinCredit.draw(graphicsHandler);

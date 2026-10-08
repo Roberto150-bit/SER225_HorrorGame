@@ -11,6 +11,7 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.awt.image.BufferedImage;
 
 public class SettingsScreen extends Screen {
     protected ScreenCoordinator screenCoordinator;
@@ -23,6 +24,7 @@ public class SettingsScreen extends Screen {
     protected SpriteFont walkRight;
     protected SpriteFont walkBehind;
     protected SpriteFont returnInstructionsLabel;
+    protected BufferedImage menuImage;
 
     public SettingsScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -30,6 +32,7 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void initialize() {
+        menuImage = ImageLoader.loadWithAlpha("dark_forest.png");
         background = new TitleScreenMap();
         background.setAdjustCamera(false);
         try {
@@ -64,6 +67,8 @@ public class SettingsScreen extends Screen {
 
     public void draw(GraphicsHandler graphicsHandler) {
         background.draw(graphicsHandler);
+        graphicsHandler.drawImage(menuImage, 0, 0, 800, 1000);
+        
         settingsLabel.draw(graphicsHandler);
         options.draw(graphicsHandler);
         walkForward.draw(graphicsHandler);

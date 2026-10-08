@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import javax.swing.ImageIcon;
+import javax.swing.JPanel;
+import java.awt.image.BufferedImage;
 
 // This is the class for the main menu screen
 public class MenuScreen extends Screen {
@@ -24,6 +27,7 @@ public class MenuScreen extends Screen {
     protected int keyPressTimer;
     protected int pointerLocationX, pointerLocationY;
     protected KeyLocker keyLocker = new KeyLocker(); 
+    protected BufferedImage menuImage;
     
     public MenuScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
@@ -31,6 +35,7 @@ public class MenuScreen extends Screen {
 
     @Override
     public void initialize() {
+        menuImage = ImageLoader.loadWithAlpha("dark_forest.png");
         try {
             Font secretSolver = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(new File("src/Resources/secret_solver.ttf"))).deriveFont(50f);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -129,6 +134,7 @@ public class MenuScreen extends Screen {
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
         background.draw(graphicsHandler);
+        graphicsHandler.drawImage(menuImage, 0, 0, 800, 1000);
         playGame.draw(graphicsHandler);
         settings.draw(graphicsHandler);
         credits.draw(graphicsHandler);
