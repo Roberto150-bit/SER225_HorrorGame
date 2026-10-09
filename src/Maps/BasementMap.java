@@ -11,6 +11,8 @@ import Scripts.PuzzleScript;
 import Puzzles.PuzzleConfig;
 import Puzzles.PuzzleId;
 import Puzzles.PuzzleDifficulty;
+import GameObject.CollectibleItem.BloodyEye;
+import GameObject.CollectibleItem.Ear;
 
 
 public class BasementMap extends Map {
