@@ -4,6 +4,7 @@ import Level.ScriptState;
 import java.awt.image.BufferedImage;
 
 //When player clicks button, item is picked up and added to inventory
+//Class is used in NoteScript to pick up the note and add it to the inventory
 
 public class PickupScriptAction extends ScriptAction {
 
@@ -16,15 +17,16 @@ public class PickupScriptAction extends ScriptAction {
 
     @Override
     public ScriptState execute() { // -----------------------------------------------------------------
-        System.out.println("PickupScriptAction execute - entity: " + entity);
-        boolean pickedUp = map.getHotbarUI().addItem(itemImage);
-        System.out.println("pickedUp: " + pickedUp);
+        //boolean pickedUp = map.getHotbarUI().addItem(itemImage);
 
-        if (pickedUp && entity != null) {
+        if (entity != null) {
             entity.setIsHidden(true);
             entity.setIsUncollidable(true);
-            System.out.println("isHidden now: " + entity.isHidden());
+            System.out.println("isHidden now: " + entity.isHidden());                
+            map.getUI().IncreaseNumPages();
+            map.setBookOpen(true);
         }
+
 
         return ScriptState.COMPLETED;
     }

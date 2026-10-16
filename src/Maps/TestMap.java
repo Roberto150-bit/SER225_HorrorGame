@@ -9,7 +9,6 @@ import NPCs.Dinosaur;
 import NPCs.Walrus;
 import Scripts.DoorScript;
 import Scripts.NoteScript;
-// import Scripts.PuzzleScript;
 import Scripts.SimpleTextScript; //---------------------------------------------
 import Scripts.TestMap.*;
 import Tilesets.CommonTileset;

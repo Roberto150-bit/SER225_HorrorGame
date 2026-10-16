@@ -12,7 +12,7 @@ import Level.TileType;
 import Utils.Direction;
 import Utils.Point;
 
-
+//Not finished, in progress for next sprint
 public class MirrorCutsceneObject extends EnchancedMapTile {
     public MirrorCutsceneObject(Point location) {
         super(location.x, location.y, null, TileType.NOT_PASSABLE);

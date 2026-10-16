@@ -1,16 +1,21 @@
 package Maps;
 
+import Engine.ImageLoader;
 import EnhancedMapTiles.CollectibleObject;
+import EnhancedMapTiles.NoteObject;
+import EnhancedMapTiles.PuzzleObject;
 import Level.*;
+import Puzzles.PuzzleConfig;
+import Puzzles.PuzzleDifficulty;
+import Puzzles.PuzzleId;
 import Scripts.DoorScript;
+import Scripts.NoteScript;
+import Scripts.PuzzleScript;
 import Tilesets.BasementTileset;
 import Utils.Direction;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import EnhancedMapTiles.PuzzleObject;
-import Scripts.PuzzleScript;
-import Puzzles.PuzzleConfig;
-import Puzzles.PuzzleId;
-import Puzzles.PuzzleDifficulty;
+
 
 
 public class BasementMap extends Map {
@@ -28,6 +33,37 @@ public class BasementMap extends Map {
         enhancedMapTiles.add(new CollectibleObject(getMapTile(3, 3).getLocation(), "BloodyEye.gif", 256));
         enhancedMapTiles.add(new CollectibleObject(getMapTile(9, 6).getLocation(), "ear.png", 256));
         enhancedMapTiles.add(new CollectibleObject(getMapTile(11, 6).getLocation(), "crucifix.gif", 256));
+        
+
+        NoteObject noteObject1 = new NoteObject(getMapTile(4, 6).getLocation());// --------------------------------
+        NoteObject noteObject2 = new NoteObject(getMapTile(5, 6).getLocation());// --------------------------------
+        NoteObject noteObject3 = new NoteObject(getMapTile(6, 6).getLocation());// --------------------------------
+        NoteObject noteObject4 = new NoteObject(getMapTile(7, 6).getLocation());// --------------------------------
+        NoteObject noteObject5 = new NoteObject(getMapTile(8, 6).getLocation());// --------------------------------
+        
+        CollectibleObject collectibleObject = new CollectibleObject(getMapTile(6, 7).getLocation());
+        noteObject1.setIsUncollidable(true);
+        noteObject2.setIsUncollidable(true);
+        noteObject3.setIsUncollidable(true);
+        noteObject4.setIsUncollidable(true);
+        noteObject5.setIsUncollidable(true);
+
+
+        BufferedImage noteItemImage = ImageLoader.load("Note.png");
+        noteObject1.setInteractScript(new NoteScript(noteItemImage));
+        noteObject2.setInteractScript(new NoteScript(noteItemImage));
+        noteObject3.setInteractScript(new NoteScript(noteItemImage));
+        noteObject4.setInteractScript(new NoteScript(noteItemImage));
+        noteObject5.setInteractScript(new NoteScript(noteItemImage));
+
+        enhancedMapTiles.add(collectibleObject);
+        enhancedMapTiles.add(noteObject1);
+        enhancedMapTiles.add(noteObject2);
+        enhancedMapTiles.add(noteObject3);
+        enhancedMapTiles.add(noteObject4);
+        enhancedMapTiles.add(noteObject5);
+
+
 
         PuzzleConfig symbolConfig = new PuzzleConfig(
             "basement_fuse_01",

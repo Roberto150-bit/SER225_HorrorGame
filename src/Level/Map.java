@@ -544,9 +544,18 @@ public abstract class Map {
         return hotbarUI;
     }
 
+    public UI getUI() {
+        return ui;
+    }
+
     // used when changing maps so the player's held items carry over to the new map
     public void setHotbarUI(HotbarUI hotbarUI) {
         this.hotbarUI = hotbarUI;
+    }
+    
+
+    public void setUI(UI ui) {
+        this.ui = ui;
     }
 
     // based on the player's current X position (which in a level can potentially be updated each frame),
