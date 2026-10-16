@@ -13,6 +13,7 @@ import Puzzles.PuzzleId;
 import Puzzles.PuzzleDifficulty;
 import GameObject.CollectibleItem.BloodyEye;
 import GameObject.CollectibleItem.Ear;
+import NPCs.MsValeNPC;
 
 
 public class BasementMap extends Map {
@@ -102,6 +103,17 @@ public class BasementMap extends Map {
         enhancedMapTiles.add(symbolLock);
 
         return enhancedMapTiles;
+    }
+
+    @Override
+    public ArrayList<NPC> loadNPCs() {
+        ArrayList<NPC> npcs = new ArrayList<>();
+
+        // Mrs. Vale stands by the desk on the left wall, facing the player's start position
+        MsValeNPC msVale = new MsValeNPC(1, getMapTile(2, 4).getLocation());
+        npcs.add(msVale);
+
+        return npcs;
     }
 
     @Override

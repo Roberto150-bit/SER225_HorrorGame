@@ -13,7 +13,7 @@ import Utils.Direction;
 import Utils.Point;
 
 
-public class MirrorCutsceneObject extends EnchancedMapTile {
+public class MirrorCutsceneObject extends EnhancedMapTile {
     public MirrorCutsceneObject(Point location) {
         super(location.x, location.y, null, TileType.NOT_PASSABLE);
     }
@@ -24,6 +24,7 @@ public class MirrorCutsceneObject extends EnchancedMapTile {
                 .withScale(3)
                 .build();
         return new GameObject(x, y, frame);
+    }
 
 
 }
