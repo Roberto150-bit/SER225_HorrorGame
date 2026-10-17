@@ -1,6 +1,7 @@
 package Maps;
 
 import EnhancedMapTiles.CollectibleObject;
+import Engine.ItemUse;
 import Level.*;
 import Scripts.DoorScript;
 import Tilesets.BasementTileset;
@@ -28,9 +29,10 @@ public class BasementMap extends Map {
         ArrayList<EnhancedMapTile> enhancedMapTiles = new ArrayList<>();
 
         // source images are 256x256, scaled down to 32x32 in the world
-        enhancedMapTiles.add(new CollectibleObject(getMapTile(3, 3).getLocation(), "BloodyEye.gif", 256));
-        enhancedMapTiles.add(new CollectibleObject(getMapTile(9, 6).getLocation(), "ear.png", 256));
-        enhancedMapTiles.add(new CollectibleObject(getMapTile(11, 6).getLocation(), "crucifix.gif", 256));
+        // these are single use defensive items -- they disappear from the hotbar once used against ghosts
+        enhancedMapTiles.add(new CollectibleObject(getMapTile(3, 3).getLocation(), "BloodyEye.gif", 256, ItemUse.SINGLE_USE));
+        enhancedMapTiles.add(new CollectibleObject(getMapTile(9, 6).getLocation(), "ear.png", 256, ItemUse.SINGLE_USE));
+        enhancedMapTiles.add(new CollectibleObject(getMapTile(11, 6).getLocation(), "crucifix.gif", 256, ItemUse.SINGLE_USE));
 
         PuzzleConfig symbolConfig = new PuzzleConfig(
             "basement_fuse_01",

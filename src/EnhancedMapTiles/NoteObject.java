@@ -6,6 +6,7 @@ import GameObject.Frame;
 import GameObject.GameObject;
 import GameObject.SpriteSheet;
 import Level.EnhancedMapTile;
+import Level.Map;
 import Level.TileType;
 import Utils.Point;
 
@@ -15,6 +16,12 @@ import Utils.Point;
 public class NoteObject extends EnhancedMapTile{
     public NoteObject(Point location) {
         super(location.x, location.y, new SpriteSheet(ImageLoader.load("Note.png"), 16, 16), TileType.PASSABLE);
+    }
+
+    @Override
+    public void setMap(Map map) {
+        super.setMap(map);
+        useCollectedFlag(); // keeps the note from reappearing after it's picked up and the player changes rooms
     }
 
     @Override

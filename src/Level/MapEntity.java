@@ -94,6 +94,20 @@ public class MapEntity extends GameObject {
         this.existenceFlag = existenceFlag;
     }
 
+    // for entities the player can pick up -- call from setMap, after super.setMap
+    // maps (and their entities) are rebuilt every time the player enters them, so the flag is named after the map and the entity's spot on it
+    // that way a rebuilt copy of an item the player already picked up finds its flag set and no longer exists
+    protected void useCollectedFlag() {
+        setExistenceFlag("collected_" + map.getClass().getSimpleName() + "_" + Math.round(x) + "_" + Math.round(y));
+    }
+
+    // call when the player picks this entity up so it stays gone after leaving and coming back to this map
+    public void markCollected() {
+        if (existenceFlag != null && map.getFlagManager() != null) {
+            map.getFlagManager().addFlag(existenceFlag, true);
+        }
+    }
+
     public boolean isUncollidable() {
         return isUncollidable;
     }
