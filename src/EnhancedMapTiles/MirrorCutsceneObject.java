@@ -1,4 +1,5 @@
 package EnhancedMapTiles;
+/* 
 
 import Builders.FrameBuilder;
 import Engine.ImageLoader;
@@ -11,9 +12,10 @@ import Level.PlayerState;
 import Level.TileType;
 import Utils.Direction;
 import Utils.Point;
-
+*/
 //Not finished, in progress for next sprint
-public class MirrorCutsceneObject extends EnchancedMapTile {
+public class MirrorCutsceneObject  { //extends EnhancedMapTile 
+    /* 
     public MirrorCutsceneObject(Point location) {
         super(location.x, location.y, null, TileType.NOT_PASSABLE);
     }
@@ -24,6 +26,7 @@ public class MirrorCutsceneObject extends EnchancedMapTile {
                 .withScale(3)
                 .build();
         return new GameObject(x, y, frame);
+    }
 
-
+*/
 }

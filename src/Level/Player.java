@@ -7,6 +7,7 @@ import GameObject.GameObject;
 import GameObject.Rectangle;
 import GameObject.SpriteSheet;
 import Utils.Direction;
+import Engine.KeyBindings;
 
 public abstract class Player extends GameObject {
     // values that affect player movement
@@ -59,6 +60,13 @@ public abstract class Player extends GameObject {
     }
 
     public void update() {
+        
+        // Refresh movement controls from Settings.
+        MOVE_UP_KEY = KeyBindings.get(0);
+        MOVE_LEFT_KEY = KeyBindings.get(1);
+        MOVE_DOWN_KEY = KeyBindings.get(2);
+        MOVE_RIGHT_KEY = KeyBindings.get(3);
+
         if (!isLocked) {
             moveAmountX = 0;
             moveAmountY = 0;

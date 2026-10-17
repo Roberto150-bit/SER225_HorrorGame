@@ -5,6 +5,7 @@ import EnhancedMapTiles.CollectibleObject;
 import EnhancedMapTiles.NoteObject;
 import EnhancedMapTiles.PuzzleObject;
 import Level.*;
+import NPCs.MsValeNPC;
 import Puzzles.PuzzleConfig;
 import Puzzles.PuzzleDifficulty;
 import Puzzles.PuzzleId;
@@ -15,7 +16,6 @@ import Tilesets.BasementTileset;
 import Utils.Direction;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-
 
 
 public class BasementMap extends Map {
@@ -136,6 +136,17 @@ public class BasementMap extends Map {
         enhancedMapTiles.add(symbolLock);
 
         return enhancedMapTiles;
+    }
+
+    @Override
+    public ArrayList<NPC> loadNPCs() {
+        ArrayList<NPC> npcs = new ArrayList<>();
+
+        // Mrs. Vale stands by the desk on the left wall, facing the player's start position
+        MsValeNPC msVale = new MsValeNPC(1, getMapTile(2, 4).getLocation());
+        npcs.add(msVale);
+
+        return npcs;
     }
 
     @Override
