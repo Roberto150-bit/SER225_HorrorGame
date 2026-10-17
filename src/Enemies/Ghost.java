@@ -6,6 +6,7 @@ import Engine.ImageLoader;
 import GameObject.Frame;
 import GameObject.ImageEffect;
 import GameObject.SpriteSheet;
+import Level.MapEntityStatus;
 import Level.NPC;
 import Level.Player;
 import Utils.Point;
@@ -42,6 +43,12 @@ public class Ghost extends NPC {
         } else {
             currentAnimationName = currentAnimationName.contains("RIGHT") ? "STAND_RIGHT" : "STAND_LEFT";
         }
+    }
+
+    // defensive items banish the ghost
+    @Override
+    public void hitByDefensiveItem() {
+        setMapEntityStatus(MapEntityStatus.REMOVED);
     }
 
     @Override

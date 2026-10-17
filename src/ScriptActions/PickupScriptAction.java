@@ -22,6 +22,7 @@ public class PickupScriptAction extends ScriptAction {
         if (entity != null) {
             entity.setIsHidden(true);
             entity.setIsUncollidable(true);
+            entity.markCollected(); // stays gone when the player comes back to this map
             System.out.println("isHidden now: " + entity.isHidden());                
             map.getUI().IncreaseNumPages();
             map.setBookOpen(true);

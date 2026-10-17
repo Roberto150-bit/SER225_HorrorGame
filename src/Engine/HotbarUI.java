@@ -1,62 +1,184 @@
 package Engine;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-
+// the player's 6 slot inventory bar
+// press 1-6 to select a slot (it lights up red), then use the item in it (it flashes green) by:
+//   pressing E, double tapping the same number, or left clicking (clicking right on a slot uses that slot)
+// pressing the selected number again slowly deselects it
+// single use items disappear after the green flash, reusable items stay
 public class HotbarUI {
 
     private BufferedImage slotBackgroundImage;
 
-    private Key pickUpKey = Key.E; // key to pick up items
-    private Key dropKey = Key.Q; // key to drop items
+    private Key useKey = Key.E; // key to use the selected item
+    private static final int SLOT_COUNT = 6;
+    private Key[] slotKeys = {Key.ONE, Key.TWO, Key.THREE, Key.FOUR, Key.FIVE, Key.SIX}; // key to select each slot
 
     private KeyLocker keyLocker = new KeyLocker();
 
-    private BufferedImage[] itemImages = new BufferedImage[3]; 
+    private BufferedImage[] itemImages = new BufferedImage[SLOT_COUNT];
 
-    private BufferedImage[][] itemFrames = new BufferedImage[3][]; // animation frames, null for static items
-    private int[] frameDelays = new int[3]; // milliseconds per frame
+    private BufferedImage[][] itemFrames = new BufferedImage[SLOT_COUNT][]; // animation frames, null for static items
+    private int[] frameDelays = new int[SLOT_COUNT]; // milliseconds per frame
+    private ItemUse[] itemUses = new ItemUse[SLOT_COUNT];
 
-    private int[]xSlots = {0, 65, 130}; // X positions for each slot
+    private static final int SLOT_SIZE = 75;
+    private static final int SLOT_SPACING = 65; // slots overlap a little since the ring image has empty space around it
+    private static final int ITEM_SIZE = 60;
+    private static final int ITEM_OFFSET_Y = 10; // items sit a little lower than the top of the slot ring
 
-    private int ySlot = 500; // Y position for all slots
+    private int[] xSlots = new int[SLOT_COUNT]; // X positions for each slot, set in the constructor
+
+    private int ySlot = 490; // Y position for all slots
+
+    private static final Color SELECTED_COLOR = new Color(255, 0, 0, 110);
+    private static final Color USING_COLOR = new Color(0, 255, 0, 140);
+    private static final Font SLOT_NUMBER_FONT = new Font("Arial", Font.BOLD, 13);
+
+    private static final int DOUBLE_TAP_FRAMES = 25; // max frames between taps of a number for it to count as a double tap
+    private static final int USE_FLASH_FRAMES = 20; // how long a slot stays green after its item is used
+
+    private int frameCount = 0;
+    private int selectedSlot = -1; // -1 when no slot is selected
+    private int lastSlotTapFrame = 0;
+    private int usingSlot = -1; // slot currently flashing green, -1 when none
+    private int useTimer = 0;
+    private ItemUse usedItem; // set the frame an item is used so the map can apply its effect
 
 
 
     public HotbarUI() {
+        for (int i = 0; i < SLOT_COUNT; i++) {
+            xSlots[i] = i * SLOT_SPACING;
+        }
 
         try {
             slotBackgroundImage = ImageIO.read(getClass().getResourceAsStream("/Resources/SingleHotbarSlot.png"));
-            
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void update() {
-        if (Keyboard.isKeyDown(pickUpKey) && !keyLocker.isKeyLocked(pickUpKey)) {
-            keyLocker.lockKey(pickUpKey);
-        }
-        else if (Keyboard.isKeyUp(pickUpKey)) {
-            keyLocker.unlockKey(pickUpKey);
+    // canTakeInput is false while something else needs the keyboard/mouse (puzzles, textboxes)
+    public void update(boolean canTakeInput) {
+        frameCount++;
+
+        // finish the green flash, then remove single use items
+        if (usingSlot != -1) {
+            useTimer--;
+            if (useTimer <= 0) {
+                if (itemUses[usingSlot] == ItemUse.SINGLE_USE) {
+                    removeItem(usingSlot);
+                }
+                usingSlot = -1;
+            }
         }
 
-        if (Keyboard.isKeyDown(dropKey) && !keyLocker.isKeyLocked(dropKey)) {
-            keyLocker.lockKey(dropKey);
+        if (!canTakeInput) {
+            return;
         }
-        else if (Keyboard.isKeyUp(dropKey)) {
-            keyLocker.unlockKey(dropKey);
+
+        for (int i = 0; i < slotKeys.length; i++) {
+            if (Keyboard.isKeyDown(slotKeys[i]) && !keyLocker.isKeyLocked(slotKeys[i])) {
+                keyLocker.lockKey(slotKeys[i]);
+                onSlotKeyTapped(i);
+            }
+            else if (Keyboard.isKeyUp(slotKeys[i])) {
+                keyLocker.unlockKey(slotKeys[i]);
+            }
         }
+
+        if (Keyboard.isKeyDown(useKey) && !keyLocker.isKeyLocked(useKey)) {
+            keyLocker.lockKey(useKey);
+            if (selectedSlot != -1) {
+                useItem(selectedSlot);
+            }
+        }
+        else if (Keyboard.isKeyUp(useKey)) {
+            keyLocker.unlockKey(useKey);
+        }
+
+        if (Mouse.isLeftClicked()) {
+            int clickedSlot = getSlotAt(Mouse.getMouseX(), Mouse.getMouseY());
+            if (clickedSlot != -1 && itemImages[clickedSlot] != null) {
+                useItem(clickedSlot);
+            } else if (selectedSlot != -1) {
+                useItem(selectedSlot);
+            }
+            Mouse.resetClick();
+        }
+    }
+
+    private void onSlotKeyTapped(int slot) {
+        if (slot == selectedSlot) {
+            if (frameCount - lastSlotTapFrame <= DOUBLE_TAP_FRAMES) {
+                useItem(slot);
+            } else {
+                selectedSlot = -1;
+            }
+        } else {
+            // only slots holding an item can be selected, tapping an empty one clears the selection
+            selectedSlot = itemImages[slot] != null ? slot : -1;
+        }
+        lastSlotTapFrame = frameCount;
+    }
+
+    private void useItem(int slot) {
+        // nothing happens while another item is flashing
+        if (usingSlot != -1) {
+            return;
+        }
+        // items that can't be used (like notes) just get deselected, so the interact key goes back to normal
+        if (itemImages[slot] == null || itemUses[slot] == ItemUse.NONE) {
+            selectedSlot = -1;
+            return;
+        }
+        usingSlot = slot;
+        useTimer = USE_FLASH_FRAMES;
+        usedItem = itemUses[slot];
+        selectedSlot = -1;
+    }
+
+    // returns the slot under the given screen position, or -1 if there isn't one
+    private int getSlotAt(int x, int y) {
+        for (int i = xSlots.length - 1; i >= 0; i--) { // slots overlap a little, the rightmost one is drawn on top
+            if (x >= xSlots[i] && x < xSlots[i] + SLOT_SIZE && y >= ySlot && y < ySlot + SLOT_SIZE) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // true while a slot is selected, so the player's interact key is left to the hotbar
+    public boolean hasSelectedItem() {
+        return selectedSlot != -1;
+    }
+
+    // returns the type of item used since the last call (null if none), so the map can apply its effect only once
+    public ItemUse takeUsedItem() {
+        ItemUse item = usedItem;
+        usedItem = null;
+        return item;
     }
 
 
 
     public boolean addItem(BufferedImage itemImage) {
+        return addItem(itemImage, ItemUse.NONE);
+    }
+
+    public boolean addItem(BufferedImage itemImage, ItemUse itemUse) {
         for (int i = 0; i < itemImages.length; i++) {
             if (itemImages[i] == null) {
                 itemImages[i] = itemImage;
+                itemUses[i] = itemUse;
                 return true; // Places in first open slot, ends loop by returning true
             }
         }
@@ -65,11 +187,16 @@ public class HotbarUI {
 
     // adds an item that animates while in the hotbar
     public boolean addAnimatedItem(BufferedImage[] frames, int frameDelay) {
+        return addAnimatedItem(frames, frameDelay, ItemUse.NONE);
+    }
+
+    public boolean addAnimatedItem(BufferedImage[] frames, int frameDelay, ItemUse itemUse) {
         for (int i = 0; i < itemImages.length; i++) {
             if (itemImages[i] == null) {
                 itemImages[i] = frames[0];
                 itemFrames[i] = frames;
                 frameDelays[i] = frameDelay;
+                itemUses[i] = itemUse;
                 return true;
             }
         }
@@ -80,23 +207,29 @@ public class HotbarUI {
         if (slotIndex >= 0 && slotIndex < itemImages.length) {
             itemImages[slotIndex] = null;
             itemFrames[slotIndex] = null;
+            itemUses[slotIndex] = null;
+            if (selectedSlot == slotIndex) {
+                selectedSlot = -1;
+            }
         }
     }
 
 
     public void draw(GraphicsHandler graphicsHandler){
-        if (slotBackgroundImage != null) {
-            graphicsHandler.drawImage(slotBackgroundImage, 0, 490, 75,75); 
-            graphicsHandler.drawImage(slotBackgroundImage, 65, 490, 75,75); 
-            graphicsHandler.drawImage(slotBackgroundImage, 130, 490, 75,75); 
-
-        }
+        Graphics2D g = graphicsHandler.getGraphics();
 
         for (int i = 0; i < xSlots.length; i++) {
-            // draw the empty slot frame
-            //if (slotBackgroundImage != null) {
-            //    graphicsHandler.drawImage(slotBackgroundImage, xSlots[i], ySlot, 75, 75);
-            //}
+            if (slotBackgroundImage != null) {
+                graphicsHandler.drawImage(slotBackgroundImage, xSlots[i], ySlot, SLOT_SIZE, SLOT_SIZE);
+            }
+
+            // light up the inside of the ring: red when selected, green while the item is being used
+            Color highlight = i == usingSlot ? USING_COLOR : i == selectedSlot ? SELECTED_COLOR : null;
+            if (highlight != null) {
+                g.setColor(highlight);
+                g.fillOval(xSlots[i] + 10, ySlot + 8, SLOT_SIZE - 20, SLOT_SIZE - 20);
+            }
+
             // draw the item on top, if this slot has one
             if (itemImages[i] != null) {
                 BufferedImage image = itemImages[i];
@@ -104,8 +237,10 @@ public class HotbarUI {
                     int frame = (int) ((System.currentTimeMillis() / frameDelays[i]) % itemFrames[i].length);
                     image = itemFrames[i][frame];
                 }
-                graphicsHandler.drawImage(image, xSlots[i], ySlot, 60, 60);
+                graphicsHandler.drawImage(image, xSlots[i] + (SLOT_SIZE - ITEM_SIZE) / 2, ySlot + ITEM_OFFSET_Y, ITEM_SIZE, ITEM_SIZE);
             }
+
+            graphicsHandler.drawStringWithOutline(String.valueOf(i + 1), xSlots[i] + 11, ySlot + 16, SLOT_NUMBER_FONT, Color.WHITE, Color.BLACK, 2);
         }
 
     }

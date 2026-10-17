@@ -29,6 +29,8 @@ public class Mouse extends MouseAdapter {
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
+            mouseX = e.getX();
+            mouseY = e.getY();
             leftClicked = true;
         }
     }

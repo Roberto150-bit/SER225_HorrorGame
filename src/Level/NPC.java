@@ -90,6 +90,10 @@ public class NPC extends MapEntity {
         }
     }
 
+    // called when the player uses a defensive item (eye, ear, crucifix, etc.) close to this npc
+    // does nothing by default, enemies like ghosts override it
+    public void hitByDefensiveItem() {}
+
     public void update(Player player) {
         if (!isLocked) {
             this.performAction(player);
