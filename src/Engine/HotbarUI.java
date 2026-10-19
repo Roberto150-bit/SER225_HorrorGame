@@ -50,6 +50,7 @@ public class HotbarUI {
     private int usingSlot = -1; // slot currently flashing green, -1 when none
     private int useTimer = 0;
     private ItemUse usedItem; // set the frame an item is used so the map can apply its effect
+    private BufferedImage usedItemImage; // image of the last used item
 
 
 
@@ -143,6 +144,7 @@ public class HotbarUI {
         usingSlot = slot;
         useTimer = USE_FLASH_FRAMES;
         usedItem = itemUses[slot];
+        usedItemImage = itemImages[slot];
         selectedSlot = -1;
     }
 
@@ -166,6 +168,10 @@ public class HotbarUI {
         ItemUse item = usedItem;
         usedItem = null;
         return item;
+    }
+
+    public BufferedImage getUsedItemImage() {
+        return usedItemImage;
     }
 
 

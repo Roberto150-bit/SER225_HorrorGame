@@ -1,6 +1,7 @@
 package Maps;
 
 import Enemies.Ghost;
+import Enemies.SmallGhost;
 import Engine.ImageLoader;
 import EnhancedMapTiles.*;
 import Level.*;
@@ -69,6 +70,9 @@ public class TestMap extends Map {
 
         Ghost ghost = new Ghost(4, getMapTile(15, 20).getLocation());
         npcs.add(ghost);
+
+        SmallGhost smallGhost = new SmallGhost(5, getMapTile(18, 15).getLocation());
+        npcs.add(smallGhost);
 
         return npcs;
     }

@@ -5,6 +5,7 @@ import Engine.ItemUse;
 import EnhancedMapTiles.CollectibleObject;
 import EnhancedMapTiles.NoteObject;
 import EnhancedMapTiles.PuzzleObject;
+import GameObject.Knife;
 import Level.*;
 import NPCs.MsValeNPC;
 import Puzzles.PuzzleConfig;
@@ -29,6 +30,9 @@ public class BasementMap extends Map {
     @Override
     public ArrayList<EnhancedMapTile> loadEnhancedMapTiles() {
         ArrayList<EnhancedMapTile> enhancedMapTiles = new ArrayList<>();
+
+        // knife
+        enhancedMapTiles.add(new Knife(getMapTile(8, 4).getLocation()));
 
         // source images are 256x256, scaled down to 32x32 in the world
         // these are single use defensive items -- they disappear from the hotbar once used against ghosts

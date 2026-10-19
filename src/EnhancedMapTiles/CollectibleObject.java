@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import Builders.FrameBuilder;
 import Engine.ImageLoader;
 import Engine.ItemUse;
+import Engine.SoundPlayer;
 import GameObject.Frame;
 import GameObject.GameObject;
 import GameObject.SpriteSheet;
@@ -21,6 +22,7 @@ public class CollectibleObject extends EnhancedMapTile {
     private BufferedImage[] gifFrames; // only set for animated (gif) items
     private int gifFrameDelay;
     private ItemUse itemUse;
+    private String[] pickupSounds; // optional sounds played on pickup
 
     public CollectibleObject(Point location) {
         this(location, "Rock.png", 14);
@@ -62,12 +64,20 @@ public class CollectibleObject extends EnhancedMapTile {
                     : map.getHotbarUI().addItem(itemImage, itemUse);
 
             if (addedToHotbar) {
+                if (pickupSounds != null) {
+                    SoundPlayer.playRandom(pickupSounds);
+                }
                 player.collectItem();
                 markCollected();
                 setMapEntityStatus(MapEntityStatus.REMOVED);
             }
             
         }
+    }
+
+    // sounds played when the item is picked up
+    public void setPickupSounds(String... pickupSounds) {
+        this.pickupSounds = pickupSounds;
     }
 
     @Override

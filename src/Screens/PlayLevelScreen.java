@@ -32,6 +32,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
     // Displays the player's current level and XP.
     private final LevelProgressHUD levelProgressHUD = new LevelProgressHUD();
 
+    // Flashes the screen red when the player is hit.
+    private final HealthHUD healthHUD = new HealthHUD();
+
     public PlayLevelScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
     }
@@ -92,6 +95,10 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 player.update();
                 map.update(player);
                 darknessManager.update();
+                // restart the level when out of hearts
+                if (player.isDead() && !player.isHurt()) {
+                    resetLevel();
+                }
                 break;
             // if level has been completed, bring up level cleared screen
             case LEVEL_COMPLETED:
@@ -186,6 +193,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
 
                 // Display the XP bar above the game world.
                 levelProgressHUD.draw(graphicsHandler);
+
+                healthHUD.draw(graphicsHandler, player);
 
                 break;
             case LEVEL_COMPLETED:

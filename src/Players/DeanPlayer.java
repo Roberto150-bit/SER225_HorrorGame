@@ -8,6 +8,8 @@ import GameObject.ImageEffect;
 import GameObject.SpriteSheet;
 import Level.Player;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
 import java.util.HashMap;
 
 // This is the class for the Dean player character
@@ -29,6 +31,22 @@ public class DeanPlayer extends Player {
 
     public void draw(GraphicsHandler graphicsHandler) {
         super.draw(graphicsHandler);
+    }
+
+    // returns a red tinted copy of a sprite
+    private static BufferedImage tintRed(BufferedImage sprite) {
+        BufferedImage tinted = new BufferedImage(sprite.getWidth(), sprite.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < sprite.getHeight(); y++) {
+            for (int x = 0; x < sprite.getWidth(); x++) {
+                Color color = new Color(sprite.getRGB(x, y), true);
+                if (color.getAlpha() == 0) {
+                    continue;
+                }
+                int red = Math.min(255, color.getRed() / 2 + 140);
+                tinted.setRGB(x, y, new Color(red, color.getGreen() / 3, color.getBlue() / 3, color.getAlpha()).getRGB());
+            }
+        }
+        return tinted;
     }
 
     @Override
@@ -113,6 +131,32 @@ public class DeanPlayer extends Player {
                             .withBounds(9, 23, 13, 7)
                             .build(),
                     new FrameBuilder(spriteSheet.getSprite(7, 3), 8)
+                            .withScale(3)
+                            .withBounds(9, 23, 13, 7)
+                            .build()
+            });
+
+            // damage animation (row 5 of Dean.png)
+            // second frame is tinted red
+            put("HURT_RIGHT", new Frame[] {
+                    new FrameBuilder(spriteSheet.getSprite(5, 0), 8)
+                            .withScale(3)
+                            .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                            .withBounds(9, 23, 13, 7)
+                            .build(),
+                    new FrameBuilder(tintRed(spriteSheet.getSprite(5, 1)), 8)
+                            .withScale(3)
+                            .withImageEffect(ImageEffect.FLIP_HORIZONTAL)
+                            .withBounds(9, 23, 13, 7)
+                            .build()
+            });
+
+            put("HURT_LEFT", new Frame[] {
+                    new FrameBuilder(spriteSheet.getSprite(5, 0), 8)
+                            .withScale(3)
+                            .withBounds(9, 23, 13, 7)
+                            .build(),
+                    new FrameBuilder(tintRed(spriteSheet.getSprite(5, 1)), 8)
                             .withScale(3)
                             .withBounds(9, 23, 13, 7)
                             .build()

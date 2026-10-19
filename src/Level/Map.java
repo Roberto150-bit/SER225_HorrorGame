@@ -7,6 +7,9 @@ import Engine.ItemUse;
 import Engine.PuzzleUI;
 import Engine.UI; // ----------------------------------------------------------------------------------
 import GameObject.Book;
+import GameObject.DefensiveItemEffect;
+import GameObject.KnifeSlash;
+import GameObject.ThrownItem;
 import GameObject.Rectangle;
 import Utils.Direction;
 import Utils.Point; 
@@ -80,7 +83,10 @@ public abstract class Map {
     
     // hotbar
     protected HotbarUI hotbarUI;
-    private static final float DEFENSIVE_ITEM_RANGE = 200; // how close (in pixels) an npc has to be to the player to be hit by a defensive item
+    // weapons used from the hotbar
+    protected KnifeSlash knifeSlash = new KnifeSlash();
+    protected ArrayList<ThrownItem> thrownItems = new ArrayList<>();
+    protected DefensiveItemEffect defensiveItemEffect = new DefensiveItemEffect();
 
     // Book's instance
     protected Book book; // ----------------------------------------------------------------------------------
@@ -539,24 +545,27 @@ public abstract class Map {
         book.update(); //Updates book state every update
         hotbarUI.update(!puzzleUI.isOpen() && !textbox.isActive()); //Updates hotbar state
         ItemUse usedItem = hotbarUI.takeUsedItem();
-        if (usedItem == ItemUse.SINGLE_USE || usedItem == ItemUse.REUSABLE) {
-            useDefensiveItem(player);
+        if (usedItem == ItemUse.REUSABLE) {
+            knifeSlash.swing(player, this);
         }
+        else if (usedItem == ItemUse.SINGLE_USE) {
+            thrownItems.add(new ThrownItem(hotbarUI.getUsedItemImage(), player));
+        }
+        updateWeapons();
 
         
     }
 
-    // a defensive item from the hotbar was used -- every npc within range of the player is hit by it (ghosts get banished)
-    private void useDefensiveItem(Player player) {
-        float playerCenterX = player.getBounds().getX() + player.getBounds().getWidth() / 2f;
-        float playerCenterY = player.getBounds().getY() + player.getBounds().getHeight() / 2f;
-        for (NPC npc : getActiveNPCs()) {
-            float dx = npc.getBounds().getX() + npc.getBounds().getWidth() / 2f - playerCenterX;
-            float dy = npc.getBounds().getY() + npc.getBounds().getHeight() / 2f - playerCenterY;
-            if (Math.sqrt(dx * dx + dy * dy) <= DEFENSIVE_ITEM_RANGE) {
-                npc.hitByDefensiveItem();
+    // updates thrown relics and weapon effects
+    private void updateWeapons() {
+        for (int i = thrownItems.size() - 1; i >= 0; i--) {
+            thrownItems.get(i).update(this, defensiveItemEffect);
+            if (thrownItems.get(i).isFinished()) {
+                thrownItems.remove(i);
             }
         }
+        knifeSlash.update();
+        defensiveItemEffect.update();
     }
 
     public HotbarUI getHotbarUI() {
@@ -653,6 +662,12 @@ public abstract class Map {
     }
 
     public void drawUI(GraphicsHandler graphicsHandler){      
+        // drawn here so they show over the darkness
+        for (ThrownItem thrownItem : thrownItems) {
+            thrownItem.draw(graphicsHandler, camera);
+        }
+        knifeSlash.draw(graphicsHandler, camera);
+        defensiveItemEffect.draw(graphicsHandler, camera);
         puzzleUI.draw(graphicsHandler);
         ui.draw(graphicsHandler);
         hotbarUI.draw(graphicsHandler);

@@ -90,9 +90,14 @@ public class NPC extends MapEntity {
         }
     }
 
-    // called when the player uses a defensive item (eye, ear, crucifix, etc.) close to this npc
+    // called when this npc is hit by the knife or a thrown relic
     // does nothing by default, enemies like ghosts override it
-    public void hitByDefensiveItem() {}
+    public void hitByDefensiveItem(int damage) {}
+
+    // only enemies can be hit by weapons
+    public boolean isEnemy() {
+        return false;
+    }
 
     public void update(Player player) {
         if (!isLocked) {

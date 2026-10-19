@@ -1,5 +1,6 @@
 package Level;
 
+import Engine.GraphicsHandler;
 import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
@@ -7,6 +8,7 @@ import GameObject.GameObject;
 import GameObject.Rectangle;
 import GameObject.SpriteSheet;
 import Utils.Direction;
+import Utils.Point;
 import Engine.KeyBindings;
 
 public abstract class Player extends GameObject {
@@ -50,6 +52,14 @@ public abstract class Player extends GameObject {
     
     private boolean hasCollectible = false;
 
+    // hearts
+    protected int maxHealth = 3;
+    protected int health = maxHealth;
+    protected static final int HURT_FRAMES = 30; // length of the damage animation
+    protected static final int INVINCIBLE_FRAMES = 90; // frames before the player can be hit again
+    protected int hurtTimer = 0;
+    protected int invincibleTimer = 0;
+
     public Player(SpriteSheet spriteSheet, float x, float y, String startingAnimationName) {
         super(spriteSheet, x, y, startingAnimationName);
         facingDirection = Direction.RIGHT;
@@ -67,7 +77,15 @@ public abstract class Player extends GameObject {
         MOVE_DOWN_KEY = KeyBindings.get(2);
         MOVE_RIGHT_KEY = KeyBindings.get(3);
 
-        if (!isLocked) {
+        if (hurtTimer > 0) {
+            hurtTimer--;
+        }
+        if (invincibleTimer > 0) {
+            invincibleTimer--;
+        }
+
+        // player can't move during the damage animation
+        if (!isLocked && hurtTimer == 0) {
             moveAmountX = 0;
             moveAmountY = 0;
 
@@ -192,7 +210,11 @@ public abstract class Player extends GameObject {
 
     // anything extra the player should do based on interactions can be handled here
     protected void handlePlayerAnimation() {
-        if (playerState == PlayerState.STANDING) {
+        // damage animation, if the character has one
+        if (hurtTimer > 0 && animations.containsKey("HURT_RIGHT")) {
+            this.currentAnimationName = facingDirection == Direction.RIGHT ? "HURT_RIGHT" : "HURT_LEFT";
+        }
+        else if (playerState == PlayerState.STANDING) {
             // sets animation to a STAND animation based on which way player is facing
             // this.currentAnimationName = facingDirection == Direction.RIGHT ? "STAND_RIGHT" : "STAND_LEFT";
             this.currentAnimationName = getDirectionalAnimationName("STAND");
@@ -313,6 +335,65 @@ public abstract class Player extends GameObject {
 
     public boolean hasCollectible() {
         return hasCollectible;
+    }
+
+    // called when a ghost's attack lands
+    // returns false if the player can't be hit right now
+    public boolean takeDamage() {
+        if (invincibleTimer > 0 || health <= 0) {
+            return false;
+        }
+        health--;
+        hurtTimer = HURT_FRAMES;
+        invincibleTimer = INVINCIBLE_FRAMES;
+        playerState = PlayerState.STANDING;
+        return true;
+    }
+
+    // direction the player is aiming, used by the knife and thrown relics
+    public Point getAimDirection() {
+        float aimX = 0;
+        float aimY = 0;
+        if (playerState == PlayerState.WALKING) {
+            if (currentWalkingXDirection == Direction.LEFT) aimX = -1;
+            if (currentWalkingXDirection == Direction.RIGHT) aimX = 1;
+            if (currentWalkingYDirection == Direction.UP) aimY = -1;
+            if (currentWalkingYDirection == Direction.DOWN) aimY = 1;
+        }
+        if (aimX == 0 && aimY == 0) {
+            if (animationDirection == Direction.UP) aimY = -1;
+            else if (animationDirection == Direction.DOWN) aimY = 1;
+            else if (facingDirection == Direction.LEFT) aimX = -1;
+            else aimX = 1;
+        }
+        // normalize so diagonals aren't faster
+        float length = (float) Math.sqrt(aimX * aimX + aimY * aimY);
+        return new Point(aimX / length, aimY / length);
+    }
+
+    // center of the player's hitbox
+    public Point getCenter() {
+        return new Point(getBounds().getX() + getBounds().getWidth() / 2f, getBounds().getY() + getBounds().getHeight() / 2f);
+    }
+
+    public int getHealth() { return health; }
+    public int getMaxHealth() { return maxHealth; }
+    public boolean isHurt() { return hurtTimer > 0; }
+    public boolean isDead() { return health <= 0; }
+    public boolean isLocked() { return isLocked; }
+
+    // 1 when just hit, down to 0 when the damage animation ends
+    public float getHurtProgress() {
+        return hurtTimer / (float) HURT_FRAMES;
+    }
+
+    @Override
+    public void draw(GraphicsHandler graphicsHandler) {
+        // blink while invincible
+        if (hurtTimer == 0 && invincibleTimer > 0 && (invincibleTimer / 6) % 2 == 0) {
+            return;
+        }
+        super.draw(graphicsHandler);
     }
 
     // Uncomment this to have game draw player's bounds to make it easier to visualize
