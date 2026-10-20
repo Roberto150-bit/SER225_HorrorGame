@@ -238,11 +238,6 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // Identify ghosts following Dean before changing rooms.
         ArrayList<Ghost> followingGhosts = new ArrayList<>();
 
-        System.out.println("=== GHOST TRANSITION DEBUG ===");
-        System.out.println("From: " + map.getClass().getSimpleName());
-        System.out.println("To: " + pendingMap.getClass().getSimpleName());
-        System.out.println("NPC count: " + map.getNPCs().size());
-
         for (NPC npc : new ArrayList<>(map.getNPCs())) {
             if (npc instanceof Ghost) {
                 Ghost ghost = (Ghost) npc;
@@ -344,75 +339,119 @@ public class PlayLevelScreen extends Screen implements GameListener {
         map.update(player);
     }
 
+
     private void updateGhostArrivals() {
         for (int i = ghostArrivals.size() - 1; i >= 0; i--) {
             GhostArrival arrival = ghostArrivals.get(i);
 
-            // Countdown until the ghost enters the room.
-            arrival.framesRemaining--;
-
-            if (arrival.framesRemaining <= 0) {
-                arrival.ghost.setLocation(arrival.x, arrival.y);
-
-                // Reuse the existing ghost instance and animations.
-                if (!arrival.destination.getNPCs().contains(arrival.ghost)) {
-                    arrival.destination.addNPC(arrival.ghost);
-                }
-
-                ghostArrivals.remove(i);
+            // Wait until the ghost is ready to enter.
+            if (arrival.framesRemaining > 0) {
+                arrival.framesRemaining--;
+                continue;
             }
+
+            float ghostWidth = arrival.ghost.getBounds().getWidth();
+            float ghostHeight = arrival.ghost.getBounds().getHeight();
+
+            float maxX = Math.max(0,
+                    arrival.destination.getWidthPixels() - ghostWidth);
+            float maxY = Math.max(0,
+                    arrival.destination.getHeightPixels() - ghostHeight);
+
+            float startX = Math.max(0, Math.min(arrival.x, maxX));
+            float startY = Math.max(0, Math.min(arrival.y, maxY));
+
+            boolean foundSpawn = false;
+            float safeX = startX;
+            float safeY = startY;
+
+            // Search outward from the doorway.
+            for (int radius = 0; radius <= 128 && !foundSpawn; radius += 16) {
+                for (int dx = -radius; dx <= radius && !foundSpawn; dx += 16) {
+                    for (int dy = -radius; dy <= radius; dy += 16) {
+                        float candidateX = startX + dx;
+                        float candidateY = startY + dy;
+
+                        if (isValidGhostSpawn(
+                                arrival.destination,
+                                arrival.ghost,
+                                candidateX,
+                                candidateY)) {
+
+                            safeX = candidateX;
+                            safeY = candidateY;
+                            foundSpawn = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!foundSpawn) {
+                // Don't spawn inside an obstacle.
+                // Try again on the next update.
+                continue;
+            }
+
+            arrival.ghost.setLocation(safeX, safeY);
+
+            // Preserve the existing ghost instance and animations.
+            if (!arrival.destination.getNPCs().contains(arrival.ghost)) {
+                arrival.destination.addNPC(arrival.ghost);
+            }
+
+            ghostArrivals.remove(i);
         }
     }
 
-    
-private boolean isValidGhostSpawn(Map room, Ghost ghost,
-                                  float x, float y) {
+        
+    private boolean isValidGhostSpawn(Map room, Ghost ghost, float x, float y) {
 
-    float width = ghost.getBounds().getWidth();
-    float height = ghost.getBounds().getHeight();
+        float width = ghost.getBounds().getWidth();
+        float height = ghost.getBounds().getHeight();
 
-    // The ghost must remain within the map boundaries.
-    if (x < 0 || y < 0
-            || x + width > room.getWidthPixels()
-            || y + height > room.getHeightPixels()) {
-        return false;
-    }
+        // The ghost must remain within the map boundaries.
+        if (x < 0 || y < 0
+                || x + width > room.getWidthPixels()
+                || y + height > room.getHeightPixels()) {
+            return false;
+        }
 
-    // Check the four corners against solid map tiles.
-    float[] xs = {x, x + width - 1};
-    float[] ys = {y, y + height - 1};
+        // Check the four corners against solid map tiles.
+        float[] xs = {x, x + width - 1};
+        float[] ys = {y, y + height - 1};
 
-    for (float px : xs) {
-        for (float py : ys) {
-            MapTile tile = room.getTileByPosition(px, py);
+        for (float px : xs) {
+            for (float py : ys) {
+                MapTile tile = room.getTileByPosition(px, py);
 
-            if (tile == null ||
-                    tile.getTileType() == TileType.NOT_PASSABLE) {
+                if (tile == null ||
+                        tile.getTileType() == TileType.NOT_PASSABLE) {
+                    return false;
+                }
+            }
+        }
+
+        // Check solid furniture and other enhanced map tiles.
+        for (EnhancedMapTile object : room.getEnhancedMapTiles()) {
+            if (object.getTileType() != TileType.NOT_PASSABLE
+                    || !object.exists()) {
+                continue;
+            }
+
+            float ox = object.getBounds().getX();
+            float oy = object.getBounds().getY();
+            float ow = object.getBounds().getWidth();
+            float oh = object.getBounds().getHeight();
+
+            if (x < ox + ow && x + width > ox
+                    && y < oy + oh && y + height > oy) {
                 return false;
             }
         }
+
+        return true;
     }
-
-    // Check solid furniture and other enhanced map tiles.
-    for (EnhancedMapTile object : room.getEnhancedMapTiles()) {
-        if (object.getTileType() != TileType.NOT_PASSABLE
-                || !object.exists()) {
-            continue;
-        }
-
-        float ox = object.getBounds().getX();
-        float oy = object.getBounds().getY();
-        float ow = object.getBounds().getWidth();
-        float oh = object.getBounds().getHeight();
-
-        if (x < ox + ow && x + width > ox
-                && y < oy + oh && y + height > oy) {
-            return false;
-        }
-    }
-
-    return true;
-}
 
 
     public void draw(GraphicsHandler graphicsHandler) {
