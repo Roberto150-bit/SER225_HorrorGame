@@ -11,11 +11,19 @@ import Players.DeanPlayer;
 import Utils.Direction;
 import Utils.Point;
 import java.awt.Color;
+import java.util.HashMap;
+import java.util.HashSet;
 
 // This class is for when the RPG game is actually being played
 public class PlayLevelScreen extends Screen implements GameListener {
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
+    
+    // Retains one instance of each room during the playthrough.
+    protected final HashMap<String, Map> loadedRooms = new HashMap<>();
+    // Tracks rooms whose scripts have already been initialized.
+    protected final HashSet<Map> preloadedRooms = new HashSet<>();
+    
     protected Player player;
     protected PlayLevelScreenState playLevelScreenState;
     protected WinScreen winScreen;
@@ -52,7 +60,10 @@ public class PlayLevelScreen extends Screen implements GameListener {
         //map = new TestMap();
 
         map = new BasementMap();
-
+        loadedRooms.clear();
+        preloadedRooms.clear();
+        
+        loadedRooms.put(map.getClass().getName(), map);
         map.setFlagManager(flagManager);
 
         // setup player
@@ -74,6 +85,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // preloads all scripts ahead of time rather than loading them dynamically
         // both are supported, however preloading is recommended
         map.preloadScripts();
+        preloadedRooms.add(map);
         
         darknessManager = new DarknessManager(180.0f);
     
@@ -121,7 +133,18 @@ public class PlayLevelScreen extends Screen implements GameListener {
         if (transitionPhase != TransitionPhase.NONE) {
             return;
         }
-        pendingMap = newMap;
+
+        // Identify the destination room.
+        String roomId = newMap.getClass().getName();
+
+        // Reuse an existing room or register it on first entry.
+        if (loadedRooms.containsKey(roomId)) {
+            pendingMap = loadedRooms.get(roomId);
+        } else {
+            loadedRooms.put(roomId, newMap);
+            pendingMap = newMap;
+        }
+
         pendingSpawnPosition = spawnPosition;
         pendingFacingDirection = facingDirection;
         transitionPhase = TransitionPhase.FADING_OUT;
@@ -153,16 +176,28 @@ public class PlayLevelScreen extends Screen implements GameListener {
         pendingMap.setUI(map.getUI());
         pendingMap.setBookOpen(false);
         pendingMap.setPlayer(player);
-        pendingMap.addListener(this);
+
+        // Register this screen only once per room.
+        if (!pendingMap.getListeners().contains(this)) {
+            pendingMap.addListener(this);
+        }
 
         player.setMap(pendingMap);
         player.setLocation(pendingSpawnPosition.x, pendingSpawnPosition.y);
         player.setFacingDirection(pendingFacingDirection);
         player.setPlayerState(PlayerState.STANDING);
 
-        pendingMap.preloadScripts();
+        // Initialize scripts only when entering a room for the first time.
+        if (preloadedRooms.add(pendingMap)) {
+            pendingMap.preloadScripts();
+        }
+
         map = pendingMap;
+
+        // Clear references from the completed transition.
         pendingMap = null;
+        pendingSpawnPosition = null;
+        pendingFacingDirection = null;
 
         // snaps the camera to the player's new position before the first frame is drawn
         map.update(player);
