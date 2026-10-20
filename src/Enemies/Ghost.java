@@ -25,6 +25,17 @@ public class Ghost extends NPC {
     protected float speed = 1.4f;
     protected float followDistance = 60f;
 
+    // Tracks when an obstacle prevents the ghost from moving.
+    protected int stuckFrames = 0;
+    protected boolean isStuck = false;
+    
+    // Temporary direction used to navigate around obstacles.
+    protected int avoidanceFrames = 0;
+    protected int avoidanceDirection = 1;
+
+    // Maximum distance at which the ghost detects the player.
+    protected float detectionRadius = 220f;
+
     // health values
     public static final int DEFAULT_HEALTH = 3;
     protected int maxHealth;
@@ -116,6 +127,15 @@ public class Ghost extends NPC {
             attackCooldown--;
         }
 
+        // Stay idle until the player enters the detection radius.
+        if (distance > detectionRadius) {
+            currentAnimationName =
+                currentAnimationName.contains("RIGHT")
+                    ? "STAND_RIGHT"
+                    : "STAND_LEFT";
+            return;
+        }
+
         // don't attack while the player is reading, in a cutscene, or doing a puzzle
         boolean playerIsBusy = player.isLocked() || map.isBookOpen() || map.getPuzzleUI().isOpen() || map.getTextbox().isActive();
         if (distance <= ATTACK_RANGE && attackCooldown == 0 && !playerIsBusy && !player.isDead()) {
@@ -131,12 +151,56 @@ public class Ghost extends NPC {
             } else if (dx > 0) {
                 currentAnimationName = "WALK_RIGHT";
             }
-            if (Math.abs(dx) > 1) {
-                moveXHandleCollision(Math.signum(dx) * speed);
+            float movedX = 0;
+            float movedY = 0;
+
+            if (avoidanceFrames > 0) {
+                // Move perpendicular to the player to get around an obstacle.
+                if (Math.abs(dx) >= Math.abs(dy)) {
+                    movedY = moveYHandleCollision(avoidanceDirection * speed);
+                } else {
+                    movedX = moveXHandleCollision(avoidanceDirection * speed);
+                }
+
+                avoidanceFrames--;
+
+                // Try the opposite side if this direction is blocked.
+                if (Math.abs(movedX) + Math.abs(movedY) < 0.01f) {
+                    avoidanceDirection *= -1;
+                    avoidanceFrames = 45;
+                }
+            } else {
+                // Normal chase behavior.
+                if (Math.abs(dx) > 1) {
+                    movedX = moveXHandleCollision(Math.signum(dx) * speed);
+                }
+
+                if (Math.abs(dy) > 1) {
+                    movedY = moveYHandleCollision(Math.signum(dy) * speed);
+                }
+
+                boolean attemptedMovement =
+                        Math.abs(dx) > 1 || Math.abs(dy) > 1;
+
+                boolean movementBlocked =
+                        Math.abs(movedX) + Math.abs(movedY) < 0.01f;
+
+                if (attemptedMovement && movementBlocked) {
+                    stuckFrames++;
+                } else {
+                    stuckFrames = 0;
+                }
+
+                // Begin navigating around the obstacle.
+                if (stuckFrames >= 15) {
+                    avoidanceFrames = 45;
+                    stuckFrames = 0;
+                }
             }
-            if (Math.abs(dy) > 1) {
-                moveYHandleCollision(Math.signum(dy) * speed);
-            }
+
+            isStuck = avoidanceFrames > 0;
+
+            
         } else {
             currentAnimationName = currentAnimationName.contains("RIGHT") ? "STAND_RIGHT" : "STAND_LEFT";
         }
