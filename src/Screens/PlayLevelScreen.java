@@ -10,6 +10,7 @@ import Maps.BasementMap;
 import Players.DeanPlayer;
 import Utils.Direction;
 import Utils.Point;
+import java.awt.Color;
 
 // This class is for when the RPG game is actually being played
 public class PlayLevelScreen extends Screen implements GameListener {
@@ -195,6 +196,17 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 levelProgressHUD.draw(graphicsHandler);
 
                 healthHUD.draw(graphicsHandler, player);
+
+                // Render the fade during room transitions.
+                if (fadeAlpha > 0) {
+                    graphicsHandler.drawFilledRectangle(
+                        0,
+                        0,
+                        graphicsHandler.getGraphics().getClipBounds().width,
+                        graphicsHandler.getGraphics().getClipBounds().height,
+                        new Color(0, 0, 0, fadeAlpha)
+                    );
+                }
 
                 break;
             case LEVEL_COMPLETED:
