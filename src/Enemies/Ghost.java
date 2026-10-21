@@ -3,6 +3,7 @@ package Enemies;
 import Builders.FrameBuilder;
 import Engine.GraphicsHandler;
 import Engine.ImageLoader;
+import Engine.SoundPlayer;
 import GameObject.Frame;
 import GameObject.ImageEffect;
 import GameObject.SpriteSheet;
@@ -139,6 +140,7 @@ public class Ghost extends NPC {
         // don't attack while the player is reading, in a cutscene, or doing a puzzle
         boolean playerIsBusy = player.isLocked() || map.isBookOpen() || map.getPuzzleUI().isOpen() || map.getTextbox().isActive();
         if (distance <= ATTACK_RANGE && attackCooldown == 0 && !playerIsBusy && !player.isDead()) {
+            SoundPlayer.play("ghostAttackSound.wav");
             isAttacking = true;
             attackTimer = 0;
             currentAnimationName = dx < 0 ? "ATTACK_LEFT" : "ATTACK_RIGHT";

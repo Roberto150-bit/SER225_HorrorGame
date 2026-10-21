@@ -3,6 +3,7 @@ package Maps;
 import Enemies.Ghost;
 import Enemies.SmallGhost;
 import Engine.ImageLoader;
+import Engine.MusicPlayer;
 import EnhancedMapTiles.*;
 import Level.*;
 import NPCs.Bug;
@@ -19,10 +20,12 @@ import java.util.ArrayList;
 
 // Represents a test map to be used in a level
 public class TestMap extends Map {
+    MusicPlayer music = new MusicPlayer();
 
     public TestMap() {
         super("test_map.txt", new CommonTileset());
         this.playerStartPosition = getMapTile(17, 20).getLocation();
+        music.stop();
     }
 
     @Override

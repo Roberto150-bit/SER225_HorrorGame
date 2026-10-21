@@ -61,7 +61,7 @@ public abstract class Player extends GameObject {
     
     private boolean hasCollectible = false;
 
-    // hearts
+    // Health System
     protected int maxHealth = 3;
     protected int health = maxHealth;
     protected static final int HURT_FRAMES = 30; // length of the damage animation
@@ -79,7 +79,6 @@ public abstract class Player extends GameObject {
     }
 
     public void update() {
-        
         // Refresh movement controls from Settings.
         MOVE_UP_KEY = KeyBindings.get(0);
         MOVE_LEFT_KEY = KeyBindings.get(1);

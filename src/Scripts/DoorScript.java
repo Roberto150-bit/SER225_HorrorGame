@@ -3,6 +3,10 @@ package Scripts;
 import java.util.ArrayList;
 import java.util.function.Supplier;
 
+import Engine.Key;
+import Engine.KeyLocker;
+import Engine.KeyBindings;
+import Engine.SoundPlayer;
 import Level.Map;
 import Level.Script;
 import ScriptActions.*;
@@ -13,9 +17,11 @@ import Utils.Direction;
 //     triggers.add(new Trigger(x, y, width, height, new DoorScript(() -> new HallwayMap(), 5, 3, Direction.DOWN)));
 // the spawn tile in the destination map should be NEXT to that map's door trigger, not on it, or the player will bounce straight back
 public class DoorScript extends Script {
+    protected KeyLocker keyLocker = new KeyLocker();
     protected Supplier<Map> destinationMap;
     protected int spawnTileX, spawnTileY;
     protected Direction facingDirection;
+    protected Key OPEN_DOOR = Key.E;
 
     public DoorScript(Supplier<Map> destinationMap, int spawnTileX, int spawnTileY, Direction facingDirection) {
         this.destinationMap = destinationMap;
@@ -28,6 +34,7 @@ public class DoorScript extends Script {
     public ArrayList<ScriptAction> loadScriptActions() {
         ArrayList<ScriptAction> scriptActions = new ArrayList<>();
         scriptActions.add(new ChangeMapScriptAction(destinationMap, spawnTileX, spawnTileY, facingDirection));
+        
         return scriptActions;
     }
 }
