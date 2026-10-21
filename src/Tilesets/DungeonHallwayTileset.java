@@ -8,6 +8,7 @@ import GameObject.ImageEffect;
 import Level.TileType;
 import Level.Tileset;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class DungeonHallwayTileset extends Tileset {
     //must be at least 9x9 tiles
@@ -33,35 +34,22 @@ public class DungeonHallwayTileset extends Tileset {
         ArrayList<Integer> leftTiles = new ArrayList<>();
         ArrayList<Integer> rightTiles = new ArrayList<>();
         ArrayList<Integer> cornerTiles = new ArrayList<>();
+        ArrayList<Integer> walkableTiles = new ArrayList<>();
 
+        walkableTiles.addAll(Arrays.asList(19, 28, 37, 38, 39, 40, 41, 42, 43, 49, 58, 67)); //10, 44, 76 are the doors
+        leftTiles.addAll(Arrays.asList(18, 27, 36, 57, 66));
+        rightTiles.addAll(Arrays.asList(20, 59, 68));
+        topTiles.addAll(Arrays.asList(30, 31, 32, 33, 34));
+        bottomTiles.addAll(Arrays.asList(46, 47, 51, 52));
+        cornerTiles.addAll(Arrays.asList(29, 48, 50));
 
-        for (int i = 0; i < TOTAL_TILES; i++){
-            if (i < COLUMNS || i >= TOTAL_TILES - COLUMNS || i % COLUMNS == 0 || i % COLUMNS == COLUMNS - 1) {
+        for (int i = 0; i < TOTAL_TILES; i++) {
+            if (!walkableTiles.contains(i)) {
                 solidTiles.add(i);
             }
-            if (i < COLUMNS) {
-                topTiles.add(i);
-            }
-            if (i >= TOTAL_TILES - COLUMNS) {
-                bottomTiles.add(i);
-            }
-            if (i % COLUMNS == 0) {
-                leftTiles.add(i);
-            }
-            if (i % COLUMNS == COLUMNS - 1) {
-                rightTiles.add(i);
-            }
-            if (i < COLUMNS && i % COLUMNS != 0 && i % COLUMNS != COLUMNS - 1) {
-                cornerTiles.add(i);
-            }
-            //Specific tiles here:
-            /* 
-            if (i == 35 || i == 44 || i == 67){
-                solidTiles.add(i);
-            }
-            */
-        
         }
+        
+        
         
 // need to add        .withBounds(1, 2, 14, 14)
 
@@ -73,17 +61,23 @@ public class DungeonHallwayTileset extends Tileset {
                     .withScale(tileScale);
 
                 if (cornerTiles.contains(index)) {
-                    builder = builder.withBounds(2, 30, 32, 1);
-                } else if (topTiles.contains(index)) { // If statement determines bounds of the non-passable edges of the tileset.
-                    builder = builder.withBounds(2, 0, 16, 1);
-                } else if (bottomTiles.contains(index)) {
-                    builder = builder.withBounds(2, 10, 16, 4);
-                } else if (leftTiles.contains(index)) {
-                    builder = builder.withBounds(10, 4, 10, 32);
-                } else if (rightTiles.contains(index)) {
-                    builder = builder.withBounds(15, 4, 10, 32);
+                    // concave corners: wall is a single block in one quadrant
+                    if (index == 29) {                       // wall top-right
+                        builder = builder.withBounds(11, 0, 21, 23);
+                    } else if (index == 48) {                // wall bottom-left
+                        builder = builder.withBounds(0, 11, 21, 21);
+                    } else if (index == 50) {                // wall bottom-right
+                        builder = builder.withBounds(11, 11, 21, 21);
+                    }
+                } else if (topTiles.contains(index)) {       // wall above, floor below
+                    builder = builder.withBounds(0, 0, 32, 23);
+                } else if (bottomTiles.contains(index)) {    // wall below, floor above
+                    builder = builder.withBounds(0, 11, 32, 21);
+                } else if (leftTiles.contains(index)) {      // wall on the left, floor right
+                    builder = builder.withBounds(0, 0, 21, 32);
+                } else if (rightTiles.contains(index)) {     // wall on the right, floor left
+                    builder = builder.withBounds(11, 0, 21, 32);
                 }
-
                 MapTileBuilder tile = new MapTileBuilder(builder.build());
 
                 if (solidTiles.contains(index)) {

@@ -2,9 +2,8 @@ package MapEditor;
 
 import Level.Map;
 import Utils.Colors;
-
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class MapBuilder extends JPanel {
     private Map map;
@@ -15,14 +14,14 @@ public class MapBuilder extends JPanel {
     private JLabel hoveredTileIndexLabel;
 
     public MapBuilder(SelectedTileIndexHolder controlPanelHolder) {
-        setBackground(Colors.CORNFLOWER_BLUE);
+        setBackground(Colors.BLACK);
         setLocation(205, 5);
         setLayout(new BorderLayout());
 
         JPanel labelPanel = new JPanel();
         labelPanel.setLayout(null);
         labelPanel.setPreferredSize(new Dimension(200, 30));
-        labelPanel.setBackground(Colors.CORNFLOWER_BLUE);
+        labelPanel.setBackground(Colors.BLACK);
         mapWidthLabel = new JLabel("Width: ");
         mapWidthLabel.setSize(70, 20);
         mapWidthLabel.setLocation(2, 5);

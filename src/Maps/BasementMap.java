@@ -20,7 +20,6 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 
-
 public class BasementMap extends Map {
 
     public BasementMap() {
@@ -165,7 +164,7 @@ public class BasementMap extends Map {
 
         // door on the right wall next to the stairs stand on the stairs at (12, 4), face right, and press E to go through
         // TestMap is a placeholder destination until the next room is built
-        getMapTile(13, 4).setInteractScript(new DoorScript(() -> new TestMap(), 22, 20, Direction.RIGHT));
+        getMapTile(13, 4).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 1, 2, Direction.RIGHT));
     }
 
 }
