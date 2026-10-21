@@ -4,6 +4,8 @@ import Level.Map;
 import Maps.TestMap;
 import Maps.TitleScreenMap;
 import Maps.BasementMap;
+import Maps.DungeonCellMap;
+import Maps.DungeonHallwayMap;
 
 import java.util.ArrayList;
 
@@ -13,6 +15,8 @@ public class EditorMaps {
             add("TestMap");
             add("TitleScreen");
             add("BasementMap");
+            add("DungeonCellMap");
+            add("DungeonHallwayMap");
         }};
     }
 
@@ -24,6 +28,10 @@ public class EditorMaps {
                 return new TitleScreenMap();
             case "BasementMap":
                 return new BasementMap();
+            case "DungeonCellMap":
+                return new DungeonCellMap();
+            case "DungeonHallwayMap":
+                return new DungeonHallwayMap();
             default:
                 throw new RuntimeException("Unrecognized map name");
         }
