@@ -243,11 +243,6 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 Ghost ghost = (Ghost) npc;
                 boolean canFollow = ghost.canFollowThroughDoor(player);
 
-                System.out.println(
-                    "Ghost: " + ghost.getClass().getSimpleName()
-                    + " | Can follow: " + canFollow
-                );
-
                 if (canFollow) {
                     followingGhosts.add(ghost);
                 }
@@ -310,9 +305,6 @@ public class PlayLevelScreen extends Screen implements GameListener {
         }
 
         pursuingGhostDistances.clear();
-
-
-        System.out.println("Ghosts transferred: " + followingGhosts.size());
 
         // Move Dean to the destination room.
         player.setMap(pendingMap);

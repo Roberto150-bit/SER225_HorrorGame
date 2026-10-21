@@ -4,6 +4,8 @@ package Puzzles;
 import Engine.GraphicsHandler;
 import java.awt.Color;
 import java.awt.Font;
+import java.util.Arrays;
+import java.util.Random;
 
 public class SymbolLockMinigame implements PuzzleMinigame {
 
@@ -11,11 +13,26 @@ public class SymbolLockMinigame implements PuzzleMinigame {
     private final int dialCount;
     private final int symbolCount;
 
-    private int[] currentSymbols;
-    private int[] targetSymbols;
+    private final int[] currentSymbols;
+    private final int[] targetSymbols;
+    private final int[] clueSymbols;
+
     private boolean solved;
 
-    // Creates a Symbol Lock with settings based on difficulty.
+    // Matches the existing PuzzleUI window.
+    private static final int PANEL_X = 150;
+    private static final int PANEL_Y = 100;
+    private static final int PANEL_WIDTH = 500;
+
+    private static final int DIAL_Y = 310;
+    private static final int DIAL_RADIUS = 29;
+
+    private static final Color GOLD =
+        new Color(220, 190, 135);
+
+    private static final Color DARK =
+        new Color(38, 34, 32);
+
     public SymbolLockMinigame(PuzzleConfig config) {
         this.config = config;
 
@@ -36,92 +53,268 @@ public class SymbolLockMinigame implements PuzzleMinigame {
                 break;
 
             default:
-                throw new IllegalArgumentException("Unknown difficulty");
+                throw new IllegalArgumentException(
+                    "Unknown difficulty"
+                );
         }
 
         currentSymbols = new int[dialCount];
         targetSymbols = new int[dialCount];
+        clueSymbols = new int[dialCount];
 
+        generateSolution();
         reset();
+    }
+
+    // Generate a reproducible combination for this instance.
+    private void generateSolution() {
+
+        long seed = 31L * config.getInstanceId().hashCode()
+            + config.getPuzzleType().ordinal();
+
+        seed = 31L * seed
+            + config.getDifficulty().ordinal();
+
+        Random random = new Random(seed);
+
+        // Every instance receives its own combination.
+        for (int i = 0; i < dialCount; i++) {
+            targetSymbols[i] = random.nextInt(symbolCount);
+        }
+
+        // Avoid starting with an already-solved combination.
+        boolean allFirst = true;
+
+        for (int value : targetSymbols) {
+            if (value != 0) {
+                allFirst = false;
+                break;
+            }
+        }
+
+        if (allFirst) {
+            targetSymbols[0] = 1;
+        }
+
+        generateClues();
+    }
+
+    // Generate clues directly from the correct answer.
+    private void generateClues() {
+
+        int shift = getClueShift();
+
+        for (int i = 0; i < dialCount; i++) {
+
+            int encoded =
+                (targetSymbols[i] + shift) % symbolCount;
+
+            if (config.getDifficulty() ==
+                    PuzzleDifficulty.HARD) {
+
+                // Hard clues are also reversed.
+                clueSymbols[dialCount - 1 - i] = encoded;
+
+            } else {
+                clueSymbols[i] = encoded;
+            }
+        }
+    }
+
+    private int getClueShift() {
+
+        switch (config.getDifficulty()) {
+            case EASY:
+                return 0;
+
+            case MEDIUM:
+                return 1;
+
+            case HARD:
+                return 2;
+
+            default:
+                return 0;
+        }
+    }
+
+    // One shared layout for every difficulty.
+    private int getDialCenterX(int index) {
+
+        int spacing = PANEL_WIDTH / (dialCount + 1);
+
+        return PANEL_X + spacing * (index + 1);
     }
 
     @Override
     public void update() {
-        // Puzzle logic will be added in the next steps.
+        // No continuous updates required.
     }
 
-    
-    
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
 
-        // Match the existing PuzzleUI window position.
-        int puzzleX = 150;
-        int puzzleY = 100;
+        Font heading = new Font(
+            "Serif", Font.BOLD, 19
+        );
 
-        // Dial centers relative to the 500x350 background.
-        int[] dialCentersX = {115, 250, 385};
-        int dialCenterY = 175;
+        Font numberFont = new Font(
+            "Serif", Font.BOLD, 29
+        );
 
-        // Draw each symbol in its corresponding dial.
+        Font instructionFont = new Font(
+            "Serif", Font.PLAIN, 15
+        );
+
+        // Dark area for puzzle-specific instructions.
+        graphicsHandler.drawFilledRectangle(
+            PANEL_X + 20,
+            PANEL_Y + 75,
+            460,
+            95,
+            DARK
+        );
+
+        graphicsHandler.drawString(
+            "THE SEALED COMBINATION",
+            PANEL_X + 115,
+            PANEL_Y + 98,
+            heading,
+            GOLD
+        );
+
+        String instruction;
+
+        switch (config.getDifficulty()) {
+
+            case EASY:
+                instruction =
+                    "Enter the etched symbols in order.";
+                break;
+
+            case MEDIUM:
+                instruction =
+                    "Subtract 1 from each symbol. Wrap around.";
+                break;
+
+            case HARD:
+                instruction =
+                    "Read right to left. Subtract 2. Wrap around.";
+                break;
+
+            default:
+                instruction = "";
+        }
+
+        graphicsHandler.drawString(
+            instruction,
+            PANEL_X + 45,
+            PANEL_Y + 119,
+            instructionFont,
+            Color.LIGHT_GRAY
+        );
+
+        // Display clues using the generated solution.
         for (int i = 0; i < dialCount; i++) {
 
-            int dialX = puzzleX + dialCentersX[i];
-            int dialY = puzzleY + dialCenterY;
-
-            String symbol = String.valueOf(currentSymbols[i] + 1);
+            int centerX = getDialCenterX(i);
 
             graphicsHandler.drawString(
-                symbol,
-                dialX - 10,
-                dialY + 12,
-                new Font("Serif", Font.BOLD, 36),
-                new Color(230, 190, 130)
+                String.valueOf(clueSymbols[i] + 1),
+                centerX - 9,
+                PANEL_Y + 158,
+                numberFont,
+                GOLD
             );
         }
+
+        graphicsHandler.drawString(
+            "ROTATE THE DIALS",
+            PANEL_X + 160,
+            PANEL_Y + 192,
+            instructionFont,
+            GOLD
+        );
+
+        // Draw one interactive dial per active symbol.
+        for (int i = 0; i < dialCount; i++) {
+
+            int centerX = getDialCenterX(i);
+
+            graphicsHandler.drawFilledRectangle(
+                centerX - DIAL_RADIUS,
+                DIAL_Y - DIAL_RADIUS,
+                DIAL_RADIUS * 2,
+                DIAL_RADIUS * 2,
+                DARK
+            );
+
+            graphicsHandler.drawRectangle(
+                centerX - DIAL_RADIUS,
+                DIAL_Y - DIAL_RADIUS,
+                DIAL_RADIUS * 2,
+                DIAL_RADIUS * 2,
+                GOLD,
+                2
+            );
+
+            graphicsHandler.drawString(
+                String.valueOf(currentSymbols[i] + 1),
+                centerX - 9,
+                DIAL_Y + 10,
+                numberFont,
+                Color.WHITE
+            );
+        }
+
+        graphicsHandler.drawString(
+            "Click each dial to rotate",
+            PANEL_X + 150,
+            PANEL_Y + 255,
+            instructionFont,
+            Color.LIGHT_GRAY
+        );
 
         if (solved) {
             graphicsHandler.drawString(
                 "LOCK UNSEALED",
-                325,
-                465,
-                new Font("Serif", Font.BOLD, 20),
-                new Color(130, 230, 160)
+                PANEL_X + 165,
+                PANEL_Y + 325,
+                heading,
+                new Color(140, 215, 165)
             );
         }
     }
-    
+
     @Override
     public void onClick(int mouseX, int mouseY) {
 
-        // Match the puzzle window and dial positions.
-        int puzzleX = 150;
-        int puzzleY = 100;
+        if (solved) {
+            return;
+        }
 
-        int[] dialCentersX = {115, 250, 385};
-        int dialCenterY = 175;
-        int dialRadius = 55;
-
-        // Find which dial was clicked.
         for (int i = 0; i < dialCount; i++) {
 
-            int centerX = puzzleX + dialCentersX[i];
-            int centerY = puzzleY + dialCenterY;
+            int centerX = getDialCenterX(i);
 
-            int dx = mouseX - centerX;
-            int dy = mouseY - centerY;
+            boolean insideDial =
+                mouseX >= centerX - DIAL_RADIUS &&
+                mouseX <= centerX + DIAL_RADIUS &&
+                mouseY >= DIAL_Y - DIAL_RADIUS &&
+                mouseY <= DIAL_Y + DIAL_RADIUS;
 
-            // Accept clicks inside the circular dial.
-            if (dx * dx + dy * dy <= dialRadius * dialRadius) {
+            if (insideDial) {
                 rotateDial(i);
                 return;
             }
         }
     }
-    
-    // Rotates one dial to its next available symbol.
+
     public void rotateDial(int dialIndex) {
-        if (solved || dialIndex < 0 || dialIndex >= dialCount) {
+
+        if (solved ||
+            dialIndex < 0 ||
+            dialIndex >= dialCount) {
             return;
         }
 
@@ -131,49 +324,26 @@ public class SymbolLockMinigame implements PuzzleMinigame {
         checkSolution();
     }
 
-    // Checks whether every dial matches the target combination.
     private void checkSolution() {
-        for (int i = 0; i < dialCount; i++) {
-            if (currentSymbols[i] != targetSymbols[i]) {
-                return;
-            }
+
+        if (Arrays.equals(
+                currentSymbols, targetSymbols)) {
+
+            solved = true;
         }
-
-        solved = true;
     }
-
 
     @Override
     public boolean isSolved() {
         return solved;
     }
 
-    
     @Override
     public void reset() {
+
         solved = false;
 
-        // Define the correct combination based on difficulty.
-        switch (config.getDifficulty()) {
-            case EASY:
-                targetSymbols = new int[]{1, 2, 3};
-                break;
-
-            case MEDIUM:
-                targetSymbols = new int[]{2, 4, 1, 3};
-                break;
-
-            case HARD:
-                targetSymbols = new int[]{5, 2, 4, 1, 3};
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unknown difficulty");
-        }
-
-        // Start every dial at its first symbol.
-        for (int i = 0; i < dialCount; i++) {
-            currentSymbols[i] = 0;
-        }
+        // Reset player inputs, NOT the generated solution.
+        Arrays.fill(currentSymbols, 0);
     }
 }
