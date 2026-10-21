@@ -6,6 +6,7 @@ import Engine.GraphicsHandler;
 import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
+import Engine.SoundPlayer;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +36,7 @@ public class Book {
 
     public Book() {
         loadFrames("src/Resources/BookFramesPNG/Intensity", FRAME_COUNT);        buildPingPongOrder();
+        
     }
 
     // Goes through images 1,2,3,4,5,6,7,6,5,4,3,2,1 for animation
@@ -48,10 +50,7 @@ public class Book {
         }
     }
 
-
-
     private void loadFrames(String basePath, int frameCount) {
-
         for (int i = 1; i <= frameCount; i++) {
             File file = new File(basePath + i + ".png");
             try {
@@ -73,7 +72,7 @@ public class Book {
         if (Keyboard.isKeyDown(interactKey) && !keyLocker.isKeyLocked(interactKey)) {
             keyLocker.lockKey(interactKey);
             isActive = !isActive; // toggle open/closed
-            //play sound effect here 
+            SoundPlayer.play("bookOpening.wav");
         }
         else if (Keyboard.isKeyUp(interactKey)) {
             keyLocker.unlockKey(interactKey);
@@ -97,7 +96,7 @@ public class Book {
         isActive = active;
     }
 
-    public BufferedImage getImage() {//Used in the draw method to know which frame to display.
+    public BufferedImage getImage() { //Used in the draw method to know which frame to display.
         if (frames.isEmpty() || playOrder.isEmpty()) {
             return null;
         }
@@ -109,7 +108,6 @@ public class Book {
             BufferedImage current = frames.get(playOrder.get(playOrderIndex));
             graphicsHandler.drawImage(current, -155, 50, 1100, 480); // Draws one frame at a time.
         }
-
     }
 
 

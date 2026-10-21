@@ -1,5 +1,14 @@
 package Level;
 
+import java.io.File;
+import java.io.IOException;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 import Engine.GraphicsHandler;
 import Engine.Key;
 import Engine.KeyLocker;
@@ -46,7 +55,7 @@ public abstract class Player extends GameObject {
     protected Key INTERACT_KEY = Key.E;
     protected Key DROP_KEY = Key.Q;
     protected Key PICKUP_KEY = Key.E;
-    protected Key OPEN_BOOK_KEY = Key.C; 
+    public Key OPEN_BOOK_KEY = Key.C; 
 
     protected boolean isLocked = false;
     
@@ -136,7 +145,6 @@ public abstract class Player extends GameObject {
             playerState = PlayerState.WALKING;
         }
     }
-
 
     // player WALKING state logic
     protected void playerWalking() {
