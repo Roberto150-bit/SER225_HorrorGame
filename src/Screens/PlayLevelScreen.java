@@ -1,6 +1,7 @@
 package Screens;
 
 import Engine.GraphicsHandler;
+import Engine.MusicManager;
 import Engine.Screen;
 import Game.GameState;
 import Game.ScreenCoordinator;
@@ -60,6 +61,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
         //map = new TestMap();
 
         map = new BasementMap();
+        MusicManager.play("Resources/Audios/Music/Electricity.wav", 0.6f, true);
+
         loadedRooms.clear();
         preloadedRooms.clear();
         
@@ -210,7 +213,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 map.drawWorld(player, graphicsHandler);
                 
                 if (!map.isBookOpen()) {
-                    darknessManager.setTargetRadius(180);//180
+                    darknessManager.setTargetRadius(230);//180
                     darknessManager.draw(
                             graphicsHandler,
                             player,
