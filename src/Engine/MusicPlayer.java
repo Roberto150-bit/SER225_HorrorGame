@@ -11,16 +11,12 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
  
 /**
- * Plays a single soundtrack (WAV) with play / pause / resume / stop,
- * looping, and volume control.
- *
- * To use in the class:
- *   MusicPlayer music = new MusicPlayer();
- *   music.setMusicFile("Resources/Audios/Music/Electricity.wav"); or whatever the file name is
- *   music.setLooping(true);
- *   music.setVolume(0.6f);
- *   music.play();
- */
+Is run through music manager to play music in the game. 
+Should only play one music track at a time, and should be used for background music.
+
+To use, call MusicManager.play("path/to/music.wav", volume, loop) to start playing a track. 
+To stop the music, call MusicManager.stop() or play the next track, which will automatically stop the previous track.
+*/
 
 public class MusicPlayer {
  

@@ -73,6 +73,7 @@ public class Book {
         if (Keyboard.isKeyDown(interactKey) && !keyLocker.isKeyLocked(interactKey)) {
             keyLocker.lockKey(interactKey);
             isActive = !isActive; // toggle open/closed
+            //play sound effect here 
         }
         else if (Keyboard.isKeyUp(interactKey)) {
             keyLocker.unlockKey(interactKey);

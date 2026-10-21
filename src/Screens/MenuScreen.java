@@ -7,13 +7,10 @@ import Level.Map;
 import Maps.TitleScreenMap;
 import SpriteFont.SpriteFont;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-import java.awt.image.BufferedImage;
 
 // This is the class for the main menu screen
 public class MenuScreen extends Screen {
@@ -28,7 +25,8 @@ public class MenuScreen extends Screen {
     protected int pointerLocationX, pointerLocationY;
     protected KeyLocker keyLocker = new KeyLocker(); 
     protected BufferedImage menuImage;
-    
+    protected MusicPlayer music;
+
     public MenuScreen(ScreenCoordinator screenCoordinator) {
         this.screenCoordinator = screenCoordinator;
     }
@@ -67,6 +65,9 @@ public class MenuScreen extends Screen {
             System.out.println(fontName);
         }
         */
+
+        //play music here
+        MusicManager.play("Resources/Audios/Music/MenuMusic.wav", 0.6f, true);
     }
 
     public void update() {
