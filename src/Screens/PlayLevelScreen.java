@@ -658,12 +658,12 @@ public class PlayLevelScreen extends Screen implements GameListener {
             );
         }
 
-        // Draw gameplay UI first.
         map.drawUI(graphicsHandler);
 
-        // Draw dialogue and journal last, above the hotbar.
-        map.drawOverlays(graphicsHandler);
-
+        if (playLevelScreenState == PlayLevelScreenState.RUNNING) {
+            map.drawOverlays(graphicsHandler);
+        }
+        
         // Display the XP bar above the game world.
         levelProgressHUD.draw(graphicsHandler);
 
