@@ -19,12 +19,12 @@ public class SymbolLockMinigame implements PuzzleMinigame {
 
     private boolean solved;
 
-    // Matches the existing PuzzleUI window.
     private static final int PANEL_X = 150;
     private static final int PANEL_Y = 100;
     private static final int PANEL_WIDTH = 500;
 
-    private static final int DIAL_Y = 310;
+    // Center the controls inside the artwork's rings.
+    private static final int DIAL_Y = 280;
     private static final int DIAL_RADIUS = 29;
 
     private static final Color GOLD =
@@ -66,7 +66,6 @@ public class SymbolLockMinigame implements PuzzleMinigame {
         reset();
     }
 
-    // Generate a reproducible combination for this instance.
     private void generateSolution() {
 
         long seed = 31L * config.getInstanceId().hashCode()
@@ -77,12 +76,11 @@ public class SymbolLockMinigame implements PuzzleMinigame {
 
         Random random = new Random(seed);
 
-        // Every instance receives its own combination.
         for (int i = 0; i < dialCount; i++) {
             targetSymbols[i] = random.nextInt(symbolCount);
         }
 
-        // Avoid starting with an already-solved combination.
+        // Prevent the puzzle from starting solved.
         boolean allFirst = true;
 
         for (int value : targetSymbols) {
@@ -99,7 +97,6 @@ public class SymbolLockMinigame implements PuzzleMinigame {
         generateClues();
     }
 
-    // Generate clues directly from the correct answer.
     private void generateClues() {
 
         int shift = getClueShift();
@@ -112,7 +109,6 @@ public class SymbolLockMinigame implements PuzzleMinigame {
             if (config.getDifficulty() ==
                     PuzzleDifficulty.HARD) {
 
-                // Hard clues are also reversed.
                 clueSymbols[dialCount - 1 - i] = encoded;
 
             } else {
@@ -138,7 +134,6 @@ public class SymbolLockMinigame implements PuzzleMinigame {
         }
     }
 
-    // One shared layout for every difficulty.
     private int getDialCenterX(int index) {
 
         int spacing = PANEL_WIDTH / (dialCount + 1);
@@ -154,137 +149,187 @@ public class SymbolLockMinigame implements PuzzleMinigame {
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
 
-        Font heading = new Font(
-            "Serif", Font.BOLD, 19
-        );
+        if (solved) {
+            return;
+        }
 
-        Font numberFont = new Font(
-            "Serif", Font.BOLD, 29
-        );
+        java.awt.Graphics2D g = graphicsHandler.getGraphics();
 
-        Font instructionFont = new Font(
-            "Serif", Font.PLAIN, 15
-        );
+        Color gold = new Color(215, 177, 108);
+        Color dark = new Color(38, 26, 35);
+        Color inner = new Color(76, 48, 54);
+        Color light = new Color(245, 221, 175);
 
-        // Dark area for puzzle-specific instructions.
+        int centerX = PANEL_X + PANEL_WIDTH / 2;
+
+        // Medium/Hard: hide the three fixed artwork rings
+        // with one reusable metal plate for additional dials.
+        if (dialCount > 3) {
+            graphicsHandler.drawFilledRectangle(
+                PANEL_X + 20,
+                DIAL_Y - 72,
+                PANEL_WIDTH - 40,
+                144,
+                dark
+            );
+
+            graphicsHandler.drawRectangle(
+                PANEL_X + 20,
+                DIAL_Y - 72,
+                PANEL_WIDTH - 40,
+                144,
+                gold,
+                2
+            );
+        }
+
+        // All difficulties use the same generated dial layout.
+        for (int i = 0; i < dialCount; i++) {
+
+            int dialX = getDialCenterX(i);
+            int dialY = DIAL_Y;
+
+            int radius = DIAL_RADIUS;
+
+            // Outer brass border.
+            g.setColor(gold);
+            g.fillOval(
+                dialX - radius - 3,
+                dialY - radius - 3,
+                radius * 2 + 6,
+                radius * 2 + 6
+            );
+
+            // Circular metal control.
+            g.setColor(dark);
+            g.fillOval(
+                dialX - radius,
+                dialY - radius,
+                radius * 2,
+                radius * 2
+            );
+
+            g.setColor(inner);
+            g.fillOval(
+                dialX - radius + 6,
+                dialY - radius + 6,
+                radius * 2 - 12,
+                radius * 2 - 12
+            );
+
+            // Current dial value.
+            String value = String.valueOf(
+                currentSymbols[i] + 1
+            );
+
+            Font dialFont = new Font(
+                "Serif", Font.BOLD, 26
+            );
+
+            g.setFont(dialFont);
+
+            int textWidth = g.getFontMetrics()
+                .stringWidth(value);
+
+            graphicsHandler.drawString(
+                value,
+                dialX - textWidth / 2,
+                dialY + 9,
+                dialFont,
+                light
+            );
+        }
+
+        // Dark backing improves readability on the plaque.
+        int plaqueX = PANEL_X + 55;
+        int plaqueY = PANEL_Y + 251;
+        int plaqueWidth = PANEL_WIDTH - 110;
+
         graphicsHandler.drawFilledRectangle(
-            PANEL_X + 20,
-            PANEL_Y + 75,
-            460,
-            95,
-            DARK
+            plaqueX,
+            plaqueY,
+            plaqueWidth,
+            43,
+            dark
         );
+
+        graphicsHandler.drawRectangle(
+            plaqueX,
+            plaqueY,
+            plaqueWidth,
+            43,
+            gold,
+            1
+        );
+
+        // Display the generated clue.
+        StringBuilder clue = new StringBuilder();
+
+        for (int i = 0; i < dialCount; i++) {
+            if (i > 0) {
+                clue.append("  -  ");
+            }
+            clue.append(clueSymbols[i] + 1);
+        }
+
+        Font clueFont = new Font(
+            "Serif", Font.BOLD, 17
+        );
+
+        g.setFont(clueFont);
+
+        String clueText = "CLUE: " + clue;
+
+        int clueWidth = g.getFontMetrics()
+            .stringWidth(clueText);
 
         graphicsHandler.drawString(
-            "THE SEALED COMBINATION",
-            PANEL_X + 115,
-            PANEL_Y + 98,
-            heading,
-            GOLD
+            clueText,
+            centerX - clueWidth / 2,
+            plaqueY + 18,
+            clueFont,
+            light
         );
 
+        // Short difficulty instructions.
         String instruction;
 
         switch (config.getDifficulty()) {
-
             case EASY:
-                instruction =
-                    "Enter the etched symbols in order.";
+                instruction = "Enter the symbols in order";
                 break;
 
             case MEDIUM:
-                instruction =
-                    "Subtract 1 from each symbol. Wrap around.";
+                instruction = "Subtract 1 from each - wrap at 5";
                 break;
 
             case HARD:
-                instruction =
-                    "Read right to left. Subtract 2. Wrap around.";
+                instruction = "Reverse order - subtract 2 - wrap at 6";
                 break;
 
             default:
                 instruction = "";
         }
 
+        Font hintFont = new Font(
+            "Serif", Font.PLAIN, 13
+        );
+
+        g.setFont(hintFont);
+
+        int hintWidth = g.getFontMetrics()
+            .stringWidth(instruction);
+
         graphicsHandler.drawString(
             instruction,
-            PANEL_X + 45,
-            PANEL_Y + 119,
-            instructionFont,
-            Color.LIGHT_GRAY
+            centerX - hintWidth / 2,
+            plaqueY + 35,
+            hintFont,
+            light
         );
-
-        // Display clues using the generated solution.
-        for (int i = 0; i < dialCount; i++) {
-
-            int centerX = getDialCenterX(i);
-
-            graphicsHandler.drawString(
-                String.valueOf(clueSymbols[i] + 1),
-                centerX - 9,
-                PANEL_Y + 158,
-                numberFont,
-                GOLD
-            );
-        }
-
-        graphicsHandler.drawString(
-            "ROTATE THE DIALS",
-            PANEL_X + 160,
-            PANEL_Y + 192,
-            instructionFont,
-            GOLD
-        );
-
-        // Draw one interactive dial per active symbol.
-        for (int i = 0; i < dialCount; i++) {
-
-            int centerX = getDialCenterX(i);
-
-            graphicsHandler.drawFilledRectangle(
-                centerX - DIAL_RADIUS,
-                DIAL_Y - DIAL_RADIUS,
-                DIAL_RADIUS * 2,
-                DIAL_RADIUS * 2,
-                DARK
-            );
-
-            graphicsHandler.drawRectangle(
-                centerX - DIAL_RADIUS,
-                DIAL_Y - DIAL_RADIUS,
-                DIAL_RADIUS * 2,
-                DIAL_RADIUS * 2,
-                GOLD,
-                2
-            );
-
-            graphicsHandler.drawString(
-                String.valueOf(currentSymbols[i] + 1),
-                centerX - 9,
-                DIAL_Y + 10,
-                numberFont,
-                Color.WHITE
-            );
-        }
-
-        graphicsHandler.drawString(
-            "Click each dial to rotate",
-            PANEL_X + 150,
-            PANEL_Y + 255,
-            instructionFont,
-            Color.LIGHT_GRAY
-        );
-
-        if (solved) {
-            graphicsHandler.drawString(
-                "LOCK UNSEALED",
-                PANEL_X + 165,
-                PANEL_Y + 325,
-                heading,
-                new Color(140, 215, 165)
-            );
-        }
     }
+
+
 
     @Override
     public void onClick(int mouseX, int mouseY) {
@@ -343,7 +388,7 @@ public class SymbolLockMinigame implements PuzzleMinigame {
 
         solved = false;
 
-        // Reset player inputs, NOT the generated solution.
+        // Keep the same solution when restarting.
         Arrays.fill(currentSymbols, 0);
     }
 }

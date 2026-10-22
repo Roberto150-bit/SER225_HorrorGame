@@ -4,57 +4,82 @@ package Puzzles;
 import Engine.GraphicsHandler;
 import java.awt.Color;
 import java.awt.Font;
+import java.util.Random;
 
 public class TuneRadioMinigame implements PuzzleMinigame {
 
-    private final PuzzleConfig config;
-
-    private final int minFrequency;
+    private final int minFrequency = 80;
     private final int maxFrequency;
     private final int tuningStep;
     private final int targetFrequency;
 
     private int currentFrequency;
     private boolean solved;
+    private boolean incorrectAttempt;
 
-    // Set the radio's tuning difficulty.
+    // Illustrated knob positions.
+    private static final int LEFT_KNOB_X = 310;
+    private static final int RIGHT_KNOB_X = 470;
+    private static final int KNOB_Y = 320;
+    private static final int KNOB_RADIUS = 35;
+
+    // Entire bottom plaque acts as Submit.
+    private static final int SUBMIT_X = 240;
+    private static final int SUBMIT_Y = 340;
+    private static final int SUBMIT_WIDTH = 320;
+    private static final int SUBMIT_HEIGHT = 45;
+
+    private static final Color GOLD =
+        new Color(245, 215, 160);
+
+    private static final Color DARK_TEXT =
+        new Color(60, 28, 34);
+
     public TuneRadioMinigame(PuzzleConfig config) {
-        this.config = config;
 
         switch (config.getDifficulty()) {
             case EASY:
-                minFrequency = 80;
                 maxFrequency = 100;
                 tuningStep = 2;
-                targetFrequency = 90;
                 break;
 
             case MEDIUM:
-                minFrequency = 80;
                 maxFrequency = 110;
                 tuningStep = 1;
-                targetFrequency = 97;
                 break;
 
             case HARD:
-                minFrequency = 80;
                 maxFrequency = 120;
                 tuningStep = 1;
-                targetFrequency = 113;
                 break;
 
             default:
-                throw new IllegalArgumentException("Unknown difficulty");
+                throw new IllegalArgumentException(
+                    "Unknown difficulty"
+                );
         }
+
+        long seed =
+            31L * config.getInstanceId().hashCode()
+            + config.getPuzzleType().ordinal();
+
+        seed = 31L * seed
+            + config.getDifficulty().ordinal();
+
+        Random random = new Random(seed);
+
+        int positions =
+            (maxFrequency - minFrequency) / tuningStep;
+
+        targetFrequency = minFrequency
+            + (1 + random.nextInt(positions)) * tuningStep;
 
         reset();
     }
 
-    // Adjust frequency without exceeding its allowed range.
     public void tune(int direction) {
-        if (solved) {
-            return;
-        }
+
+        if (solved) return;
 
         currentFrequency += direction * tuningStep;
 
@@ -63,103 +88,201 @@ public class TuneRadioMinigame implements PuzzleMinigame {
             Math.min(maxFrequency, currentFrequency)
         );
 
-        // Reaching the target transmission solves the puzzle.
+        incorrectAttempt = false;
+    }
+
+    private void submitFrequency() {
+
+        if (solved) return;
+
         if (currentFrequency == targetFrequency) {
             solved = true;
+        } else {
+            incorrectAttempt = true;
         }
+    }
+
+    private int getSignalStrength() {
+
+        int distance =
+            Math.abs(currentFrequency - targetFrequency);
+
+        return Math.max(0, 100 - distance * 10);
+    }
+
+    private String getSignalMessage() {
+
+        if (incorrectAttempt) {
+            return "INCORRECT FREQUENCY";
+        }
+
+        int strength = getSignalStrength();
+
+        if (strength >= 80) {
+            return "STRONG TRANSMISSION";
+        }
+
+        if (strength >= 50) {
+            return "FAINT TRANSMISSION";
+        }
+
+        if (strength >= 20) {
+            return "SIGNAL INTERFERENCE";
+        }
+
+        return "ONLY STATIC";
     }
 
     @Override
     public void update() {
-        // No automatic updates needed yet.
+        // Mouse-controlled puzzle.
     }
 
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
-        // Display the radio's current frequency.
-        graphicsHandler.drawString(
-            "TUNE RADIO",
-            320, 190,
-            new Font("Serif", Font.BOLD, 28),
-            Color.WHITE
-        );
 
-        graphicsHandler.drawString(
-            currentFrequency + " MHz",
-            340, 270,
-            new Font("Serif", Font.BOLD, 36),
-            new Color(230, 190, 130)
-        );
-
-        // Show the target frequency for initial testing.
-        graphicsHandler.drawString(
-            "Find signal: " + targetFrequency + " MHz",
-            290, 330,
-            new Font("Arial", Font.PLAIN, 18),
-            Color.LIGHT_GRAY
-        );
-
-        // Display success after reaching the correct frequency.
         if (solved) {
-            graphicsHandler.drawString(
-                "SIGNAL FOUND",
-                320, 380,
-                new Font("Serif", Font.BOLD, 24),
-                Color.GREEN
-            );
+            return;
         }
 
-        
-        // Draw the decrease-frequency button.
-        graphicsHandler.drawFilledRectangle(
-            270, 345, 80, 45, new Color(75, 55, 60)
+        java.awt.Graphics2D g =
+            graphicsHandler.getGraphics();
+
+        int centerX = 400;
+
+        Color gold = new Color(245, 215, 160);
+        Color darkInk = new Color(65, 30, 35);
+
+        // 1. Signal hint on the parchment.
+        String message = "SIGNAL: " + getSignalMessage();
+
+        Font statusFont =
+            new Font("Serif", Font.BOLD, 13);
+
+        g.setFont(statusFont);
+
+        int statusWidth =
+            g.getFontMetrics().stringWidth(message);
+
+        graphicsHandler.drawString(
+            message,
+            centerX - statusWidth / 2,
+            195,
+            statusFont,
+            darkInk
         );
+
+        // 2. Frequency in the radio display.
+        String frequency = currentFrequency + " MHz";
+
+        Font frequencyFont =
+            new Font("Serif", Font.BOLD, 24);
+
+        g.setFont(frequencyFont);
+
+        int frequencyWidth =
+            g.getFontMetrics().stringWidth(frequency);
+
+        graphicsHandler.drawString(
+            frequency,
+            centerX - frequencyWidth / 2,
+            245,
+            frequencyFont,
+            gold
+        );
+
+        // 3. Signal strength indicator.
+        int strength = getSignalStrength();
+
+        graphicsHandler.drawFilledRectangle(
+            345,
+            264,
+            110 * strength / 100,
+            5,
+            new Color(190, 155, 105)
+        );
+
+        // 4. Functional knob labels.
+        Font knobFont =
+            new Font("Serif", Font.BOLD, 22);
 
         graphicsHandler.drawString(
             "-",
-            298, 378,
-            new Font("Arial", Font.BOLD, 30),
-            Color.WHITE
-        );
-
-        // Draw the increase-frequency button.
-        graphicsHandler.drawFilledRectangle(
-            450, 345, 80, 45, new Color(75, 55, 60)
+            LEFT_KNOB_X - 6,
+            KNOB_Y + 7,
+            knobFont,
+            darkInk
         );
 
         graphicsHandler.drawString(
             "+",
-            476, 378,
-            new Font("Arial", Font.BOLD, 30),
-            Color.WHITE
+            RIGHT_KNOB_X - 7,
+            KNOB_Y + 7,
+            knobFont,
+            darkInk
         );
 
+        // 5. Submit label on the existing plaque.
+        String submitText = incorrectAttempt
+            ? "TRY AGAIN - SUBMIT"
+            : "SUBMIT FREQUENCY";
+
+        Font submitFont =
+            new Font("Serif", Font.BOLD, 18);
+
+        g.setFont(submitFont);
+
+        int submitWidth =
+            g.getFontMetrics().stringWidth(submitText);
+
+        graphicsHandler.drawString(
+            submitText,
+            centerX - submitWidth / 2,
+            380,
+            submitFont,
+            darkInk
+        );
     }
+
 
 
     @Override
     public void onClick(int mouseX, int mouseY) {
 
-        // Ignore clicks once the radio is solved.
-        if (solved) {
+        if (solved) return;
+
+        // Check knobs first to avoid hitbox conflicts.
+        int leftDx = mouseX - LEFT_KNOB_X;
+        int leftDy = mouseY - KNOB_Y;
+
+        if (leftDx * leftDx + leftDy * leftDy
+                <= KNOB_RADIUS * KNOB_RADIUS) {
+
+            tune(-1);
             return;
         }
 
-        // Decrease frequency when the left button is clicked.
-        if (mouseX >= 270 && mouseX <= 350 &&
-            mouseY >= 345 && mouseY <= 390) {
+        int rightDx = mouseX - RIGHT_KNOB_X;
+        int rightDy = mouseY - KNOB_Y;
 
-            tune(-1);
-        }
-
-        // Increase frequency when the right button is clicked.
-        if (mouseX >= 450 && mouseX <= 530 &&
-            mouseY >= 345 && mouseY <= 390) {
+        if (rightDx * rightDx + rightDy * rightDy
+                <= KNOB_RADIUS * KNOB_RADIUS) {
 
             tune(1);
+            return;
+        }
+
+        // Check the entire Submit plaque.
+        boolean clickedSubmit =
+            mouseX >= SUBMIT_X &&
+            mouseX <= SUBMIT_X + SUBMIT_WIDTH &&
+            mouseY >= SUBMIT_Y &&
+            mouseY <= SUBMIT_Y + SUBMIT_HEIGHT;
+
+        if (clickedSubmit) {
+            submitFrequency();
         }
     }
-
 
     @Override
     public boolean isSolved() {
@@ -170,9 +293,9 @@ public class TuneRadioMinigame implements PuzzleMinigame {
     public void reset() {
         currentFrequency = minFrequency;
         solved = false;
+        incorrectAttempt = false;
     }
 
-    // Provides the frequency for the visual display.
     public int getCurrentFrequency() {
         return currentFrequency;
     }
