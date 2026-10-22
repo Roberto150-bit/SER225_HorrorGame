@@ -49,7 +49,8 @@ public class HotbarUI {
 
     private static final Color SELECTED_COLOR = new Color(255, 0, 0, 110);
     private static final Color USING_COLOR = new Color(0, 255, 0, 140);
-    private static final Font SLOT_NUMBER_FONT = new Font("Arial", Font.BOLD, 13);
+    private static final Font SLOT_NUMBER_FONT = new Font("Chalkduster", Font.BOLD, 13);
+    
 
     private static final int DOUBLE_TAP_FRAMES = 25; // max frames between taps of a number for it to count as a double tap
     private static final int USE_FLASH_FRAMES = 20; // how long a slot stays green after its item is used

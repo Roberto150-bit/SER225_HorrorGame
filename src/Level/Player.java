@@ -92,8 +92,7 @@ public abstract class Player extends GameObject {
             invincibleTimer--;
         }
 
-        // player can't move during the damage animation
-        if (!isLocked && hurtTimer == 0) {
+        if (!isLocked) {
             moveAmountX = 0;
             moveAmountY = 0;
 
@@ -353,7 +352,7 @@ public abstract class Player extends GameObject {
         health--;
         hurtTimer = HURT_FRAMES;
         invincibleTimer = INVINCIBLE_FRAMES;
-        playerState = PlayerState.STANDING;
+        playerState = PlayerState.WALKING;
         return true;
     }
 
