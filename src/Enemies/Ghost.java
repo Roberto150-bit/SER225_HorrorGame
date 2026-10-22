@@ -3,6 +3,7 @@ package Enemies;
 import Builders.FrameBuilder;
 import Engine.GraphicsHandler;
 import Engine.ImageLoader;
+import Engine.SoundPlayer;
 import GameObject.Frame;
 import GameObject.ImageEffect;
 import GameObject.SpriteSheet;
@@ -93,8 +94,7 @@ public class Ghost extends NPC {
         return health;
     }
 
-    
-    public boolean canFollowThroughDoor(Player player) {
+    public boolean isWithinDetectionRadius(Player player) {
         if (isBanished || health <= 0 || player == null) {
             return false;
         }
@@ -114,6 +114,10 @@ public class Ghost extends NPC {
         // A nearby ghost may follow even if it is attacking
         // or temporarily stopped close to Dean.
         return distance <= detectionRadius;
+    }
+
+    public boolean canFollowThroughDoor(Player player) {
+        return isWithinDetectionRadius(player);
     }
 
 
@@ -164,6 +168,7 @@ public class Ghost extends NPC {
         // don't attack while the player is reading, in a cutscene, or doing a puzzle
         boolean playerIsBusy = player.isLocked() || map.isBookOpen() || map.getPuzzleUI().isOpen() || map.getTextbox().isActive();
         if (distance <= ATTACK_RANGE && attackCooldown == 0 && !playerIsBusy && !player.isDead()) {
+            SoundPlayer.play("ghostAttackSound.wav");
             isAttacking = true;
             attackTimer = 0;
             currentAnimationName = dx < 0 ? "ATTACK_LEFT" : "ATTACK_RIGHT";

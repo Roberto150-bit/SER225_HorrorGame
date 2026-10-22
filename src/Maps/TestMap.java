@@ -3,6 +3,7 @@ package Maps;
 import Enemies.Ghost;
 import Enemies.SmallGhost;
 import Engine.ImageLoader;
+import Engine.MusicPlayer;
 import EnhancedMapTiles.*;
 import Level.*;
 import NPCs.Bug;
@@ -19,10 +20,12 @@ import java.util.ArrayList;
 
 // Represents a test map to be used in a level
 public class TestMap extends Map {
+    MusicPlayer music = new MusicPlayer();
 
     public TestMap() {
         super("test_map.txt", new CommonTileset());
         this.playerStartPosition = getMapTile(17, 20).getLocation();
+        music.stop();
     }
 
     @Override
@@ -45,7 +48,8 @@ public class TestMap extends Map {
         CellarDoor cellarDoor = new CellarDoor(getMapTile(22, 19).getLocation());
         // cellarDoor.setInteractScript(new DoorScript(() -> new BasementMap(), 1, 7, Direction.RIGHT));
         // spawns the player on the stairs beside the basement's right door
-        cellarDoor.setInteractScript(new DoorScript(() -> new BasementMap(), 12, 4, Direction.LEFT));
+        cellarDoor.setInteractScript(new DoorScript(
+                () -> new BasementMap(), 12, 4, Direction.LEFT, "openingDoor.wav"));
         enhancedMapTiles.add(cellarDoor);
 
         return enhancedMapTiles;
@@ -97,4 +101,3 @@ public class TestMap extends Map {
         getMapTile(2, 6).setInteractScript(new TreeScript());
     }
 }
-

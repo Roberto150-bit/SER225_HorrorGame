@@ -61,9 +61,9 @@ public abstract class Player extends GameObject {
     
     private boolean hasCollectible = false;
 
-    // hearts
-    protected int maxHealth = 3;
-    protected int health = maxHealth;
+    // Health System
+    protected static int maxHealth = 1;
+    protected static int health = maxHealth;
     protected static final int HURT_FRAMES = 30; // length of the damage animation
     protected static final int INVINCIBLE_FRAMES = 90; // frames before the player can be hit again
     protected int hurtTimer = 0;
@@ -79,7 +79,6 @@ public abstract class Player extends GameObject {
     }
 
     public void update() {
-        
         // Refresh movement controls from Settings.
         MOVE_UP_KEY = KeyBindings.get(0);
         MOVE_LEFT_KEY = KeyBindings.get(1);
@@ -355,6 +354,9 @@ public abstract class Player extends GameObject {
         hurtTimer = HURT_FRAMES;
         invincibleTimer = INVINCIBLE_FRAMES;
         playerState = PlayerState.STANDING;
+        if(health == 0) {
+            
+        }
         return true;
     }
 
@@ -384,7 +386,7 @@ public abstract class Player extends GameObject {
         return new Point(getBounds().getX() + getBounds().getWidth() / 2f, getBounds().getY() + getBounds().getHeight() / 2f);
     }
 
-    public int getHealth() { return health; }
+    public static int getHealth() { return health; }
     public int getMaxHealth() { return maxHealth; }
     public boolean isHurt() { return hurtTimer > 0; }
     public boolean isDead() { return health <= 0; }

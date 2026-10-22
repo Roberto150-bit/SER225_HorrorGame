@@ -29,5 +29,8 @@ public class MusicManager {
             currentFile = null;
         }
     }
-}
 
+    public static String getCurrentFile() {
+        return currentFile;
+    }
+}

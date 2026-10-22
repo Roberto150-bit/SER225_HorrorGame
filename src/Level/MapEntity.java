@@ -6,6 +6,10 @@ import GameObject.SpriteSheet;
 
 import java.util.HashMap;
 
+import javax.sound.SoundClip;
+
+import Engine.SoundPlayer;
+
 // This class represents a map entity, which is any "entity" on a map besides the player
 // it is basically a game object with a few extra features for handling things what to do upon the player interacting with them
 public class MapEntity extends GameObject {

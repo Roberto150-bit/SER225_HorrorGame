@@ -670,7 +670,7 @@ public abstract class Map {
         defensiveItemEffect.draw(graphicsHandler, camera);
         puzzleUI.draw(graphicsHandler);
         ui.draw(graphicsHandler);
-        hotbarUI.draw(graphicsHandler);
+        hotbarUI.draw(graphicsHandler, player == null ? 0 : player.getHealth());
     }
 
     
