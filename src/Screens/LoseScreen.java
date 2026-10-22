@@ -47,7 +47,7 @@ public class LoseScreen extends Screen {
         switch (menu.update()) {
             case TRY_AGAIN:
                 Mouse.hideCursor();
-                Player.setHealth(3);
+                Player.setHealth(Player.MAX_HEALTH);
                 playLevelScreen.resetLevel();
                 break;
             case MAIN_MENU:

@@ -34,6 +34,9 @@ public class CollectibleObject extends EnhancedMapTile {
         super(location.x, location.y, new SpriteSheet(loadImage(imageFile), imageSize, imageSize), TileType.PASSABLE);
         this.itemImage = loadImage(imageFile);
         this.itemUse = itemUse;
+        // picked up by walking over it, so it never blocks movement -- otherwise an item dropped on top of the player
+        // (like a ghost's relic) would shove them to the far side of it, possibly into a wall
+        setIsUncollidable(true);
         // gifs are static on the ground but animate once in the hotbar
         if (imageFile.toLowerCase().endsWith(".gif")) {
             gifFrames = ImageLoader.loadGifFrames(imageFile);

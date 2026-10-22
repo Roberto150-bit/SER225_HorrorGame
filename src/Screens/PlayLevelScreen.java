@@ -54,6 +54,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
 
     // Ghosts waiting to enter another room.
     private final ArrayList<GhostArrival> ghostArrivals = new ArrayList<>();
+
+    // last spot the player stood that wasn't inside a wall, used to rescue them if something pushes them into one
+    private float lastSafePlayerX, lastSafePlayerY;
     private boolean ghostChaseMusicPlaying;
     private String musicBeforeGhostChase;
 
@@ -99,6 +102,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // a new game starts with every door locked again and a new code for the final seal
         PuzzleManager.reset();
         Ghost.resetDrops();
+        // full health every new game, including after dying and starting again from the main menu
+        Player.setHealth(Player.MAX_HEALTH);
 
         map = new BasementMap();
         MusicManager.play("Resources/Audios/Music/Electricity.wav", 0.6f, true);
@@ -118,6 +123,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
         player.setMap(map);
         playLevelScreenState = PlayLevelScreenState.RUNNING;
         player.setFacingDirection(Direction.LEFT);
+        lastSafePlayerX = player.getX();
+        lastSafePlayerY = player.getY();
 
         map.setPlayer(player);
 
@@ -162,6 +169,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 }
                 player.update();
                 map.update(player);
+                keepPlayerOutOfWalls();
 
                 darknessManager.update();
                 // show the lose screen after the player's damage animation finishes
@@ -413,6 +421,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
         player.setMap(pendingMap);
         player.setFacingDirection(pendingFacingDirection);
         placePlayerAtSpawn(pendingMap, pendingSpawnPosition);
+        lastSafePlayerX = player.getX();
+        lastSafePlayerY = player.getY();
         player.setPlayerState(PlayerState.STANDING);
 
         // Initialize scripts only once per room.
@@ -464,6 +474,30 @@ public class PlayLevelScreen extends Screen implements GameListener {
         }
 
         player.setLocation(hitboxX - hitboxOffsetX, hitboxY - hitboxOffsetY);
+    }
+
+    // walls are checked with the same bounds the collision code uses, so any spot the player can normally walk to counts as safe
+    private void keepPlayerOutOfWalls() {
+        if (isInsideWall(map, player.getBounds())) {
+            player.setLocation(lastSafePlayerX, lastSafePlayerY);
+        } else {
+            lastSafePlayerX = player.getX();
+            lastSafePlayerY = player.getY();
+        }
+    }
+
+    private boolean isInsideWall(Map room, GameObject.Rectangle bounds) {
+        if (bounds.getX() < 0 || bounds.getY() < 0
+                || bounds.getX() + bounds.getWidth() > room.getWidthPixels()
+                || bounds.getY() + bounds.getHeight() > room.getHeightPixels()) {
+            return true;
+        }
+        for (MapTile tile : room.getMapTiles()) {
+            if (tile.getTileType() == TileType.NOT_PASSABLE && tile.intersects(bounds)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void updateGhostArrivals() {

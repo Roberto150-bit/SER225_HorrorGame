@@ -1,6 +1,7 @@
 package Level;
 
 import GameObject.GameObject;
+import GameObject.Rectangle;
 import Utils.Direction;
 import Utils.Point;
 
@@ -217,8 +218,23 @@ public class MapCollisionHandler {
         }
 
         // for all other cases other than MapTile, let game object subclass (NPC, enhanced map tile, etc.) handle the intersection logic
+        // if the game object was already overlapping the entity before this 1 pixel step (e.g. a ghost floated into the player),
+        // it isn't a collision -- otherwise the game object would be snapped to the entity's far side, which can be inside a wall
         else {
-            return otherEntity.intersects(gameObject);
+            return otherEntity.intersects(gameObject) && !wasAlreadyOverlapping(gameObject, otherEntity, direction);
         }
+    }
+
+    private static boolean wasAlreadyOverlapping(GameObject gameObject, GameObject otherEntity, Direction direction) {
+        Rectangle bounds = gameObject.getBounds();
+        float previousX = bounds.getX();
+        float previousY = bounds.getY();
+        if (direction == Direction.LEFT || direction == Direction.RIGHT) {
+            previousX -= direction.getVelocity();
+        } else {
+            previousY -= direction.getVelocity();
+        }
+        Rectangle previousBounds = new Rectangle(previousX, previousY, bounds.getWidth(), bounds.getHeight());
+        return previousBounds.intersects(otherEntity);
     }
 }

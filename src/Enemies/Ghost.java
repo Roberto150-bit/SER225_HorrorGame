@@ -292,6 +292,8 @@ public class Ghost extends NPC {
             PlayerProgressManager.awardXP(xpReward);
             dropItems();
             isBanished = true;
+            // the fading ghost no longer blocks the player, so it can't push them into a wall
+            setIsUncollidable(true);
             banishTimer = BANISH_FRAMES;
             currentAnimationName = currentAnimationName.contains("RIGHT") ? "STAND_RIGHT" : "STAND_LEFT";
         } else {
