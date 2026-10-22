@@ -185,7 +185,7 @@ public class UI {
                                     "Remember them", 115,260, secretSolverFont, Color.black);
         }
         else if (page == CONTROLS_PAGE) {
-            graphicsHandler.drawString("WASD to Move \nSPACE to Continue\nE to Interact \nC to Open/Close Journal\nArrows to Turn Pages", 115,100, secretSolverFont, Color.black);
+            graphicsHandler.drawString("Esc to pause game \nWASD to Move \nSPACE to Continue\nE to Interact \nC to Open/Close Journal\nArrows to Turn Pages", 115,100, secretSolverFont, Color.black);
         }
         else if (page == 1) {
             graphicsHandler.drawString("I am sorry for the souls \n who rest here. \n \n" + //

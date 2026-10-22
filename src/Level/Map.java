@@ -665,10 +665,16 @@ public abstract class Map {
     }
 
     public void drawOverlays(GraphicsHandler graphicsHandler) {
+
+        // Journal background
         if (book.isActive()) {
             book.draw(graphicsHandler);
         }
 
+        // Journal text, pages, and arrows
+        ui.draw(graphicsHandler, book.isActive());
+
+        // Dialogue always appears above everything
         if (textbox.isActive()) {
             textbox.draw(graphicsHandler);
         }
@@ -682,7 +688,6 @@ public abstract class Map {
         knifeSlash.draw(graphicsHandler, camera);
         defensiveItemEffect.draw(graphicsHandler, camera);
         puzzleUI.draw(graphicsHandler);
-        ui.draw(graphicsHandler, book.isActive());
         hotbarUI.draw(graphicsHandler, player == null ? 0 : player.getHealth());
     }
 
