@@ -44,7 +44,7 @@ public class PuzzleObject extends EnhancedMapTile {
 
     private static SpriteSheet createSpriteSheet(PuzzleConfig config) {
 
-        BufferedImage original = ImageLoader.load(
+        BufferedImage original = ImageLoader.loadWithAlpha(
             getSpriteName(config)
         );
 
@@ -113,11 +113,16 @@ public class PuzzleObject extends EnhancedMapTile {
 
     @Override
     protected GameObject loadBottomLayer(SpriteSheet spriteSheet) {
-        Frame frame = new FrameBuilder(
-            spriteSheet.getSubImage(0, 0)
-        )
-        .withScale(3)
-        .build();
+
+        BufferedImage image = spriteSheet.getSubImage(0, 0);
+
+        // Original 16x16 rocks use scale 3.
+        // New 48x48 puzzle sprites use scale 1.
+        int scale = image.getWidth() == 16 ? 3 : 1;
+
+        Frame frame = new FrameBuilder(image)
+            .withScale(scale)
+            .build();
 
         return new GameObject(x, y, frame);
     }
