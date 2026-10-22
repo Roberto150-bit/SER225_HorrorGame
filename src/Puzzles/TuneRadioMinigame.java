@@ -157,7 +157,7 @@ public class TuneRadioMinigame implements PuzzleMinigame {
         String message = "SIGNAL: " + getSignalMessage();
 
         Font statusFont =
-            new Font("Serif", Font.BOLD, 13);
+            new Font("Serif", Font.BOLD, 15);
 
         g.setFont(statusFont);
 
@@ -167,7 +167,7 @@ public class TuneRadioMinigame implements PuzzleMinigame {
         graphicsHandler.drawString(
             message,
             centerX - statusWidth / 2,
-            195,
+            178,
             statusFont,
             darkInk
         );
