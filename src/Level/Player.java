@@ -62,7 +62,8 @@ public abstract class Player extends GameObject {
     private boolean hasCollectible = false;
 
     // Health System
-    protected static int maxHealth = 3;
+    public static final int MAX_HEALTH = 5;
+    protected static int maxHealth = MAX_HEALTH;
     protected static int health = maxHealth;
     protected static final int HURT_FRAMES = 30; // length of the damage animation
     protected static final int INVINCIBLE_FRAMES = 90; // frames before the player can be hit again

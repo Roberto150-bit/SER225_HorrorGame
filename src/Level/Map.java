@@ -139,7 +139,7 @@ public abstract class Map {
         this.textbox = new Textbox(this);
         this.puzzleUI = new PuzzleUI();
         this.book = new Book();  // ----------------------------------------------------------------------------------
-        this.ui = new UI(this.book); // ----------------------------------------------------------------------------------
+        this.ui = new UI(); // ----------------------------------------------------------------------------------
         this.hotbarUI = new HotbarUI(); // ----------------------------------------------------------------------------------
     }
 
@@ -542,14 +542,23 @@ public abstract class Map {
         }
         // ------------------------------------------------------------------------------
         puzzleUI.update(); //Updates puzzle state
-        book.update(); //Updates book state every update
-        hotbarUI.update(!puzzleUI.isOpen() && !textbox.isActive()); //Updates hotbar state
+        // The journal cannot open while a puzzle or dialogue is active.
+        if (textbox.isActive() && book.isActive()) {
+            book.setActive(false);
+        }
+
+        book.update(!puzzleUI.isOpen() && !textbox.isActive());
+        ui.update(book.isActive(), puzzleUI.isOpen()); // journal page turning, before the hotbar so clicking an arrow doesn't also use an item
+        hotbarUI.update(!puzzleUI.isOpen() && !textbox.isActive() && !book.isActive());
         ItemUse usedItem = hotbarUI.takeUsedItem();
         if (usedItem == ItemUse.REUSABLE) {
             knifeSlash.swing(player, this);
         }
         else if (usedItem == ItemUse.SINGLE_USE) {
             thrownItems.add(new ThrownItem(hotbarUI.getUsedItemImage(), player));
+        }
+        else if (usedItem == ItemUse.RANGED) {
+            thrownItems.add(ThrownItem.arrow(player));
         }
         updateWeapons();
 
@@ -653,11 +662,21 @@ public abstract class Map {
 
     public void drawWorld(Player player, GraphicsHandler graphicsHandler) {
         camera.draw(player, graphicsHandler);
-        if (textbox.isActive()) {
-            textbox.draw(graphicsHandler);
-        }
+    }
+
+    public void drawOverlays(GraphicsHandler graphicsHandler) {
+
+        // Journal background
         if (book.isActive()) {
             book.draw(graphicsHandler);
+        }
+
+        // Journal text, pages, and arrows
+        ui.draw(graphicsHandler, book.isActive());
+
+        // Dialogue always appears above everything
+        if (textbox.isActive()) {
+            textbox.draw(graphicsHandler);
         }
     }
 
@@ -669,7 +688,6 @@ public abstract class Map {
         knifeSlash.draw(graphicsHandler, camera);
         defensiveItemEffect.draw(graphicsHandler, camera);
         puzzleUI.draw(graphicsHandler);
-        ui.draw(graphicsHandler);
         hotbarUI.draw(graphicsHandler, player == null ? 0 : player.getHealth());
     }
 

@@ -17,6 +17,7 @@ public class PuzzleFactory {
         register(PuzzleId.HAUNTED_CLOCK, HauntedClockMinigame::new);
         register(PuzzleId.RITUAL_SEQUENCE, RitualSequenceMinigame::new);
         register(PuzzleId.SPIRIT_MIRROR, SpiritMirrorMinigame::new);
+        register(PuzzleId.CODE_LOCK, CodeLockMinigame::new);
     }
 
     // Registers how a particular minigame should be created.

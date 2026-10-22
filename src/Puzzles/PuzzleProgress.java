@@ -19,6 +19,11 @@ public class PuzzleProgress {
         return completed.contains(instanceId);
     }
 
+    // Forgets every completed puzzle, used when a new game starts.
+    public void reset() {
+        completed.clear();
+    }
+
     // Returns the total number of completed puzzle instances.
     public int getCompletedCount() {
         return completed.size();

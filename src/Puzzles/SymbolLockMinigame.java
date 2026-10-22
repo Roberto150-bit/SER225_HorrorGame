@@ -25,7 +25,7 @@ public class SymbolLockMinigame implements PuzzleMinigame {
 
     // Center the controls inside the artwork's rings.
     private static final int DIAL_Y = 280;
-    private static final int DIAL_RADIUS = 29;
+    private static final int DIAL_RADIUS = 30;
 
     private static final Color GOLD =
         new Color(220, 190, 135);
@@ -68,13 +68,7 @@ public class SymbolLockMinigame implements PuzzleMinigame {
 
     private void generateSolution() {
 
-        long seed = 31L * config.getInstanceId().hashCode()
-            + config.getPuzzleType().ordinal();
-
-        seed = 31L * seed
-            + config.getDifficulty().ordinal();
-
-        Random random = new Random(seed);
+        Random random = new Random();
 
         for (int i = 0; i < dialCount; i++) {
             targetSymbols[i] = random.nextInt(symbolCount);
@@ -121,7 +115,7 @@ public class SymbolLockMinigame implements PuzzleMinigame {
 
         switch (config.getDifficulty()) {
             case EASY:
-                return 0;
+                return symbolCount - 1;
 
             case MEDIUM:
                 return 1;
@@ -135,10 +129,24 @@ public class SymbolLockMinigame implements PuzzleMinigame {
     }
 
     private int getDialCenterX(int index) {
+        // Five fixed slots illustrated in the PNG.
+        int[] slots = {225, 315, 400, 485, 575};
 
-        int spacing = PANEL_WIDTH / (dialCount + 1);
+        switch (dialCount) {
+            case 3:
+                return slots[new int[]{0, 2, 4}[index]];
 
-        return PANEL_X + spacing * (index + 1);
+            case 4:
+                return slots[new int[]{0, 1, 3, 4}[index]];
+
+            case 5:
+                return slots[index];
+
+            default:
+                throw new IllegalStateException(
+                    "Unsupported dial count: " + dialCount
+                );
+        }
     }
 
     @Override
@@ -149,187 +157,97 @@ public class SymbolLockMinigame implements PuzzleMinigame {
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
 
-        if (solved) {
-            return;
-        }
-
         java.awt.Graphics2D g = graphicsHandler.getGraphics();
 
-        Color gold = new Color(215, 177, 108);
-        Color dark = new Color(38, 26, 35);
-        Color inner = new Color(76, 48, 54);
-        Color light = new Color(245, 221, 175);
+        Font numberFont = new Font("Serif", Font.BOLD, 24);
+        Font clueFont = new Font("Serif", Font.BOLD, 16);
+        Font instructionFont = new Font("Serif", Font.PLAIN, 12);
 
-        int centerX = PANEL_X + PANEL_WIDTH / 2;
-
-        // Medium/Hard: hide the three fixed artwork rings
-        // with one reusable metal plate for additional dials.
-        if (dialCount > 3) {
-            graphicsHandler.drawFilledRectangle(
-                PANEL_X + 20,
-                DIAL_Y - 72,
-                PANEL_WIDTH - 40,
-                144,
-                dark
-            );
-
-            graphicsHandler.drawRectangle(
-                PANEL_X + 20,
-                DIAL_Y - 72,
-                PANEL_WIDTH - 40,
-                144,
-                gold,
-                2
-            );
-        }
-
-        // All difficulties use the same generated dial layout.
+        // The background PNG already contains the five dial
+        // frames. Only draw the values of active dials.
         for (int i = 0; i < dialCount; i++) {
 
-            int dialX = getDialCenterX(i);
-            int dialY = DIAL_Y;
+            int centerX = getDialCenterX(i);
 
-            int radius = DIAL_RADIUS;
-
-            // Outer brass border.
-            g.setColor(gold);
-            g.fillOval(
-                dialX - radius - 3,
-                dialY - radius - 3,
-                radius * 2 + 6,
-                radius * 2 + 6
-            );
-
-            // Circular metal control.
-            g.setColor(dark);
-            g.fillOval(
-                dialX - radius,
-                dialY - radius,
-                radius * 2,
-                radius * 2
-            );
-
-            g.setColor(inner);
-            g.fillOval(
-                dialX - radius + 6,
-                dialY - radius + 6,
-                radius * 2 - 12,
-                radius * 2 - 12
-            );
-
-            // Current dial value.
-            String value = String.valueOf(
+            String number = String.valueOf(
                 currentSymbols[i] + 1
             );
 
-            Font dialFont = new Font(
-                "Serif", Font.BOLD, 26
-            );
+            g.setFont(numberFont);
 
-            g.setFont(dialFont);
-
-            int textWidth = g.getFontMetrics()
-                .stringWidth(value);
+            int textWidth =
+                g.getFontMetrics().stringWidth(number);
 
             graphicsHandler.drawString(
-                value,
-                dialX - textWidth / 2,
-                dialY + 9,
-                dialFont,
-                light
+                number,
+                centerX - textWidth / 2,
+                DIAL_Y + 9,
+                numberFont,
+                new Color(250, 220, 165)
             );
         }
 
-        // Dark backing improves readability on the plaque.
-        int plaqueX = PANEL_X + 55;
-        int plaqueY = PANEL_Y + 251;
-        int plaqueWidth = PANEL_WIDTH - 110;
-
-        graphicsHandler.drawFilledRectangle(
-            plaqueX,
-            plaqueY,
-            plaqueWidth,
-            43,
-            dark
-        );
-
-        graphicsHandler.drawRectangle(
-            plaqueX,
-            plaqueY,
-            plaqueWidth,
-            43,
-            gold,
-            1
-        );
-
-        // Display the generated clue.
-        StringBuilder clue = new StringBuilder();
+        // Build the clue from the generated combination.
+        StringBuilder clueBuilder = new StringBuilder("CLUE: ");
 
         for (int i = 0; i < dialCount; i++) {
+
             if (i > 0) {
-                clue.append("  -  ");
+                clueBuilder.append(" - ");
             }
-            clue.append(clueSymbols[i] + 1);
+
+            clueBuilder.append(clueSymbols[i] + 1);
         }
 
-        Font clueFont = new Font(
-            "Serif", Font.BOLD, 17
-        );
+        String clueText = clueBuilder.toString();
 
-        g.setFont(clueFont);
-
-        String clueText = "CLUE: " + clue;
-
-        int clueWidth = g.getFontMetrics()
-            .stringWidth(clueText);
-
-        graphicsHandler.drawString(
-            clueText,
-            centerX - clueWidth / 2,
-            plaqueY + 18,
-            clueFont,
-            light
-        );
-
-        // Short difficulty instructions.
         String instruction;
 
         switch (config.getDifficulty()) {
             case EASY:
-                instruction = "Enter the symbols in order";
+                instruction = "Add 1 to each - cycle 1-4";
                 break;
 
             case MEDIUM:
-                instruction = "Subtract 1 from each - wrap at 5";
+                instruction = "Subtract 1 from each - cycle 1-5";
                 break;
 
             case HARD:
-                instruction = "Reverse order - subtract 2 - wrap at 6";
+                instruction = "Reverse order - subtract 2 - cycle 1-6";
                 break;
 
             default:
                 instruction = "";
         }
 
-        Font hintFont = new Font(
-            "Serif", Font.PLAIN, 13
+        // Center the clue inside the bottom gold plaque.
+        g.setFont(clueFont);
+
+        int clueWidth =
+            g.getFontMetrics().stringWidth(clueText);
+
+        graphicsHandler.drawString(
+            clueText,
+            400 - clueWidth / 2,
+            382,
+            clueFont,
+            new Color(255, 225, 175)
         );
 
-        g.setFont(hintFont);
+        // Difficulty instruction underneath the clue.
+        g.setFont(instructionFont);
 
-        int hintWidth = g.getFontMetrics()
-            .stringWidth(instruction);
+        int instructionWidth =
+            g.getFontMetrics().stringWidth(instruction);
 
         graphicsHandler.drawString(
             instruction,
-            centerX - hintWidth / 2,
-            plaqueY + 35,
-            hintFont,
-            light
+            400 - instructionWidth / 2,
+            393,
+            instructionFont,
+            new Color(245, 210, 160)
         );
     }
-
-
 
     @Override
     public void onClick(int mouseX, int mouseY) {

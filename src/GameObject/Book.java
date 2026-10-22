@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
 
 public class Book {
     private BufferedImage image;
-    private boolean isActive = true;
+    private boolean isActive = false;
     private Key interactKey = Key.C; // key to interact with the book
     private KeyLocker keyLocker = new KeyLocker();
 
@@ -68,8 +68,9 @@ public class Book {
     }
 
 
-    public void update() {
-        if (Keyboard.isKeyDown(interactKey) && !keyLocker.isKeyLocked(interactKey)) {
+    // canToggle is false while something else (like a puzzle) is on screen, so the journal can't open on top of it
+    public void update(boolean canToggle) {
+        if (canToggle && Keyboard.isKeyDown(interactKey) && !keyLocker.isKeyLocked(interactKey)) {
             keyLocker.lockKey(interactKey);
             isActive = !isActive; // toggle open/closed
             SoundPlayer.play("bookOpening.wav");

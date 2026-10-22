@@ -2,62 +2,109 @@
 package Puzzles;
 
 import Engine.GraphicsHandler;
+import Engine.ImageLoader;
+
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.util.Random;
 
 public class SpiritMirrorMinigame implements PuzzleMinigame {
 
+    private final int gridSize;
     private final int fragmentCount;
 
-    private int[] currentRotations;
-    private int[] targetRotations;
+    private final int[] currentRotations;
+    private final int[] startingRotations;
+
+    private final BufferedImage reflection;
+
     private boolean solved;
 
-    // Configure the number of fragments based on difficulty.
+    // Shared mirror area for every difficulty.
+    private static final int MIRROR_X = 304;
+    private static final int MIRROR_Y = 157;
+    private static final int MIRROR_SIZE = 192;
+
+    private static final Color GOLD =
+        new Color(245, 210, 155);
+
     public SpiritMirrorMinigame(PuzzleConfig config) {
+        
+        reflection = ImageLoader.load("../Resources/Puzzles/SpiritMirror/Fragments/spirit_reflection.png");
 
         switch (config.getDifficulty()) {
             case EASY:
-                fragmentCount = 3;
+                gridSize = 2;
                 break;
 
             case MEDIUM:
-                fragmentCount = 4;
+                gridSize = 3;
                 break;
 
             case HARD:
-                fragmentCount = 5;
+                gridSize = 4;
                 break;
 
             default:
-                throw new IllegalArgumentException("Unknown difficulty");
+                throw new IllegalArgumentException(
+                    "Unknown difficulty"
+                );
         }
 
-        currentRotations = new int[fragmentCount];
-        targetRotations = new int[fragmentCount];
+        fragmentCount = gridSize * gridSize;
 
+        currentRotations = new int[fragmentCount];
+        startingRotations = new int[fragmentCount];
+
+        // Keep the reflection initialization already used
+        // by your project here, if it exists.
+
+        generateStartingRotations();
         reset();
     }
 
-    // Rotate one fragment clockwise by 90 degrees.
-    public void rotateFragment(int fragmentIndex) {
+    private void generateStartingRotations() {
 
-        if (solved || fragmentIndex < 0 ||
-            fragmentIndex >= fragmentCount) {
+        Random random = new Random();
+
+        boolean anyRotated = false;
+
+        for (int i = 0; i < fragmentCount; i++) {
+
+            startingRotations[i] = random.nextInt(4);
+
+            if (startingRotations[i] != 0) {
+                anyRotated = true;
+            }
+        }
+
+        // Ensure the mirror does not start completed.
+        if (!anyRotated) {
+            startingRotations[random.nextInt(fragmentCount)] = 1;
+        }
+    }
+
+    // Rotate the selected fragment by 90 degrees.
+    public void rotateFragment(int index) {
+
+        if (solved || index < 0 ||
+            index >= fragmentCount) {
             return;
         }
 
-        currentRotations[fragmentIndex] =
-            (currentRotations[fragmentIndex] + 1) % 4;
+        currentRotations[index] =
+            (currentRotations[index] + 1) % 4;
 
         checkSolution();
     }
 
-    // Complete the puzzle when all fragments are aligned.
+    // All image pieces must return to upright.
     private void checkSolution() {
 
-        for (int i = 0; i < fragmentCount; i++) {
-            if (currentRotations[i] != targetRotations[i]) {
+        for (int rotation : currentRotations) {
+            if (rotation != 0) {
                 return;
             }
         }
@@ -67,103 +114,197 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
 
     @Override
     public void update() {
-        // No automatic updates required.
+        // Mouse controls the fragments.
     }
 
 
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
 
-        graphicsHandler.drawString(
-            "SPIRIT MIRROR",
-            300, 185,
-            new Font("Serif", Font.BOLD, 28),
-            Color.WHITE
-        );
+        Graphics2D g = graphicsHandler.getGraphics();
 
-        graphicsHandler.drawString(
-            "Rotate each fragment to match its target",
-            240, 230,
-            new Font("Arial", Font.PLAIN, 18),
-            Color.LIGHT_GRAY
-        );
+        if (reflection == null) return;
 
-        // Center fragments based on the selected difficulty.
-        int fragmentSize = 65;
-        int spacing = 12;
-        int totalWidth = fragmentCount * fragmentSize
-            + (fragmentCount - 1) * spacing;
-        int startX = 400 - totalWidth / 2;
+        int tileSize = MIRROR_SIZE / gridSize;
 
-        for (int i = 0; i < fragmentCount; i++) {
-
-            int fragmentX = startX + i * (fragmentSize + spacing);
-            int fragmentY = 265;
-
-            // Green indicates that the fragment is correctly aligned.
-            boolean aligned = currentRotations[i] == targetRotations[i];
-
-            Color fragmentColor = aligned
-                ? new Color(55, 120, 90)
-                : new Color(75, 85, 105);
-
-            graphicsHandler.drawFilledRectangle(
-                fragmentX, fragmentY,
-                fragmentSize, fragmentSize,
-                fragmentColor
+        // The entire puzzle must fit inside the oval mirror.
+        java.awt.geom.Ellipse2D mirrorArea =
+            new java.awt.geom.Ellipse2D.Double(
+                MIRROR_X, MIRROR_Y,
+                MIRROR_SIZE, MIRROR_SIZE
             );
 
-            // Show the fragment's current rotation in degrees.
-            graphicsHandler.drawString(
-                (currentRotations[i] * 90) + "°",
-                fragmentX + 8, fragmentY + 38,
-                new Font("Arial", Font.BOLD, 17),
-                Color.WHITE
-            );
+        Graphics2D board = (Graphics2D) g.create();
+
+        try {
+            board.clip(mirrorArea);
+
+            for (int row = 0; row < gridSize; row++) {
+                for (int col = 0; col < gridSize; col++) {
+
+                    int index = row * gridSize + col;
+
+                    java.awt.Polygon shard =
+                        createShardPolygon(row, col, tileSize);
+
+                    double centerX =
+                        MIRROR_X + col * tileSize + tileSize / 2.0;
+
+                    double centerY =
+                        MIRROR_Y + row * tileSize + tileSize / 2.0;
+
+                    Graphics2D piece = (Graphics2D) board.create();
+
+                    try {
+                        // Rotate the shard and its image together.
+                        piece.rotate(
+                            Math.toRadians(currentRotations[index] * 90),
+                            centerX, centerY
+                        );
+
+                        piece.clip(shard);
+
+                        // Draw the complete reflection through
+                        // this fragment's irregular shape.
+                        piece.drawImage(
+                            reflection,
+                            MIRROR_X, MIRROR_Y,
+                            MIRROR_SIZE, MIRROR_SIZE,
+                            null
+                        );
+
+                        piece.setColor(
+                            new Color(190, 220, 235)
+                        );
+
+                        piece.setStroke(
+                            new java.awt.BasicStroke(1.2f)
+                        );
+
+                        piece.drawPolygon(shard);
+
+                    } finally {
+                        piece.dispose();
+                    }
+                }
+            }
+        } finally {
+            board.dispose();
         }
 
-        graphicsHandler.drawString(
-            "Click fragments to rotate them 90 degrees",
-            245, 365,
-            new Font("Arial", Font.PLAIN, 17),
-            Color.LIGHT_GRAY
-        );
+        // Bottom plaque.
+        String label = solved
+            ? "REFLECTION RESTORED"
+            : "ROTATE THE SHARDS";
+        Font font = new Font("Serif", Font.BOLD, 12);
 
-        // Display completion feedback.
-        if (solved) {
-            graphicsHandler.drawString(
-                "REFLECTION RESTORED",
-                285, 410,
-                new Font("Serif", Font.BOLD, 22),
-                Color.GREEN
-            );
-        }
+        g.setFont(font);
+
+        int textWidth =
+            g.getFontMetrics().stringWidth(label);
+
+        graphicsHandler.drawString(
+            label,
+            400 - textWidth / 2,
+            390,
+            font,
+            GOLD
+        );
     }
+
+
+    private java.awt.Polygon createShardPolygon(
+            int row, int col, int size) {
+
+        int x = MIRROR_X + col * size;
+        int y = MIRROR_Y + row * size;
+
+        // Shared irregular edges.
+        int variation = Math.max(3, size / 7);
+
+        int top = row == 0 ? 0 :
+            (((row * 13 + col * 7) % 3) - 1) * variation;
+
+        int bottom = row == gridSize - 1 ? 0 :
+            ((((row + 1) * 13 + col * 7) % 3) - 1)
+            * variation;
+
+        int left = col == 0 ? 0 :
+            (((row * 7 + col * 11) % 3) - 1) * variation;
+
+        int right = col == gridSize - 1 ? 0 :
+            (((row * 7 + (col + 1) * 11) % 3) - 1)
+            * variation;
+
+        int[] xs = {
+            x,
+            x + size / 2,
+            x + size,
+            x + size + right,
+            x + size,
+            x + size / 2,
+            x,
+            x + left
+        };
+
+        int[] ys = {
+            y,
+            y + top,
+            y,
+            y + size / 2,
+            y + size,
+            y + size + bottom,
+            y + size,
+            y + size / 2
+        };
+
+        return new java.awt.Polygon(xs, ys, 8);
+    }
+
 
     @Override
     public void onClick(int mouseX, int mouseY) {
 
-        if (solved) {
+        if (solved) return;
+
+        java.awt.geom.Ellipse2D mirrorArea =
+            new java.awt.geom.Ellipse2D.Double(
+                MIRROR_X, MIRROR_Y,
+                MIRROR_SIZE, MIRROR_SIZE
+            );
+
+        if (!mirrorArea.contains(mouseX, mouseY)) {
             return;
         }
 
-        // Use the same positions as the drawing method.
-        int fragmentSize = 65;
-        int spacing = 12;
-        int totalWidth = fragmentCount * fragmentSize
-            + (fragmentCount - 1) * spacing;
-        int startX = 400 - totalWidth / 2;
+        int tileSize = MIRROR_SIZE / gridSize;
 
-        for (int i = 0; i < fragmentCount; i++) {
+        // Check from last-drawn shard to first so
+        // overlapping rotated fragments click correctly.
+        for (int index = fragmentCount - 1; index >= 0; index--) {
 
-            int fragmentX = startX + i * (fragmentSize + spacing);
+            int row = index / gridSize;
+            int col = index % gridSize;
 
-            if (mouseX >= fragmentX &&
-                mouseX <= fragmentX + fragmentSize &&
-                mouseY >= 265 &&
-                mouseY <= 265 + fragmentSize) {
+            java.awt.Polygon shard =
+                createShardPolygon(row, col, tileSize);
 
-                rotateFragment(i);
+            double centerX =
+                MIRROR_X + col * tileSize + tileSize / 2.0;
+
+            double centerY =
+                MIRROR_Y + row * tileSize + tileSize / 2.0;
+
+            java.awt.geom.AffineTransform rotation =
+                java.awt.geom.AffineTransform.getRotateInstance(
+                    Math.toRadians(currentRotations[index] * 90),
+                    centerX, centerY
+                );
+
+            if (rotation.createTransformedShape(shard)
+                    .contains(mouseX, mouseY)) {
+
+                rotateFragment(index);
                 return;
             }
         }
@@ -179,10 +320,8 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
     public void reset() {
         solved = false;
 
-        // Temporary target rotations for each difficulty.
         for (int i = 0; i < fragmentCount; i++) {
-            currentRotations[i] = 0;
-            targetRotations[i] = (i % 3) + 1;
+            currentRotations[i] = startingRotations[i];
         }
     }
 
@@ -194,7 +333,8 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
         return currentRotations[index];
     }
 
+    // The restored reflection uses zero rotation.
     public int getTargetRotation(int index) {
-        return targetRotations[index];
+        return 0;
     }
 }

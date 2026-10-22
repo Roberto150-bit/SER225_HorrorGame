@@ -22,6 +22,12 @@ public class PuzzleUI {
     private PuzzleResult pendingResult;
     private boolean alreadyCompleted = false;
 
+    // Spirit Mirror completion animation.
+    private long mirrorSolvedAt = -1L;
+
+    private static final long MIRROR_REVEAL_MS = 2000;
+    private static final long MIRROR_FADE_MS = 600;
+
     private BufferedImage backgroundImage;
 
     private int x = 150;
@@ -39,6 +45,8 @@ public class PuzzleUI {
     private int activateWidth = 180;
     private int activateHeight = 50;
 
+    private boolean completionSoundPlayed = false;
+
     public void open() {
         solved = false;
         isOpen = true;
@@ -54,6 +62,8 @@ public class PuzzleUI {
         // Reset UI state for the selected puzzle instance.
         currentPuzzle = config;
         pendingResult = null;
+        completionSoundPlayed = false;
+        mirrorSolvedAt = -1L;
         backgroundImage = null;
         controller = null;
 
@@ -79,6 +89,12 @@ public class PuzzleUI {
         if (config.getPuzzleType() == PuzzleId.RITUAL_SEQUENCE) {
             backgroundImage = PuzzleAssets.get(
                 "RitualSequence/ritual_sequence_panel.png"
+            );
+        }
+
+        if (config.getPuzzleType() == PuzzleId.SPIRIT_MIRROR) {
+            backgroundImage = PuzzleAssets.get(
+                "SpiritMirror/spirit_mirror_panel.png"
             );
         }
 
@@ -155,6 +171,15 @@ public class PuzzleUI {
             if (result != null) {
                 pendingResult = result;
                 solved = true;
+
+                if (!completionSoundPlayed) {
+                    SoundPlayer.play("PuzzleComplete.wav");
+                    completionSoundPlayed = true;
+                }
+
+                if (mirrorSolvedAt == -1L) {
+                    mirrorSolvedAt = System.currentTimeMillis();
+                }
             }
         }
        
@@ -287,7 +312,44 @@ public class PuzzleUI {
 
         // Display a shared completed interface.
         // Works for newly solved and previously solved puzzles.
-        if (solved || alreadyCompleted) {
+        boolean showCompletion = solved || alreadyCompleted;
+        float completionAlpha = 1.0f;
+
+        if (showCompletion && !alreadyCompleted) {
+
+            if (mirrorSolvedAt == -1L) {
+                mirrorSolvedAt = System.currentTimeMillis();
+            }
+
+            long elapsed =
+                System.currentTimeMillis() - mirrorSolvedAt;
+
+            if (elapsed < MIRROR_REVEAL_MS) {
+                showCompletion = false;
+            } else {
+                completionAlpha = Math.min(
+                    1.0f,
+                    (float)(elapsed - MIRROR_REVEAL_MS)
+                        / MIRROR_FADE_MS
+                );
+            }
+        }
+
+        if (showCompletion) {
+
+            java.awt.Graphics2D g =
+                graphicsHandler.getGraphics();
+
+            java.awt.Composite previousComposite =
+                g.getComposite();
+
+            g.setComposite(
+                java.awt.AlphaComposite.getInstance(
+                    java.awt.AlphaComposite.SRC_OVER,
+                    completionAlpha
+                )
+            );
+
 
             int panelX = x + 55;
             int panelY = y + 115;
@@ -337,6 +399,9 @@ public class PuzzleUI {
                 new Font("Serif", Font.ITALIC, 16),
                 new Color(185, 175, 160)
             );
+
+            // Restore transparency for subsequent UI elements.
+            g.setComposite(previousComposite);
         }
 
         // Always draw the close button last.

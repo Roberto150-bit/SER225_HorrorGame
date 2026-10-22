@@ -4,9 +4,11 @@ import Builders.FrameBuilder;
 import Engine.GraphicsHandler;
 import Engine.ImageLoader;
 import Engine.SoundPlayer;
+import GameObject.Bow;
 import GameObject.Frame;
 import GameObject.ImageEffect;
 import GameObject.SpriteSheet;
+import Level.EnhancedMapTile;
 import Level.MapEntityStatus;
 import Level.NPC;
 import Level.Player;
@@ -18,6 +20,7 @@ import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.util.HashMap;
+import java.util.function.Function;
 
 // A ghost enemy that slowly floats toward the player, but keeps a short gap instead of overlapping them
 // when close enough it lunges at the player, and the player loses a heart if it hits
@@ -70,6 +73,11 @@ public class Ghost extends NPC {
     private boolean isBanished = false;
     private int banishTimer = 0;
 
+    // item this ghost carries and drops when banished (like a relic), null if it isn't carrying one
+    private Function<Point, EnhancedMapTile> drop;
+    // the first ghost banished each game also drops the bow
+    private static boolean bowDropped = false;
+
     public Ghost(int id, Point location) {
         this(id, location, DEFAULT_HEALTH);
     }
@@ -114,6 +122,16 @@ public class Ghost extends NPC {
         // A nearby ghost may follow even if it is attacking
         // or temporarily stopped close to Dean.
         return distance <= detectionRadius;
+    }
+
+    // gives this ghost an item to drop when banished, e.g. ghost.setDrop(Relic.Ear::new)
+    public void setDrop(Function<Point, EnhancedMapTile> drop) {
+        this.drop = drop;
+    }
+
+    // called when a new game starts, so the next ghost banished drops the bow again
+    public static void resetDrops() {
+        bowDropped = false;
     }
 
     public boolean canFollowThroughDoor(Player player) {
@@ -272,11 +290,30 @@ public class Ghost extends NPC {
         }
         if (health == 0) {
             PlayerProgressManager.awardXP(xpReward);
+            dropItems();
             isBanished = true;
+            // the fading ghost no longer blocks the player, so it can't push them into a wall
+            setIsUncollidable(true);
             banishTimer = BANISH_FRAMES;
             currentAnimationName = currentAnimationName.contains("RIGHT") ? "STAND_RIGHT" : "STAND_LEFT";
         } else {
             hurtTimer = HURT_FRAMES;
+        }
+    }
+
+    // leaves the carried item (and the bow, if this is the first ghost banished) where the ghost was
+    private void dropItems() {
+        // items are 32x32 in the world, so center them on the ghost
+        float x = getBounds().getX() + getBounds().getWidth() / 2f - 16;
+        float y = getBounds().getY() + getBounds().getHeight() / 2f - 16;
+        if (drop != null) {
+            map.addEnhancedMapTile(drop.apply(new Point(x, y)));
+            drop = null;
+            x += 36; // so the bow doesn't land on top of it
+        }
+        if (!bowDropped) {
+            bowDropped = true;
+            map.addEnhancedMapTile(new Bow(new Point(x, y)));
         }
     }
 

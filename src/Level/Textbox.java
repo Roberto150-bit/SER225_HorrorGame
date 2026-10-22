@@ -22,10 +22,10 @@ public class Textbox {
     // textbox constants
     protected final int x = 22;
     protected final int bottomY = 460;
-    protected final int topY = 22;
+    protected final int topY = 460; //22
     protected final int fontX = 35;
     protected final int fontBottomY = 472;
-    protected final int fontTopY = 34;
+    protected final int fontTopY = 472; //34
     protected final int width = 750;
     protected final int height = 100;
 

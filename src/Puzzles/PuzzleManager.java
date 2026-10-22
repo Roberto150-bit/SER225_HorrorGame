@@ -21,6 +21,12 @@ public class PuzzleManager {
         return progress.isCompleted(instanceId);
     }
 
+    // Starts a new game with no puzzles solved and a new code for the final seal.
+    public static void reset() {
+        progress.reset();
+        SealCode.reset();
+    }
+
     // Returns the total number of unique puzzles completed.
     public static int getCompletedCount() {
         return progress.getCompletedCount();

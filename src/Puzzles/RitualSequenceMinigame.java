@@ -24,11 +24,11 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
 
     // Positions match the five illustrated symbols.
     private static final int[] SYMBOL_X = {
-        267, 333, 400, 467, 533
+        283, 341, 400, 459, 517
     };
 
-    private static final int SYMBOL_Y = 310;
-    private static final int SYMBOL_RADIUS = 28;
+    private static final int SYMBOL_Y = 308;
+    private static final int SYMBOL_RADIUS = 23;
 
     private static final Color GOLD =
         new Color(245, 195, 110);
@@ -62,7 +62,22 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
 
         sequence = new int[symbolCount];
 
-        generateSequence(config);
+        // Start with each symbol exactly once.
+        for (int i = 0; i < symbolCount; i++) {
+            sequence[i] = i;
+        }
+
+        // Shuffle the ritual order for this puzzle instance.
+        Random random = new Random();
+
+        for (int i = sequence.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+
+            int temp = sequence[i];
+            sequence[i] = sequence[j];
+            sequence[j] = temp;
+        }
+
         reset();
     }
 
@@ -173,46 +188,34 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
 
         Stroke oldStroke = g.getStroke();
 
-        // Match glow and click regions to the artwork.
-        for (int i = 0; i < 5; i++) {
+        // Only highlight the active symbol.
+        // The background already draws all five gold buttons.
+        if (glowingSymbol >= 0 && glowingSymbol < symbolCount) {
 
-            int x = SYMBOL_X[i];
+            int x = SYMBOL_X[glowingSymbol];
             int y = SYMBOL_Y;
 
-            if (i >= symbolCount) {
+            g.setColor(new Color(255, 210, 100, 65));
+            g.fillOval(
+                x - 18,
+                y - 18,
+                36,
+                36
+            );
 
-                g.setColor(INACTIVE);
-                g.fillOval(
-                    x - SYMBOL_RADIUS,
-                    y - SYMBOL_RADIUS,
-                    SYMBOL_RADIUS * 2,
-                    SYMBOL_RADIUS * 2
-                );
+            g.setColor(new Color(255, 220, 130, 170));
+            g.setStroke(new BasicStroke(2));
 
-            } else if (i == glowingSymbol) {
-
-                g.setColor(new Color(255, 190, 75, 80));
-                g.fillOval(
-                    x - SYMBOL_RADIUS,
-                    y - SYMBOL_RADIUS,
-                    SYMBOL_RADIUS * 2,
-                    SYMBOL_RADIUS * 2
-                );
-
-                g.setColor(GOLD);
-                g.setStroke(new BasicStroke(4));
-                g.drawOval(
-                    x - SYMBOL_RADIUS,
-                    y - SYMBOL_RADIUS -6,
-                    SYMBOL_RADIUS * 2,
-                    SYMBOL_RADIUS * 2
-                );
-            }
+            g.drawOval(
+                x - 21,
+                y - 21,
+                42,
+                42
+            );
         }
 
         g.setStroke(oldStroke);
-
-
+        
         // Status text inside the lower plaque.
         String statusText;
 
