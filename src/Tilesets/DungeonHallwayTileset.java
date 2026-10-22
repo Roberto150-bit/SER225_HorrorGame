@@ -1,5 +1,5 @@
 package Tilesets;
-
+//tested and implemented
 import Builders.FrameBuilder;
 import Builders.MapTileBuilder;
 import Engine.ImageLoader;
@@ -19,7 +19,7 @@ public class DungeonHallwayTileset extends Tileset {
     private static final int TOTAL_TILES = COLUMNS * ROWS;
 
     public DungeonHallwayTileset() { //32 by 32 pixels, scaled by 3 for a total of 96 by 96 pixels 
-        super(ImageLoader.load("DungeonHallwayTileset.png"), 32, 32, 2);
+        super(ImageLoader.load("DungeonHallwayTilesetV2.png"), 32, 32, 2);
     }
 
     @Override

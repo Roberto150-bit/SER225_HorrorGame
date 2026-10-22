@@ -17,6 +17,11 @@ public class EditorMaps {
             add("BasementMap");
             add("DungeonCellMap");
             add("DungeonHallwayMap");
+            add("DungeonWaterRoomMap");
+            add("DungeonBasicRoomMap");
+            add("DungeonSecretRoomMap");
+            add("DungeonLibraryMap");
+            
         }};
     }
 
@@ -32,6 +37,14 @@ public class EditorMaps {
                 return new DungeonCellMap();
             case "DungeonHallwayMap":
                 return new DungeonHallwayMap();
+            case "DungeonWaterRoomMap":
+                return new Maps.DungeonWaterRoomMap();
+            case "DungeonBasicRoomMap":
+                return new Maps.DungeonBasicRoomMap();
+            case "DungeonSecretRoomMap":
+                return new Maps.DungeonSecretRoomMap();
+            case "DungeonLibraryMap":
+                return new Maps.DungeonLibraryMap();
             default:
                 throw new RuntimeException("Unrecognized map name");
         }
