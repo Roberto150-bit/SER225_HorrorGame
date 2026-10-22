@@ -27,7 +27,7 @@ public class HauntedClockMinigame implements PuzzleMinigame {
 
     // Coordinates matching the 500x350 clock artwork.
     private static final int CLOCK_X = 400;
-    private static final int CLOCK_Y = 210;
+    private static final int CLOCK_Y = 212;
 
     // Four illustrated adjustment knobs.
     private static final int[] KNOB_X = {
@@ -76,13 +76,7 @@ public class HauntedClockMinigame implements PuzzleMinigame {
         }
 
         // Same instance ID produces the same target.
-        long seed =
-            31L * config.getInstanceId().hashCode()
-            + config.getPuzzleType().ordinal();
-
-        seed = 31L * seed + difficulty.ordinal();
-
-        Random random = new Random(seed);
+        Random random = new Random();
 
         targetHour = random.nextInt(12) + 1;
 
@@ -196,10 +190,6 @@ public class HauntedClockMinigame implements PuzzleMinigame {
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
 
-        if (solved) {
-            return;
-        }
-
         Graphics2D g = graphicsHandler.getGraphics();
 
         Font headingFont = new Font("Serif", Font.BOLD, 12);
@@ -210,7 +200,7 @@ public class HauntedClockMinigame implements PuzzleMinigame {
         drawCentered(
             graphicsHandler, g,
             "CHIME",
-            260, 185,
+            266, 190,
             new Font("Serif", Font.BOLD, 13),
             DARK_INK
         );
@@ -219,7 +209,7 @@ public class HauntedClockMinigame implements PuzzleMinigame {
         drawCentered(
             graphicsHandler, g,
             formatTime(clueHour, clueMinute),
-            260, 215,
+            266, 215,
             new Font("Serif", Font.BOLD, 21),
             DARK_INK
         );
@@ -247,7 +237,7 @@ public class HauntedClockMinigame implements PuzzleMinigame {
         drawCentered(
             graphicsHandler, g,
             riddle,
-            260, 245,
+            266, 245,
             new Font("Serif", Font.BOLD, 12),
             DARK_INK
         );
@@ -256,15 +246,16 @@ public class HauntedClockMinigame implements PuzzleMinigame {
         // RIGHT PARCHMENT: Current selected time.
         drawCentered(
             graphicsHandler, g,
-            "YOUR TIME",
-            540, 185,
-            headingFont, DARK_INK
+            "TIME",
+            535, 190,
+            new Font("Serif", Font.BOLD, 12),
+            DARK_INK
         );
 
         drawCentered(
             graphicsHandler, g,
             formatTime(currentHour, currentMinute),
-            540, 218,
+            535, 219,
             timeFont, GOLD
         );
 
@@ -321,10 +312,10 @@ public class HauntedClockMinigame implements PuzzleMinigame {
         drawCentered(
             graphicsHandler, g,
             incorrectAttempt
-                ? "INCORRECT - TRY AGAIN"
+                ? "TRY AGAIN"
                 : "SUBMIT TIME",
-            400, 397,
-            new Font("Serif", Font.BOLD, 17),
+            400, 388,
+            new Font("Serif", Font.BOLD, 14),
             DARK_INK
         );
     }

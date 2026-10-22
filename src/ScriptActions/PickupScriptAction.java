@@ -1,35 +1,28 @@
 package ScriptActions;
 
 import Level.ScriptState;
-import java.awt.image.BufferedImage;
 
-//When player clicks button, item is picked up and added to inventory
-//Class is used in NoteScript to pick up the note and add it to the inventory
+//When player clicks button, the note is picked up and its page is added to the journal
+//Class is used in NoteScript to pick up a story note
 
 public class PickupScriptAction extends ScriptAction {
 
-    private BufferedImage itemImage;
+    private final int page;
 
-
-    public PickupScriptAction(BufferedImage itemImage) {
-        this.itemImage = itemImage;
+    // page is which journal page (1-5) this note holds
+    public PickupScriptAction(int page) {
+        this.page = page;
     }
 
     @Override
-    public ScriptState execute() { // -----------------------------------------------------------------
-        //boolean pickedUp = map.getHotbarUI().addItem(itemImage);
-
+    public ScriptState execute() {
         if (entity != null) {
             entity.setIsHidden(true);
             entity.setIsUncollidable(true);
             entity.markCollected(); // stays gone when the player comes back to this map
-            System.out.println("isHidden now: " + entity.isHidden());                
-            map.getUI().IncreaseNumPages();
+            map.getUI().addStoryPage(page);
             map.setBookOpen(true);
         }
-
-
         return ScriptState.COMPLETED;
     }
-    
 }

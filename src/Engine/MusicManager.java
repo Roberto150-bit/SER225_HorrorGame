@@ -7,6 +7,10 @@ package Engine;
 public class MusicManager {
     private static MusicPlayer current;
     private static String currentFile;
+    private static float currentTrackVolume = 1f;
+
+    // player-chosen music volume from the pause menu (0.0 to 1.0), applied on top of each track's own volume
+    private static float masterVolume = 1f;
 
     public static void play(String file, float volume, boolean loop) {
         // Same track already running? Leave it alone.
@@ -17,9 +21,21 @@ public class MusicManager {
         current = new MusicPlayer();
         current.setMusicFile(file);
         current.setLooping(loop);
-        current.setVolume(volume);
+        current.setVolume(volume * masterVolume);
         current.play();
         currentFile = file;
+        currentTrackVolume = volume;
+    }
+
+    public static float getMasterVolume() {
+        return masterVolume;
+    }
+
+    public static void setMasterVolume(float volume) {
+        masterVolume = Math.max(0f, Math.min(1f, volume));
+        if (current != null) {
+            current.setVolume(currentTrackVolume * masterVolume);
+        }
     }
 
     public static void stop() {

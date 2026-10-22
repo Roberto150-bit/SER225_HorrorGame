@@ -6,5 +6,6 @@ public enum PuzzleId {
     SYMBOL_LOCK,
     HAUNTED_CLOCK,
     SPIRIT_MIRROR,
-    RITUAL_SEQUENCE
+    RITUAL_SEQUENCE,
+    CODE_LOCK
 }

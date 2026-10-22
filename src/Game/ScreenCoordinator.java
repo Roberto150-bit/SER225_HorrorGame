@@ -15,6 +15,8 @@ import Screens.SettingsScreen;
 public class ScreenCoordinator extends Screen {
 	// currently shown Screen
 	protected Screen currentScreen = new DefaultScreen();
+	// Preserve the current playthrough when returning to the menu.
+	private PlayLevelScreen savedGame;
 
 	// keep track of gameState so ScreenCoordinator knows which Screen to show
 	protected GameState gameState;
@@ -46,7 +48,14 @@ public class ScreenCoordinator extends Screen {
 						currentScreen = new MenuScreen(this);
 						break;
 					case LEVEL:
-						currentScreen = new PlayLevelScreen(this);
+						if (savedGame == null) {
+							savedGame = new PlayLevelScreen(this);
+							savedGame.initialize();
+						} else {
+							savedGame.resumeGame();
+						}
+
+						currentScreen = savedGame;
 						break;
 					case SETTINGS:
 						currentScreen = new SettingsScreen(this);
@@ -55,7 +64,10 @@ public class ScreenCoordinator extends Screen {
 						currentScreen = new CreditsScreen(this);
 						break;
 				}
-				currentScreen.initialize();
+				// The existing game must not be initialized again.
+				if (gameState != GameState.LEVEL) {
+					currentScreen.initialize();
+				}
 			}
 			previousGameState = gameState;
 

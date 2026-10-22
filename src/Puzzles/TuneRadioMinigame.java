@@ -59,14 +59,7 @@ public class TuneRadioMinigame implements PuzzleMinigame {
                 );
         }
 
-        long seed =
-            31L * config.getInstanceId().hashCode()
-            + config.getPuzzleType().ordinal();
-
-        seed = 31L * seed
-            + config.getDifficulty().ordinal();
-
-        Random random = new Random(seed);
+        Random random = new Random();
 
         int positions =
             (maxFrequency - minFrequency) / tuningStep;
@@ -141,10 +134,6 @@ public class TuneRadioMinigame implements PuzzleMinigame {
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
 
-        if (solved) {
-            return;
-        }
-
         java.awt.Graphics2D g =
             graphicsHandler.getGraphics();
 
@@ -157,7 +146,7 @@ public class TuneRadioMinigame implements PuzzleMinigame {
         String message = "SIGNAL: " + getSignalMessage();
 
         Font statusFont =
-            new Font("Serif", Font.BOLD, 13);
+            new Font("Serif", Font.BOLD, 15);
 
         g.setFont(statusFont);
 
@@ -167,7 +156,7 @@ public class TuneRadioMinigame implements PuzzleMinigame {
         graphicsHandler.drawString(
             message,
             centerX - statusWidth / 2,
-            195,
+            178,
             statusFont,
             darkInk
         );
@@ -191,7 +180,7 @@ public class TuneRadioMinigame implements PuzzleMinigame {
             gold
         );
 
-        // 3. Signal strength indicator.
+        /*
         int strength = getSignalStrength();
 
         graphicsHandler.drawFilledRectangle(
@@ -200,9 +189,9 @@ public class TuneRadioMinigame implements PuzzleMinigame {
             110 * strength / 100,
             5,
             new Color(190, 155, 105)
-        );
+        );*/
 
-        // 4. Functional knob labels.
+        //
         Font knobFont =
             new Font("Serif", Font.BOLD, 22);
 

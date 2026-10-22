@@ -7,6 +7,8 @@ import Level.TileType;
 import Level.Tileset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DungeonSecretRoomTileset extends Tileset {
     //must be at least 9x9 tiles, or else the background will not render correctly. My base map is 7 rows by 8 columns.
@@ -87,7 +89,11 @@ public class DungeonSecretRoomTileset extends Tileset {
                 FrameBuilder builder = new FrameBuilder(getSubImage(row, col))
                     .withScale(tileScale);
 
-                if (topTiles.contains(index)) {
+                int[] b = partialBounds.get(index);
+                if (b != null) {
+                    builder = builder.withBounds(b[0], b[1], b[2], b[3]);
+                    solidTiles.add(index);
+                } else if (topTiles.contains(index)) {
                     builder = builder.withBounds(0, 0, 32, 24);
                 } else if (bottomTiles.contains(index)) {
                     builder = builder.withBounds(0, 12, 32, 20);
@@ -109,6 +115,11 @@ public class DungeonSecretRoomTileset extends Tileset {
                 tiles.add(tile);            }
         }
         return tiles;
+    }
+
+    // tileset index of the tile at column x, row y
+    private static int index(int x, int y) {
+        return y * COLUMNS + x;
     }
 }
 

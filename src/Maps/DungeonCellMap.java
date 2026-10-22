@@ -1,5 +1,7 @@
 package Maps;
 
+import Puzzles.PuzzleDifficulty;
+import Puzzles.PuzzleId;
 import EnhancedMapTiles.*;   
 import Level.EnhancedMapTile;
 import Level.Map;
@@ -13,13 +15,23 @@ public class DungeonCellMap extends Map {
     public DungeonCellMap() {
         super("DungeonCellMap.txt", new DungeonCellTileset());
         this.playerStartPosition = getMapTile(6, 4).getLocation();
+
+        // ghosts start somewhere random each playthrough
+        DungeonRoomSetup.addRandomGhosts(this, 0, 1);
     }
 
     @Override
     public ArrayList<EnhancedMapTile> loadEnhancedMapTiles() {
         ArrayList<EnhancedMapTile> enhancedMapTiles = new ArrayList<>();
 
-        //nothing here yet, but this is where you would add any enhanced map tiles to the map. 
+        // solving this unlocks the library door in the hallway
+        enhancedMapTiles.add(DungeonRoomSetup.puzzle(this, 6, 6, DungeonRoomSetup.CELL_PUZZLE, PuzzleId.TUNE_RADIO, PuzzleDifficulty.EASY));
+
+        // second digit of the final seal's code
+        enhancedMapTiles.add(DungeonRoomSetup.codeNote(this, 3, 4, 1));
+
+        // page 2 of the journal's story
+        enhancedMapTiles.add(DungeonRoomSetup.storyNote(this, 5, 3, 2));
 
         return enhancedMapTiles;
     }
@@ -27,9 +39,7 @@ public class DungeonCellMap extends Map {
 
     @Override
     public void loadScripts() {
-        // door on the right wall next to the stairs stand on the stairs at (12, 4), face right, and press E to go through
-        // TestMap is a placeholder destination until the next room is built
+        // door on the top wall back to the hallway
         getMapTile(2, 2).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 7, 4, Direction.LEFT));
-
     }
 }

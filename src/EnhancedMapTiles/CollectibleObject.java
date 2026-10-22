@@ -24,10 +24,6 @@ public class CollectibleObject extends EnhancedMapTile {
     private ItemUse itemUse;
     private String[] pickupSounds; // optional sounds played on pickup
 
-    public CollectibleObject(Point location) {
-        this(location, "Rock.png", 14);
-    }
-
     // imageFile is a square image of imageSize pixels
     public CollectibleObject(Point location, String imageFile, int imageSize) {
         this(location, imageFile, imageSize, ItemUse.NONE);
@@ -38,6 +34,9 @@ public class CollectibleObject extends EnhancedMapTile {
         super(location.x, location.y, new SpriteSheet(loadImage(imageFile), imageSize, imageSize), TileType.PASSABLE);
         this.itemImage = loadImage(imageFile);
         this.itemUse = itemUse;
+        // picked up by walking over it, so it never blocks movement -- otherwise an item dropped on top of the player
+        // (like a ghost's relic) would shove them to the far side of it, possibly into a wall
+        setIsUncollidable(true);
         // gifs are static on the ground but animate once in the hotbar
         if (imageFile.toLowerCase().endsWith(".gif")) {
             gifFrames = ImageLoader.loadGifFrames(imageFile);
@@ -48,7 +47,7 @@ public class CollectibleObject extends EnhancedMapTile {
     // images with their own alpha channel keep it, others use the magenta transparent color
     private static BufferedImage loadImage(String imageFile) {
         String name = imageFile.toLowerCase();
-        return name.endsWith(".png") && !imageFile.equals("Rock.png") || name.endsWith(".gif")
+        return name.endsWith(".png") || name.endsWith(".gif")
                 ? ImageLoader.loadWithAlpha(imageFile)
                 : ImageLoader.load(imageFile);
     }
@@ -90,7 +89,7 @@ public class CollectibleObject extends EnhancedMapTile {
     protected GameObject loadBottomLayer(SpriteSheet spriteSheet) {
 
         BufferedImage image = spriteSheet.getSubImage(0,0);
-        // large images are shrunk to 32px in the world, small ones (like the rock) are doubled
+        // large images are shrunk to 32px in the world, small ones are doubled
         float scale = image.getWidth() > 32 ? 32f / image.getWidth() : 2;
         Frame frame = new FrameBuilder(image).withScale(scale).build();
 

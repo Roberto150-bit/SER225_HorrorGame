@@ -23,7 +23,7 @@ public class HotbarUI {
 
     private Key useKey = Key.E; // key to use the selected item
     private static final int SLOT_COUNT = 6;
-    private static final int HEART_COUNT = Player.getHealth();
+    private static final int HEART_COUNT = Player.MAX_HEALTH;
     private Key[] slotKeys = {Key.ONE, Key.TWO, Key.THREE, Key.FOUR, Key.FIVE, Key.SIX}; // key to select each slot
 
     private KeyLocker keyLocker = new KeyLocker();
@@ -34,22 +34,24 @@ public class HotbarUI {
     private int[] frameDelays = new int[SLOT_COUNT]; // milliseconds per frame
     private ItemUse[] itemUses = new ItemUse[SLOT_COUNT];
 
-    private static final int HEART_SIZE = 60;
-    private static final int HEART_SPACING = 65;
-    private static final int SLOT_SIZE = 75;
-    private static final int SLOT_SPACING = 65; // slots overlap a little since the ring image has empty space around it
-    private static final int ITEM_SIZE = 60;
-    private static final int ITEM_OFFSET_Y = 10; // items sit a little lower than the top of the slot ring
+    private static final int HEART_SIZE = 36;
+    private static final int HEART_SPACING = 40;
+    private static final int SLOT_SIZE = 48;
+    private static final int SLOT_SPACING = 42; // slots overlap a little since the ring image has empty space around it
+    private static final int ITEM_SIZE = 38;
+    private static final int ITEM_OFFSET_Y = 6; // items sit a little lower than the top of the slot ring
+    private static final int HOTBAR_MARGIN = 8; // gap from the left edge of the screen
 
     private int[] xSlots = new int[SLOT_COUNT]; // X positions for each slot, set in the constructor
     private int[] xHearts = new int[HEART_COUNT]; // X positions for each heart
 
-    private int yHeart = 420;
-    private int ySlot = 490; // Y position for all slots
+    private static final int HEART_MARGIN = 20;
+    private int yHeart = 14;
+    private int ySlot = 517; // Y position for all slots (bottom of the bar stays where the bigger one ended)
 
     private static final Color SELECTED_COLOR = new Color(255, 0, 0, 110);
     private static final Color USING_COLOR = new Color(0, 255, 0, 140);
-    private static final Font SLOT_NUMBER_FONT = new Font("Arial", Font.BOLD, 13);
+    private static final Font SLOT_NUMBER_FONT = new Font("Arial", Font.BOLD, 11);
 
     private static final int DOUBLE_TAP_FRAMES = 25; // max frames between taps of a number for it to count as a double tap
     private static final int USE_FLASH_FRAMES = 20; // how long a slot stays green after its item is used
@@ -66,7 +68,7 @@ public class HotbarUI {
 
     public HotbarUI() {
         for (int i = 0; i < SLOT_COUNT; i++) {
-            xSlots[i] = i * SLOT_SPACING;
+            xSlots[i] = HOTBAR_MARGIN + i * SLOT_SPACING;
         }
 
         try {
@@ -75,8 +77,10 @@ public class HotbarUI {
             e.printStackTrace();
         }
 
+        // hearts sit in the top right corner, the XP bar is in the top left
+        int heartsLeft = Config.GAME_WINDOW_WIDTH - HEART_MARGIN - (HEART_COUNT - 1) * HEART_SPACING - HEART_SIZE;
         for(int i = 0; i < HEART_COUNT; i++) {
-            xHearts[i] = i * HEART_SPACING;
+            xHearts[i] = heartsLeft + i * HEART_SPACING;
         }
 
         try {
@@ -259,7 +263,7 @@ public class HotbarUI {
             Color highlight = i == usingSlot ? USING_COLOR : i == selectedSlot ? SELECTED_COLOR : null;
             if (highlight != null) {
                 g.setColor(highlight);
-                g.fillOval(xSlots[i] + 10, ySlot + 8, SLOT_SIZE - 20, SLOT_SIZE - 20);
+                g.fillOval(xSlots[i] + 6, ySlot + 5, SLOT_SIZE - 13, SLOT_SIZE - 13);
             }
 
             // draw the item on top, if this slot has one
@@ -272,7 +276,7 @@ public class HotbarUI {
                 graphicsHandler.drawImage(image, xSlots[i] + (SLOT_SIZE - ITEM_SIZE) / 2, ySlot + ITEM_OFFSET_Y, ITEM_SIZE, ITEM_SIZE);
             }
 
-            graphicsHandler.drawStringWithOutline(String.valueOf(i + 1), xSlots[i] + 11, ySlot + 16, SLOT_NUMBER_FONT, Color.WHITE, Color.BLACK, 2);
+            graphicsHandler.drawStringWithOutline(String.valueOf(i + 1), xSlots[i] + 6, ySlot + 12, SLOT_NUMBER_FONT, Color.WHITE, Color.BLACK, 2);
         }
 
     }

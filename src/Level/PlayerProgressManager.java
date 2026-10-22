@@ -1,14 +1,24 @@
 
 package Level;
 
+import Engine.SoundPlayer;
+
 public class PlayerProgressManager {
 
     // Shared player progress throughout the current game session.
     private static final PlayerProgress progress = new PlayerProgress();
 
+    private static final String LEVEL_UP_SOUND = "levelUp.wav";
+
     // Award experience points to the player.
     public static void awardXP(int amount) {
+        int previousLevel = progress.getLevel();
         progress.addXP(amount);
+
+        // play the level up sound once, even if multiple levels were gained
+        if (progress.getLevel() > previousLevel) {
+            SoundPlayer.play(LEVEL_UP_SOUND);
+        }
     }
 
     // Returns the player's current level.
