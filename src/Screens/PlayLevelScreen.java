@@ -14,6 +14,8 @@ import Utils.Point;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.HashSet;
+import Enemies.Ghost;
+import java.util.ArrayList;
 
 // This class is for when the RPG game is actually being played
 public class PlayLevelScreen extends Screen implements GameListener {
@@ -37,6 +39,28 @@ public class PlayLevelScreen extends Screen implements GameListener {
     protected Map pendingMap;
     protected Point pendingSpawnPosition;
     protected Direction pendingFacingDirection;
+    // Distance of each pursuing ghost when Dean enters a doorway.
+    private final HashMap<Ghost, Float> pursuingGhostDistances = new HashMap<>();
+
+    // Ghosts waiting to enter another room.
+    private final ArrayList<GhostArrival> ghostArrivals = new ArrayList<>();
+
+    // Stores the information needed for a delayed ghost arrival.
+    private static class GhostArrival {
+        Ghost ghost;
+        Map destination;
+        float x;
+        float y;
+        int framesRemaining;
+
+        GhostArrival(Ghost ghost, Map destination, float x, float y, int frames) {
+            this.ghost = ghost;
+            this.destination = destination;
+            this.x = x;
+            this.y = y;
+            this.framesRemaining = frames;
+        }
+    }
     private DarknessManager darknessManager;
     
     // Displays the player's current level and XP.
@@ -65,6 +89,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
 
         loadedRooms.clear();
         preloadedRooms.clear();
+        // Reset ghost pursuit when starting a new playthrough.
+        ghostArrivals.clear();
+        pursuingGhostDistances.clear();
         
         loadedRooms.put(map.getClass().getName(), map);
         map.setFlagManager(flagManager);
@@ -104,12 +131,14 @@ public class PlayLevelScreen extends Screen implements GameListener {
         switch (playLevelScreenState) {
             // if level is "running" update player and map to keep game logic for the platformer level going
             case RUNNING:
+                updateGhostArrivals();
                 if (transitionPhase != TransitionPhase.NONE) {
                     updateTransition();
                     break;
                 }
                 player.update();
                 map.update(player);
+
                 darknessManager.update();
                 // restart the level when out of hearts
                 if (player.isDead() && !player.isHurt()) {
@@ -135,6 +164,38 @@ public class PlayLevelScreen extends Screen implements GameListener {
     public void onChangeMap(Map newMap, Point spawnPosition, Direction facingDirection) {
         if (transitionPhase != TransitionPhase.NONE) {
             return;
+        }
+
+        // Capture pursuing ghosts at the moment Dean uses the doorway.
+        pursuingGhostDistances.clear();
+
+        for (NPC npc : map.getNPCs()) {
+            if (!(npc instanceof Ghost)) {
+                continue;
+            }
+
+            Ghost ghost = (Ghost) npc;
+
+            if (!ghost.canFollowThroughDoor(player)) {
+                continue;
+            }
+
+            float ghostX = ghost.getBounds().getX()
+                    + ghost.getBounds().getWidth() / 2f;
+            float ghostY = ghost.getBounds().getY()
+                    + ghost.getBounds().getHeight() / 2f;
+
+            float playerX = player.getBounds().getX()
+                    + player.getBounds().getWidth() / 2f;
+            float playerY = player.getBounds().getY()
+                    + player.getBounds().getHeight() / 2f;
+
+            float dx = playerX - ghostX;
+            float dy = playerY - ghostY;
+
+            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+            pursuingGhostDistances.put(ghost, distance);
         }
 
         // Identify the destination room.
@@ -173,38 +234,220 @@ public class PlayLevelScreen extends Screen implements GameListener {
     }
 
     private void swapToPendingMap() {
-        // carry shared state (flags, held items, listeners) over to the new map
+        if (pendingMap == null) {
+            return;
+        }
+
+        // Identify ghosts following Dean before changing rooms.
+        ArrayList<Ghost> followingGhosts = new ArrayList<>();
+
+        for (NPC npc : new ArrayList<>(map.getNPCs())) {
+            if (npc instanceof Ghost) {
+                Ghost ghost = (Ghost) npc;
+                boolean canFollow = ghost.canFollowThroughDoor(player);
+
+                if (canFollow) {
+                    followingGhosts.add(ghost);
+                }
+            }
+        }
+
+        // Preserve shared game state.
         pendingMap.setFlagManager(flagManager);
         pendingMap.setHotbarUI(map.getHotbarUI());
         pendingMap.setUI(map.getUI());
         pendingMap.setBookOpen(false);
         pendingMap.setPlayer(player);
 
-        // Register this screen only once per room.
+        // Avoid registering duplicate listeners.
         if (!pendingMap.getListeners().contains(this)) {
             pendingMap.addListener(this);
         }
 
+        for (java.util.Map.Entry<Ghost, Float> entry : pursuingGhostDistances.entrySet()) {
+
+            Ghost ghost = entry.getKey();
+            float distance = entry.getValue();
+
+            if (!map.getNPCs().contains(ghost)) {
+                continue;
+            }
+
+            // Greater distance means a longer arrival delay.
+            int delay = Math.max(12,
+                    Math.min(120, Math.round(distance / 2f)));
+
+            // Use Dean's destination doorway as the arrival reference.
+            float ghostX = pendingSpawnPosition.x;
+            float ghostY = pendingSpawnPosition.y;
+
+            float tileW = pendingMap.getTileset().getScaledSpriteWidth();
+            float tileH = pendingMap.getTileset().getScaledSpriteHeight();
+
+            switch (pendingFacingDirection) {
+                case LEFT:
+                    ghostX += tileW * 0.55f;
+                    break;
+                case RIGHT:
+                    ghostX -= tileW * 0.55f;
+                    break;
+                case UP:
+                    ghostY += tileH * 0.55f;
+                    break;
+                case DOWN:
+                    ghostY -= tileH * 0.55f;
+                    break;
+            }
+
+            // Remove from the old room while awaiting arrival.
+            map.getNPCs().remove(ghost);
+
+            ghostArrivals.add(new GhostArrival(
+                    ghost, pendingMap, ghostX, ghostY, delay
+            ));
+        }
+
+        pursuingGhostDistances.clear();
+
+        // Move Dean to the destination room.
         player.setMap(pendingMap);
-        player.setLocation(pendingSpawnPosition.x, pendingSpawnPosition.y);
+        player.setLocation(
+            pendingSpawnPosition.x,
+            pendingSpawnPosition.y
+        );
         player.setFacingDirection(pendingFacingDirection);
         player.setPlayerState(PlayerState.STANDING);
 
-        // Initialize scripts only when entering a room for the first time.
+        // Initialize scripts only once per room.
         if (preloadedRooms.add(pendingMap)) {
             pendingMap.preloadScripts();
         }
 
         map = pendingMap;
 
-        // Clear references from the completed transition.
+        // Clear completed transition references.
         pendingMap = null;
         pendingSpawnPosition = null;
         pendingFacingDirection = null;
 
-        // snaps the camera to the player's new position before the first frame is drawn
+        // Update the new room and camera.
         map.update(player);
     }
+
+
+    private void updateGhostArrivals() {
+        for (int i = ghostArrivals.size() - 1; i >= 0; i--) {
+            GhostArrival arrival = ghostArrivals.get(i);
+
+            // Wait until the ghost is ready to enter.
+            if (arrival.framesRemaining > 0) {
+                arrival.framesRemaining--;
+                continue;
+            }
+
+            float ghostWidth = arrival.ghost.getBounds().getWidth();
+            float ghostHeight = arrival.ghost.getBounds().getHeight();
+
+            float maxX = Math.max(0,
+                    arrival.destination.getWidthPixels() - ghostWidth);
+            float maxY = Math.max(0,
+                    arrival.destination.getHeightPixels() - ghostHeight);
+
+            float startX = Math.max(0, Math.min(arrival.x, maxX));
+            float startY = Math.max(0, Math.min(arrival.y, maxY));
+
+            boolean foundSpawn = false;
+            float safeX = startX;
+            float safeY = startY;
+
+            // Search outward from the doorway.
+            for (int radius = 0; radius <= 128 && !foundSpawn; radius += 16) {
+                for (int dx = -radius; dx <= radius && !foundSpawn; dx += 16) {
+                    for (int dy = -radius; dy <= radius; dy += 16) {
+                        float candidateX = startX + dx;
+                        float candidateY = startY + dy;
+
+                        if (isValidGhostSpawn(
+                                arrival.destination,
+                                arrival.ghost,
+                                candidateX,
+                                candidateY)) {
+
+                            safeX = candidateX;
+                            safeY = candidateY;
+                            foundSpawn = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!foundSpawn) {
+                // Don't spawn inside an obstacle.
+                // Try again on the next update.
+                continue;
+            }
+
+            arrival.ghost.setLocation(safeX, safeY);
+
+            // Preserve the existing ghost instance and animations.
+            if (!arrival.destination.getNPCs().contains(arrival.ghost)) {
+                arrival.destination.addNPC(arrival.ghost);
+            }
+
+            ghostArrivals.remove(i);
+        }
+    }
+
+        
+    private boolean isValidGhostSpawn(Map room, Ghost ghost, float x, float y) {
+
+        float width = ghost.getBounds().getWidth();
+        float height = ghost.getBounds().getHeight();
+
+        // The ghost must remain within the map boundaries.
+        if (x < 0 || y < 0
+                || x + width > room.getWidthPixels()
+                || y + height > room.getHeightPixels()) {
+            return false;
+        }
+
+        // Check the four corners against solid map tiles.
+        float[] xs = {x, x + width - 1};
+        float[] ys = {y, y + height - 1};
+
+        for (float px : xs) {
+            for (float py : ys) {
+                MapTile tile = room.getTileByPosition(px, py);
+
+                if (tile == null ||
+                        tile.getTileType() == TileType.NOT_PASSABLE) {
+                    return false;
+                }
+            }
+        }
+
+        // Check solid furniture and other enhanced map tiles.
+        for (EnhancedMapTile object : room.getEnhancedMapTiles()) {
+            if (object.getTileType() != TileType.NOT_PASSABLE
+                    || !object.exists()) {
+                continue;
+            }
+
+            float ox = object.getBounds().getX();
+            float oy = object.getBounds().getY();
+            float ow = object.getBounds().getWidth();
+            float oh = object.getBounds().getHeight();
+
+            if (x < ox + ow && x + width > ox
+                    && y < oy + oh && y + height > oy) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 
     public void draw(GraphicsHandler graphicsHandler) {
         // based on screen state, draw appropriate graphics

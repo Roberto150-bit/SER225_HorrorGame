@@ -94,6 +94,31 @@ public class Ghost extends NPC {
         return health;
     }
 
+    
+    public boolean canFollowThroughDoor(Player player) {
+        if (isBanished || health <= 0 || player == null) {
+            return false;
+        }
+
+        float dx = (player.getBounds().getX()
+                + player.getBounds().getWidth() / 2f)
+                - (getBounds().getX()
+                + getBounds().getWidth() / 2f);
+
+        float dy = (player.getBounds().getY()
+                + player.getBounds().getHeight() / 2f)
+                - (getBounds().getY()
+                + getBounds().getHeight() / 2f);
+
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
+
+        // A nearby ghost may follow even if it is attacking
+        // or temporarily stopped close to Dean.
+        return distance <= detectionRadius;
+    }
+
+
+
     @Override
     public void performAction(Player player) {
         if (isBanished) {
