@@ -94,8 +94,7 @@ public class Ghost extends NPC {
         return health;
     }
 
-    
-    public boolean canFollowThroughDoor(Player player) {
+    public boolean isWithinDetectionRadius(Player player) {
         if (isBanished || health <= 0 || player == null) {
             return false;
         }
@@ -115,6 +114,10 @@ public class Ghost extends NPC {
         // A nearby ghost may follow even if it is attacking
         // or temporarily stopped close to Dean.
         return distance <= detectionRadius;
+    }
+
+    public boolean canFollowThroughDoor(Player player) {
+        return isWithinDetectionRadius(player);
     }
 
 

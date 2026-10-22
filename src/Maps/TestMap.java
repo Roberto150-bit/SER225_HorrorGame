@@ -48,7 +48,8 @@ public class TestMap extends Map {
         CellarDoor cellarDoor = new CellarDoor(getMapTile(22, 19).getLocation());
         // cellarDoor.setInteractScript(new DoorScript(() -> new BasementMap(), 1, 7, Direction.RIGHT));
         // spawns the player on the stairs beside the basement's right door
-        cellarDoor.setInteractScript(new DoorScript(() -> new BasementMap(), 12, 4, Direction.LEFT));
+        cellarDoor.setInteractScript(new DoorScript(
+                () -> new BasementMap(), 12, 4, Direction.LEFT, "openingDoor.wav"));
         enhancedMapTiles.add(cellarDoor);
 
         return enhancedMapTiles;
@@ -100,4 +101,3 @@ public class TestMap extends Map {
         getMapTile(2, 6).setInteractScript(new TreeScript());
     }
 }
-

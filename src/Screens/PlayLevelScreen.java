@@ -19,6 +19,8 @@ import java.util.ArrayList;
 
 // This class is for when the RPG game is actually being played
 public class PlayLevelScreen extends Screen implements GameListener {
+    private static final String GHOST_CHASE_MUSIC = "Resources/Audios/Music/Whisper of the Abyss.wav";
+
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
     
@@ -30,6 +32,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
     protected Player player;
     protected PlayLevelScreenState playLevelScreenState;
     protected WinScreen winScreen;
+    protected LoseScreen loseScreen;
     protected FlagManager flagManager;
 
     // map transition (door) state -- the screen fades to black, swaps maps, then fades back in
@@ -44,6 +47,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
 
     // Ghosts waiting to enter another room.
     private final ArrayList<GhostArrival> ghostArrivals = new ArrayList<>();
+    private boolean ghostChaseMusicPlaying;
+    private String musicBeforeGhostChase;
 
     // Stores the information needed for a delayed ghost arrival.
     private static class GhostArrival {
@@ -120,6 +125,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         darknessManager = new DarknessManager(180.0f);
     
         winScreen = new WinScreen(this);
+        loseScreen = new LoseScreen(this);
 
         transitionPhase = TransitionPhase.NONE;
         fadeAlpha = 0;
@@ -140,15 +146,55 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 map.update(player);
 
                 darknessManager.update();
-                // restart the level when out of hearts
+                // show the lose screen after the player's damage animation finishes
                 if (player.isDead() && !player.isHurt()) {
-                    resetLevel();
+                    playLevelScreenState = PlayLevelScreenState.LOSE;
                 }
                 break;
             // if level has been completed, bring up level cleared screen
             case LEVEL_COMPLETED:
                 winScreen.update();
                 break;
+            case LOSE:
+                loseScreen.update();
+                break;
+        }
+        updateGhostChaseMusic();
+    }
+
+    private void updateGhostChaseMusic() {
+        boolean ghostNearby = false;
+        if (player != null && map != null) {
+            for (NPC npc : map.getNPCs()) {
+                if (npc instanceof Ghost && ((Ghost) npc).isWithinDetectionRadius(player)) {
+                    ghostNearby = true;
+                    break;
+                }
+            }
+        }
+
+        String currentTrack = MusicManager.getCurrentFile();
+        if (ghostNearby) {
+            if (!ghostChaseMusicPlaying) {
+                musicBeforeGhostChase = currentTrack;
+                ghostChaseMusicPlaying = true;
+            } else if (!GHOST_CHASE_MUSIC.equals(currentTrack)) {
+                musicBeforeGhostChase = currentTrack;
+            }
+
+            if (!GHOST_CHASE_MUSIC.equals(currentTrack)) {
+                MusicManager.play(GHOST_CHASE_MUSIC, 0.6f, true);
+            }
+        } else if (ghostChaseMusicPlaying) {
+            if (GHOST_CHASE_MUSIC.equals(currentTrack)) {
+                if (musicBeforeGhostChase == null) {
+                    MusicManager.stop();
+                } else {
+                    MusicManager.play(musicBeforeGhostChase, 0.6f, true);
+                }
+            }
+            musicBeforeGhostChase = null;
+            ghostChaseMusicPlaying = false;
         }
     }
 
@@ -296,6 +342,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
                     break;
                 case DOWN:
                     ghostY -= tileH * 0.55f;
+                    break;
+                case NONE:
                     break;
             }
 
@@ -493,6 +541,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
             case LEVEL_COMPLETED:
                 winScreen.draw(graphicsHandler);
                 break;
+            case LOSE:
+                loseScreen.draw(graphicsHandler);
+                break;
         }
     }
 
@@ -510,7 +561,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
 
     // This enum represents the different states this screen can be in
     private enum PlayLevelScreenState {
-        RUNNING, LEVEL_COMPLETED
+        RUNNING, LEVEL_COMPLETED, LOSE
     }
 
     private enum TransitionPhase {

@@ -4,8 +4,12 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+
 import javax.imageio.ImageIO;
+
+import Level.Player;
 
 // the player's 6 slot inventory bar
 // press 1-6 to select a slot (it lights up red), then use the item in it (it flashes green) by:
@@ -15,9 +19,11 @@ import javax.imageio.ImageIO;
 public class HotbarUI {
 
     private BufferedImage slotBackgroundImage;
+    private BufferedImage heartImage;
 
     private Key useKey = Key.E; // key to use the selected item
     private static final int SLOT_COUNT = 6;
+    private static final int HEART_COUNT = Player.getHealth();
     private Key[] slotKeys = {Key.ONE, Key.TWO, Key.THREE, Key.FOUR, Key.FIVE, Key.SIX}; // key to select each slot
 
     private KeyLocker keyLocker = new KeyLocker();
@@ -28,13 +34,17 @@ public class HotbarUI {
     private int[] frameDelays = new int[SLOT_COUNT]; // milliseconds per frame
     private ItemUse[] itemUses = new ItemUse[SLOT_COUNT];
 
+    private static final int HEART_SIZE = 60;
+    private static final int HEART_SPACING = 65;
     private static final int SLOT_SIZE = 75;
     private static final int SLOT_SPACING = 65; // slots overlap a little since the ring image has empty space around it
     private static final int ITEM_SIZE = 60;
     private static final int ITEM_OFFSET_Y = 10; // items sit a little lower than the top of the slot ring
 
     private int[] xSlots = new int[SLOT_COUNT]; // X positions for each slot, set in the constructor
+    private int[] xHearts = new int[HEART_COUNT]; // X positions for each slot
 
+    private int yHeart = 420;
     private int ySlot = 490; // Y position for all slots
 
     private static final Color SELECTED_COLOR = new Color(255, 0, 0, 110);
@@ -61,9 +71,21 @@ public class HotbarUI {
 
         try {
             slotBackgroundImage = ImageIO.read(getClass().getResourceAsStream("/Resources/SingleHotbarSlot.png"));
-
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        for(int i = 0; i < HEART_COUNT; i++) {
+            xHearts[i] = i * HEART_SPACING;
+        }
+
+        try {
+            heartImage = ImageIO.read(getClass().getResourceAsStream("/Resources/heartIcon.png"));
+            if (heartImage == null) {
+                System.out.println("The heart image could not be found for HOTBARUI.java");
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to load heart icon from " + Config.RESOURCES_PATH, e);
         }
     }
 
@@ -221,8 +243,12 @@ public class HotbarUI {
     }
 
 
-    public void draw(GraphicsHandler graphicsHandler){
+    public void draw(GraphicsHandler graphicsHandler, int health){
         Graphics2D g = graphicsHandler.getGraphics();
+
+        for (int i = 0; i < Math.min(Math.max(health, 0), HEART_COUNT); i++) {
+            graphicsHandler.drawImage(heartImage, xHearts[i], yHeart, HEART_SIZE, HEART_SIZE);
+        }
 
         for (int i = 0; i < xSlots.length; i++) {
             if (slotBackgroundImage != null) {

@@ -2,6 +2,7 @@ package Maps;
 
 import Engine.ImageLoader;
 import Engine.ItemUse;
+import Engine.MusicManager;
 import Engine.MusicPlayer;
 import EnhancedMapTiles.CollectibleObject;
 import EnhancedMapTiles.NoteObject;
@@ -22,28 +23,16 @@ import java.util.ArrayList;
 
 
 public class BasementMap extends Map {
-
-    public MusicPlayer music = new MusicPlayer();
     public BasementMap() {
         super("BasementMap.txt", new BasementTileset());
         this.playerStartPosition = getMapTile(6, 4).getLocation();
-        
-        music.setMusicFile("Resources/Audios/horrorthriller.wav");
-        music.setVolume(0.1f);
-        music.play();
-        music.setLooping(true);
     }
 
     @Override
     public ArrayList<EnhancedMapTile> loadEnhancedMapTiles() {
-        MusicPlayer music = new MusicPlayer();
-        music.setMusicFile("Resources/Audios/horrorthriller.wav");
-        music.setVolume(0.2f);
-        music.play();
-        music.setLooping(true);
         ArrayList<EnhancedMapTile> enhancedMapTiles = new ArrayList<>();
 
-        // knife
+        // Knife
         enhancedMapTiles.add(new Knife(getMapTile(8, 4).getLocation()));
 
         // source images are 256x256, scaled down to 32x32 in the world

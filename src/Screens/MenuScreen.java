@@ -59,14 +59,8 @@ public class MenuScreen extends Screen {
         keyPressTimer = 0;
         menuItemSelected = -1;
         keyLocker.lockKey(Key.SPACE);
-        /* 
-        String[] fontNsames = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();
-        for (String fontName : fontNsames) {
-            System.out.println(fontName);
-        }
-        */
 
-        //play music here
+        // Play music here
         MusicManager.play("Resources/Audios/Music/MenuMusic.wav", 0.6f, true);
     }
 
