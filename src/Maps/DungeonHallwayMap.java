@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 public class DungeonHallwayMap extends Map {
 
+    
     public DungeonHallwayMap() {
         super("DungeonHallwayMap.txt", new DungeonHallwayTileset());
         this.playerStartPosition = getMapTile(6, 7).getLocation();
@@ -39,6 +40,8 @@ public class DungeonHallwayMap extends Map {
         getMapTile(3, 6).setInteractScript(new DoorScript(() -> new DungeonLibraryMap(), 2, 9 , Direction.RIGHT));
 
         getMapTile(4, 8).setInteractScript(new DoorScript(() -> new DungeonBasicRoomMap(), 4, 6, Direction.RIGHT));
+        //only if 5 puzzle completed
+        //getMapTile(5, 3).setInteractScript(new DoorScript(() -> new DungeonSecretRoomMap(), 4, 8, Direction.RIGHT));
     }
 
 }

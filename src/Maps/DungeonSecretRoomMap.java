@@ -1,12 +1,11 @@
 package Maps;
 
-import EnhancedMapTiles.*;   
 import Level.EnhancedMapTile;
 import Level.Map;
-import Tilesets.DungeonSecretRoomTileset;
-import java.util.ArrayList;
 import Scripts.DoorScript;
+import Tilesets.DungeonSecretRoomTileset;
 import Utils.Direction;
+import java.util.ArrayList;
 
 public class DungeonSecretRoomMap extends Map {
 
@@ -31,7 +30,7 @@ public class DungeonSecretRoomMap extends Map {
         // TestMap is a placeholder destination until the next room is built
         
         // HERE -------------------------------------------------------------
-        //getMapTile(2, 2).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 7, 4, Direction.LEFT));
+        getMapTile(4, 10).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 5, 4, Direction.LEFT));
 
     }
 }

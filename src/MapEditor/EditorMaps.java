@@ -21,6 +21,7 @@ public class EditorMaps {
             add("DungeonBasicRoomMap");
             add("DungeonSecretRoomMap");
             add("DungeonLibraryMap");
+            add("DungeonHallwaySecretDoorRevealedMap");
             
         }};
     }
@@ -45,6 +46,8 @@ public class EditorMaps {
                 return new Maps.DungeonSecretRoomMap();
             case "DungeonLibraryMap":
                 return new Maps.DungeonLibraryMap();
+            case "DungeonHallwaySecretDoorRevealedMap":
+                return new Maps.DungeonHallwaySecretDoorRevealedMap();
             default:
                 throw new RuntimeException("Unrecognized map name");
         }

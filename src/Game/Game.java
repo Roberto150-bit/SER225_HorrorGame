@@ -1,7 +1,5 @@
 package Game;
 
-import javax.swing.JPanel;
-import javax.swing.ImageIcon;
 import Engine.GameWindow;
 import Engine.ScreenManager;
 

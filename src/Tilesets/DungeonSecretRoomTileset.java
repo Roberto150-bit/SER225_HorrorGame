@@ -3,8 +3,6 @@ package Tilesets;
 import Builders.FrameBuilder;
 import Builders.MapTileBuilder;
 import Engine.ImageLoader;
-import GameObject.Frame;
-import GameObject.ImageEffect;
 import Level.TileType;
 import Level.Tileset;
 import java.util.ArrayList;
@@ -36,43 +34,33 @@ public class DungeonSecretRoomTileset extends Tileset {
         ArrayList<Integer> cornerTiles = new ArrayList<>();
 
         // Black padding and outer boundaries
-        for (int row = 0; row < ROWS; row++) {
-            for (int col = 0; col < COLUMNS; col++) {
+        for (int rows = 0; rows < ROWS; rows++) {
+            for (int cols = 0; cols < COLUMNS; cols++) {
 
-                int index = row * COLUMNS + col;
+                int indexs = rows * COLUMNS + cols;
 
-                // Padding at the top and outer sides
-                if (row == 0 || col == 0 || col == COLUMNS - 1) {
-                    solidTiles.add(index);
-                    continue;
+                if (indexs < COLUMNS) {
+                    topTiles.add(indexs);
                 }
 
-                // Top wall/shelf area
-                boolean topEdge = row == 1;
+                if (indexs >= (ROWS - 1) * COLUMNS && indexs < ROWS * COLUMNS) {
+                    bottomTiles.add(indexs);
+                }
 
-                // Side walls around the room
-                boolean leftEdge = col == 1;
-                boolean rightEdge = col == 7;
+                if (indexs % COLUMNS == 0) {
+                    leftTiles.add(indexs);
+                }
 
-                // Bottom wall, leaving the entrance open
-                boolean bottomEdge = row == 9 && col != 4;
-
-                if (topEdge) {
-                    solidTiles.add(index);
-                    topTiles.add(index);
-                } else if (bottomEdge) {
-                    solidTiles.add(index);
-                    bottomTiles.add(index);
-                } else if (leftEdge) {
-                    solidTiles.add(index);
-                    leftTiles.add(index);
-                } else if (rightEdge) {
-                    solidTiles.add(index);
-                    rightTiles.add(index);
+                if (indexs % COLUMNS == COLUMNS - 1) {
+                    rightTiles.add(indexs);
                 }
             }
         }
+
         //specific tiles here:
+        solidTiles.addAll(Arrays.asList(10,11,12,13,14,15,16));//the chairs
+        solidTiles.addAll(Arrays.asList(73, 79, 83, 87));//the fences
+        /* 
         solidTiles.addAll(Arrays.asList(
                 11, 12, 13, 14, 15,
                 20, 21, 22, 23, 24,
@@ -90,7 +78,7 @@ public class DungeonSecretRoomTileset extends Tileset {
                 55, 61,
                 65, 67
         ));
-        
+        */
 
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLUMNS; col++) {
@@ -110,12 +98,15 @@ public class DungeonSecretRoomTileset extends Tileset {
                 }
                 MapTileBuilder tile = new MapTileBuilder(builder.build());
 
-                if (solidTiles.contains(index)) {
+                if (solidTiles.contains(index)
+                        || topTiles.contains(index)
+                        || bottomTiles.contains(index)
+                        || leftTiles.contains(index)
+                        || rightTiles.contains(index)) {
                     tile.withTileType(TileType.NOT_PASSABLE);
                 }
 
-                tiles.add(tile);
-            }
+                tiles.add(tile);            }
         }
         return tiles;
     }

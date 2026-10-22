@@ -2,8 +2,6 @@ package Maps;
 
 import Engine.ImageLoader;
 import Engine.ItemUse;
-import Engine.MusicManager;
-import Engine.MusicPlayer;
 import EnhancedMapTiles.CollectibleObject;
 import EnhancedMapTiles.NoteObject;
 import EnhancedMapTiles.PuzzleObject;
@@ -13,6 +11,7 @@ import NPCs.MsValeNPC;
 import Puzzles.PuzzleConfig;
 import Puzzles.PuzzleDifficulty;
 import Puzzles.PuzzleId;
+import static Puzzles.PuzzleManager.getCompletedCount;
 import Scripts.DoorScript;
 import Scripts.NoteScript;
 import Scripts.PuzzleScript;
@@ -165,7 +164,14 @@ public class BasementMap extends Map {
 
         // door on the right wall next to the stairs stand on the stairs at (12, 4), face right, and press E to go through
         // TestMap is a placeholder destination until the next room is built
-        getMapTile(13, 4).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 1, 2, Direction.RIGHT));
+        System.out.println(getCompletedCount());
+        getMapTile(13, 4).setInteractScript(new DoorScript(
+            () -> getCompletedCount() >= 5
+                    ? new DungeonHallwaySecretDoorRevealedMap()
+                    : new DungeonHallwayMap(),
+            1, 2, Direction.RIGHT));
+
+        //getMapTile(13, 4).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 1, 2, Direction.RIGHT));
     }
 
 }
