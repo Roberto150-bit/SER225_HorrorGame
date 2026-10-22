@@ -45,6 +45,8 @@ public class PuzzleUI {
     private int activateWidth = 180;
     private int activateHeight = 50;
 
+    private boolean completionSoundPlayed = false;
+
     public void open() {
         solved = false;
         isOpen = true;
@@ -60,6 +62,7 @@ public class PuzzleUI {
         // Reset UI state for the selected puzzle instance.
         currentPuzzle = config;
         pendingResult = null;
+        completionSoundPlayed = false;
         mirrorSolvedAt = -1L;
         backgroundImage = null;
         controller = null;
@@ -169,10 +172,12 @@ public class PuzzleUI {
                 pendingResult = result;
                 solved = true;
 
-                if (currentPuzzle != null &&
-                    currentPuzzle.getPuzzleType() == PuzzleId.SPIRIT_MIRROR &&
-                    mirrorSolvedAt == -1L) {
+                if (!completionSoundPlayed) {
+                    SoundPlayer.play("PuzzleComplete.wav");
+                    completionSoundPlayed = true;
+                }
 
+                if (mirrorSolvedAt == -1L) {
                     mirrorSolvedAt = System.currentTimeMillis();
                 }
             }
@@ -310,10 +315,7 @@ public class PuzzleUI {
         boolean showCompletion = solved || alreadyCompleted;
         float completionAlpha = 1.0f;
 
-        if (showCompletion &&
-            !alreadyCompleted &&
-            currentPuzzle != null &&
-            currentPuzzle.getPuzzleType() == PuzzleId.SPIRIT_MIRROR) {
+        if (showCompletion && !alreadyCompleted) {
 
             if (mirrorSolvedAt == -1L) {
                 mirrorSolvedAt = System.currentTimeMillis();

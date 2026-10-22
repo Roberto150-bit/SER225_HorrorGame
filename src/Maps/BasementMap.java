@@ -74,7 +74,7 @@ public class BasementMap extends Map {
 
         PuzzleConfig symbolConfig = new PuzzleConfig(
             "basement_fuse_01",
-            PuzzleId.SYMBOL_LOCK,
+            PuzzleId.SPIRIT_MIRROR,
             PuzzleDifficulty.EASY
         );
 
@@ -84,8 +84,8 @@ public class BasementMap extends Map {
 
         PuzzleConfig radioConfig = new PuzzleConfig(
             "basement_radio_01",
-            PuzzleId.TUNE_RADIO,
-            PuzzleDifficulty.EASY
+            PuzzleId.SPIRIT_MIRROR,
+            PuzzleDifficulty.MEDIUM
         );
 
         PuzzleObject radioObject = new PuzzleObject(
@@ -94,8 +94,8 @@ public class BasementMap extends Map {
 
         PuzzleConfig clockConfig = new PuzzleConfig(
             "basement_clock_01",
-            PuzzleId.HAUNTED_CLOCK,
-            PuzzleDifficulty.EASY
+            PuzzleId.SPIRIT_MIRROR,
+            PuzzleDifficulty.HARD
         );
 
         PuzzleObject clockObject = new PuzzleObject(
@@ -105,8 +105,8 @@ public class BasementMap extends Map {
         // Configuration for the basement Ritual Sequence puzzle.
         PuzzleConfig ritualConfig = new PuzzleConfig(
             "basement_ritual_01",
-            PuzzleId.RITUAL_SEQUENCE,
-            PuzzleDifficulty.EASY
+            PuzzleId.SPIRIT_MIRROR,
+            PuzzleDifficulty.HARD
         );
 
         // Temporary interactable object for Ritual Sequence.

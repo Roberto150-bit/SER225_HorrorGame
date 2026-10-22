@@ -141,10 +141,6 @@ public class TuneRadioMinigame implements PuzzleMinigame {
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
 
-        if (solved) {
-            return;
-        }
-
         java.awt.Graphics2D g =
             graphicsHandler.getGraphics();
 
@@ -191,7 +187,7 @@ public class TuneRadioMinigame implements PuzzleMinigame {
             gold
         );
 
-        // 3. Signal strength indicator.
+        /*
         int strength = getSignalStrength();
 
         graphicsHandler.drawFilledRectangle(
@@ -200,9 +196,9 @@ public class TuneRadioMinigame implements PuzzleMinigame {
             110 * strength / 100,
             5,
             new Color(190, 155, 105)
-        );
+        );*/
 
-        // 4. Functional knob labels.
+        //
         Font knobFont =
             new Font("Serif", Font.BOLD, 22);
 
