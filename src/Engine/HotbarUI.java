@@ -42,7 +42,7 @@ public class HotbarUI {
     private static final int ITEM_OFFSET_Y = 10; // items sit a little lower than the top of the slot ring
 
     private int[] xSlots = new int[SLOT_COUNT]; // X positions for each slot, set in the constructor
-    private int[] xHearts = new int[HEART_COUNT]; // X positions for each slot
+    private int[] xHearts = new int[HEART_COUNT]; // X positions for each heart
 
     private int yHeart = 420;
     private int ySlot = 490; // Y position for all slots

@@ -9,16 +9,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 public class UI {
     private Font secretSolverFont;
     private Book book;
-    private String bookSound;
 
     private int currentPage = 0;
 

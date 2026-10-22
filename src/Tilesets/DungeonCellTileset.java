@@ -1,5 +1,5 @@
 package Tilesets;
-
+//tested and implemented
 import Builders.FrameBuilder;
 import Builders.MapTileBuilder;
 import Engine.ImageLoader;

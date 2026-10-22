@@ -1,6 +1,5 @@
 package Maps;
 
-import EnhancedMapTiles.*;   
 import Level.EnhancedMapTile;
 import Level.Map;
 import Scripts.DoorScript;
@@ -35,6 +34,11 @@ public class DungeonHallwayMap extends Map {
 
         getMapTile(8, 4).setInteractScript(new DoorScript(() -> new DungeonCellMap(), 2, 3, Direction.RIGHT));
 
+        getMapTile(0, 4).setInteractScript(new DoorScript(() -> new DungeonWaterRoomMap(), 8, 5 , Direction.RIGHT));
+
+        getMapTile(3, 6).setInteractScript(new DoorScript(() -> new DungeonLibraryMap(), 2, 9 , Direction.RIGHT));
+
+        getMapTile(4, 8).setInteractScript(new DoorScript(() -> new DungeonBasicRoomMap(), 4, 6, Direction.RIGHT));
     }
 
 }

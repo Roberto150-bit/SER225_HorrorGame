@@ -1,6 +1,7 @@
 package Screens;
 
 import Engine.*;
+import Level.Player;
 import SpriteFont.SpriteFont;
 
 import java.awt.*;
@@ -48,6 +49,7 @@ public class LoseScreen extends Screen {
         // if space is pressed, reset level. if escape is pressed, go back to main menu
         if (Keyboard.isKeyDown(Key.SPACE) && !keyLocker.isKeyLocked(Key.SPACE)) {
             playLevelScreen.resetLevel();
+            Player.setHealth(3);
         } else if (Keyboard.isKeyDown(Key.ESC) && !keyLocker.isKeyLocked(Key.ESC)) {
             playLevelScreen.goBackToMenu();
         }
