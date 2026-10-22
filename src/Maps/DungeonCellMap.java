@@ -1,14 +1,14 @@
 package Maps;
 
-import Puzzles.PuzzleDifficulty;
-import Puzzles.PuzzleId;
-import EnhancedMapTiles.*;   
 import Level.EnhancedMapTile;
 import Level.Map;
-import Tilesets.DungeonCellTileset;
-import java.util.ArrayList;
+import Puzzles.PuzzleDifficulty;
+import Puzzles.PuzzleId;
+import static Puzzles.PuzzleManager.getCompletedCount;
 import Scripts.DoorScript;
+import Tilesets.DungeonCellTileset;
 import Utils.Direction;
+import java.util.ArrayList;
 
 public class DungeonCellMap extends Map {
 
@@ -41,5 +41,13 @@ public class DungeonCellMap extends Map {
     public void loadScripts() {
         // door on the top wall back to the hallway
         getMapTile(2, 2).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 7, 4, Direction.LEFT));
+
+        System.out.println(getCompletedCount());
+        getMapTile(13, 4).setInteractScript(new DoorScript(
+            () -> getCompletedCount() >= 5
+                    ? new DungeonHallwaySecretDoorRevealedMap()
+                    : new DungeonHallwayMap(),
+            4, 7, Direction.UP   // <-- replace with the spawn tile + facing you want in the hallway
+        ));
     }
 }

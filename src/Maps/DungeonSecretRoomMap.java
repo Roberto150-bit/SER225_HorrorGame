@@ -2,6 +2,7 @@ package Maps;
 
 import Level.EnhancedMapTile;
 import Level.Map;
+import static Puzzles.PuzzleManager.getCompletedCount;
 import Scripts.DoorScript;
 import Tilesets.DungeonSecretRoomTileset;
 import Utils.Direction;
@@ -32,5 +33,13 @@ public class DungeonSecretRoomMap extends Map {
         // HERE -------------------------------------------------------------
         getMapTile(4, 10).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 5, 4, Direction.LEFT));
 
+
+        System.out.println(getCompletedCount());
+        getMapTile(13, 4).setInteractScript(new DoorScript(
+            () -> getCompletedCount() >= 5
+                    ? new DungeonHallwaySecretDoorRevealedMap()
+                    : new DungeonHallwayMap(),
+            4, 7, Direction.UP   // <-- replace with the spawn tile + facing you want in the hallway
+        ));
     }
 }

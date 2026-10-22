@@ -1,10 +1,11 @@
 package Maps;
 
 import GameObject.Relic;
-import Puzzles.PuzzleDifficulty;
-import Puzzles.PuzzleId;
 import Level.EnhancedMapTile;
 import Level.Map;
+import Puzzles.PuzzleDifficulty;
+import Puzzles.PuzzleId;
+import static Puzzles.PuzzleManager.getCompletedCount;
 import Scripts.DoorScript;
 import Tilesets.DungeonBasicRoomTileset;
 import Utils.Direction;
@@ -42,5 +43,13 @@ public class DungeonBasicRoomMap extends Map {
     public void loadScripts() {
         // door on the bottom wall back to the hallway
         getMapTile(3, 8).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 4, 7, Direction.UP));
+
+        System.out.println(getCompletedCount());
+        getMapTile(13, 4).setInteractScript(new DoorScript(
+            () -> getCompletedCount() >= 5
+                    ? new DungeonHallwaySecretDoorRevealedMap()
+                    : new DungeonHallwayMap(),
+            4, 7, Direction.UP   // <-- replace with the spawn tile + facing you want in the hallway
+        ));
     }
 }

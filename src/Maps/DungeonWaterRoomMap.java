@@ -1,10 +1,11 @@
 package Maps;
 
 import GameObject.Relic;
-import Puzzles.PuzzleDifficulty;
-import Puzzles.PuzzleId;
 import Level.EnhancedMapTile;
 import Level.Map;
+import Puzzles.PuzzleDifficulty;
+import Puzzles.PuzzleId;
+import static Puzzles.PuzzleManager.getCompletedCount;
 import Scripts.DoorScript;
 import Tilesets.DungeonWaterRoomTileset;
 import Utils.Direction;
@@ -46,5 +47,13 @@ public class DungeonWaterRoomMap extends Map {
         // door on the top wall to the rundown room
         getMapTile(3, 2).setInteractScript(new DoorScript(() -> new DungeonRundownRoomMap(), 2, 6, Direction.UP)
                 .lockedUntilSolved(DungeonRoomSetup.WATER_ROOM_PUZZLE, "Something holds this door shut.\nThe mirror in this room is watching."));
+    
+            System.out.println(getCompletedCount());
+        getMapTile(13, 4).setInteractScript(new DoorScript(
+            () -> getCompletedCount() >= 5
+                    ? new DungeonHallwaySecretDoorRevealedMap()
+                    : new DungeonHallwayMap(),
+            4, 7, Direction.UP   // <-- replace with the spawn tile + facing you want in the hallway
+        ));
     }
 }
