@@ -46,7 +46,7 @@ public class BasementMap extends Map {
         ArrayList<NPC> npcs = new ArrayList<>();
 
         // Mrs. Vale stands by the desk on the left wall, facing the player's start position
-        MsValeNPC msVale = new MsValeNPC(1, getMapTile(2, 4).getLocation());
+        MsValeNPC msVale = new MsValeNPC(1, getMapTile(5, 4).getLocation());
         npcs.add(msVale);
 
         return npcs;

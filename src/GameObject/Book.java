@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
 
 public class Book {
     private BufferedImage image;
-    private boolean isActive = true;
+    private boolean isActive = false;
     private Key interactKey = Key.C; // key to interact with the book
     private KeyLocker keyLocker = new KeyLocker();
 

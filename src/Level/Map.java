@@ -542,7 +542,12 @@ public abstract class Map {
         }
         // ------------------------------------------------------------------------------
         puzzleUI.update(); //Updates puzzle state
-        book.update(!puzzleUI.isOpen()); //Updates book state every update, the journal can't be opened over a puzzle
+        // The journal cannot open while a puzzle or dialogue is active.
+        if (textbox.isActive() && book.isActive()) {
+            book.setActive(false);
+        }
+
+        book.update(!puzzleUI.isOpen() && !textbox.isActive());
         ui.update(book.isActive(), puzzleUI.isOpen()); // journal page turning, before the hotbar so clicking an arrow doesn't also use an item
         hotbarUI.update(!puzzleUI.isOpen() && !textbox.isActive()); //Updates hotbar state
         ItemUse usedItem = hotbarUI.takeUsedItem();
@@ -657,11 +662,15 @@ public abstract class Map {
 
     public void drawWorld(Player player, GraphicsHandler graphicsHandler) {
         camera.draw(player, graphicsHandler);
-        if (textbox.isActive()) {
-            textbox.draw(graphicsHandler);
-        }
+    }
+
+    public void drawOverlays(GraphicsHandler graphicsHandler) {
         if (book.isActive()) {
             book.draw(graphicsHandler);
+        }
+
+        if (textbox.isActive()) {
+            textbox.draw(graphicsHandler);
         }
     }
 

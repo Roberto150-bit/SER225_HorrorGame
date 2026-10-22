@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import Enemies.Ghost;
 import java.util.ArrayList;
+import Scripts.ValeIntroScript;
 
 // This class is for when the RPG game is actually being played
 public class PlayLevelScreen extends Screen implements GameListener {
@@ -139,6 +140,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // both are supported, however preloading is recommended
         map.preloadScripts();
         preloadedRooms.add(map);
+
+        // Begin Mrs. Vale's introduction automatically.
+        map.setActiveScript(new ValeIntroScript());
         
         darknessManager = new DarknessManager(180.0f);
     
@@ -654,7 +658,11 @@ public class PlayLevelScreen extends Screen implements GameListener {
             );
         }
 
+        // Draw gameplay UI first.
         map.drawUI(graphicsHandler);
+
+        // Draw dialogue and journal last, above the hotbar.
+        map.drawOverlays(graphicsHandler);
 
         // Display the XP bar above the game world.
         levelProgressHUD.draw(graphicsHandler);
