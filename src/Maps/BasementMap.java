@@ -74,44 +74,44 @@ public class BasementMap extends Map {
 
         PuzzleConfig symbolConfig = new PuzzleConfig(
             "basement_fuse_01",
-            PuzzleId.SPIRIT_MIRROR,
+            PuzzleId.SYMBOL_LOCK,
             PuzzleDifficulty.EASY
         );
 
         PuzzleObject symbolLock = new PuzzleObject(
-            getMapTile(2, 7).getLocation()
+            getMapTile(2, 7).getLocation(), symbolConfig
         );
 
         PuzzleConfig radioConfig = new PuzzleConfig(
             "basement_radio_01",
-            PuzzleId.SPIRIT_MIRROR,
+            PuzzleId.TUNE_RADIO,
             PuzzleDifficulty.MEDIUM
         );
 
         PuzzleObject radioObject = new PuzzleObject(
-            getMapTile(4, 7).getLocation()
+            getMapTile(4, 7).getLocation(), radioConfig
         );
 
         PuzzleConfig clockConfig = new PuzzleConfig(
             "basement_clock_01",
-            PuzzleId.SPIRIT_MIRROR,
+            PuzzleId.HAUNTED_CLOCK,
             PuzzleDifficulty.HARD
         );
 
         PuzzleObject clockObject = new PuzzleObject(
-            getMapTile(6, 7).getLocation()
+            getMapTile(6, 7).getLocation(), clockConfig
         );
         
         // Configuration for the basement Ritual Sequence puzzle.
         PuzzleConfig ritualConfig = new PuzzleConfig(
             "basement_ritual_01",
-            PuzzleId.SPIRIT_MIRROR,
+            PuzzleId.RITUAL_SEQUENCE,
             PuzzleDifficulty.HARD
         );
 
         // Temporary interactable object for Ritual Sequence.
         PuzzleObject ritualObject = new PuzzleObject(
-            getMapTile(8, 7).getLocation()
+            getMapTile(8, 7).getLocation(), ritualConfig
         );
 
         // Configuration for the basement Spirit Mirror puzzle.
@@ -123,7 +123,7 @@ public class BasementMap extends Map {
 
         // Temporary interactable object for Spirit Mirror.
         PuzzleObject mirrorObject = new PuzzleObject(
-            getMapTile(10, 7).getLocation()
+            getMapTile(10, 7).getLocation(), mirrorConfig
         );
 
         mirrorObject.setInteractScript(new PuzzleScript(mirrorConfig));
