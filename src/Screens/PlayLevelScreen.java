@@ -1,6 +1,10 @@
 package Screens;
 
 import Engine.GraphicsHandler;
+import Engine.Key;
+import Engine.KeyLocker;
+import Engine.Keyboard;
+import Engine.Mouse;
 import Engine.MusicManager;
 import Engine.Screen;
 import Game.GameState;
@@ -9,6 +13,7 @@ import Level.*;
 import Lighting.DarknessManager;
 import Maps.BasementMap;
 import Players.DeanPlayer;
+import Puzzles.PuzzleManager;
 import Utils.Direction;
 import Utils.Point;
 import java.awt.Color;
@@ -33,6 +38,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
     protected PlayLevelScreenState playLevelScreenState;
     protected WinScreen winScreen;
     protected LoseScreen loseScreen;
+    protected PauseMenu pauseMenu;
+    protected KeyLocker keyLocker = new KeyLocker();
     protected FlagManager flagManager;
 
     // map transition (door) state -- the screen fades to black, swaps maps, then fades back in
@@ -89,6 +96,10 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // define/setup map -------------------------------------------------------------------------------
         //map = new TestMap();
 
+        // a new game starts with every door locked again and a new code for the final seal
+        PuzzleManager.reset();
+        Ghost.resetDrops();
+
         map = new BasementMap();
         MusicManager.play("Resources/Audios/Music/Electricity.wav", 0.6f, true);
 
@@ -126,6 +137,9 @@ public class PlayLevelScreen extends Screen implements GameListener {
     
         winScreen = new WinScreen(this);
         loseScreen = new LoseScreen(this);
+        pauseMenu = new PauseMenu(this);
+        // ESC may still be held from a previous menu, so it has to be released before it can pause
+        keyLocker.lockKey(Key.ESC);
 
         transitionPhase = TransitionPhase.NONE;
         fadeAlpha = 0;
@@ -137,6 +151,10 @@ public class PlayLevelScreen extends Screen implements GameListener {
         switch (playLevelScreenState) {
             // if level is "running" update player and map to keep game logic for the platformer level going
             case RUNNING:
+                if (escPressed() && transitionPhase == TransitionPhase.NONE) {
+                    pauseGame();
+                    break;
+                }
                 updateGhostArrivals();
                 if (transitionPhase != TransitionPhase.NONE) {
                     updateTransition();
@@ -149,7 +167,15 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 // show the lose screen after the player's damage animation finishes
                 if (player.isDead() && !player.isHurt()) {
                     playLevelScreenState = PlayLevelScreenState.LOSE;
+                    loseScreen.open();
                 }
+                break;
+            case PAUSED:
+                if (escPressed()) {
+                    resumeGame();
+                    break;
+                }
+                pauseMenu.update();
                 break;
             // if level has been completed, bring up level cleared screen
             case LEVEL_COMPLETED:
@@ -160,6 +186,32 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 break;
         }
         updateGhostChaseMusic();
+    }
+
+    // true only on the frame ESC goes down
+    private boolean escPressed() {
+        if (Keyboard.isKeyUp(Key.ESC)) {
+            keyLocker.unlockKey(Key.ESC);
+            return false;
+        }
+        if (!keyLocker.isKeyLocked(Key.ESC)) {
+            keyLocker.lockKey(Key.ESC);
+            return true;
+        }
+        return false;
+    }
+
+    public void pauseGame() {
+        playLevelScreenState = PlayLevelScreenState.PAUSED;
+        pauseMenu.open();
+    }
+
+    public void resumeGame() {
+        playLevelScreenState = PlayLevelScreenState.RUNNING;
+        // puzzles use the mouse, so only hide the cursor if one isn't open
+        if (!map.getPuzzleUI().isOpen()) {
+            Mouse.hideCursor();
+        }
     }
 
     private void updateGhostChaseMusic() {
@@ -359,11 +411,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
 
         // Move Dean to the destination room.
         player.setMap(pendingMap);
-        player.setLocation(
-            pendingSpawnPosition.x,
-            pendingSpawnPosition.y
-        );
         player.setFacingDirection(pendingFacingDirection);
+        placePlayerAtSpawn(pendingMap, pendingSpawnPosition);
         player.setPlayerState(PlayerState.STANDING);
 
         // Initialize scripts only once per room.
@@ -382,6 +431,40 @@ public class PlayLevelScreen extends Screen implements GameListener {
         map.update(player);
     }
 
+
+    // The spawn position is the top-left of the spawn tile, but Dean's hitbox sits well inside his sprite.
+    // Putting the sprite's corner on the tile could leave his hitbox inside a wall or off the map, and moving from
+    // there pushed him through the wall and out of bounds. Instead, center the hitbox on the spawn tile,
+    // and if that spot is blocked, use the closest open spot nearby.
+    private void placePlayerAtSpawn(Map room, Point spawnTilePosition) {
+        float hitboxOffsetX = player.getBounds().getX() - player.getX();
+        float hitboxOffsetY = player.getBounds().getY() - player.getY();
+        float hitboxWidth = player.getBounds().getWidth();
+        float hitboxHeight = player.getBounds().getHeight();
+
+        float startX = spawnTilePosition.x + (room.getTileset().getScaledSpriteWidth() - hitboxWidth) / 2f;
+        float startY = spawnTilePosition.y + (room.getTileset().getScaledSpriteHeight() - hitboxHeight) / 2f;
+
+        float hitboxX = startX;
+        float hitboxY = startY;
+        boolean foundSpot = false;
+
+        // Search outward from the spawn tile.
+        for (int radius = 0; radius <= 128 && !foundSpot; radius += 4) {
+            for (int dx = -radius; dx <= radius && !foundSpot; dx += 4) {
+                for (int dy = -radius; dy <= radius; dy += 4) {
+                    if (isOpenArea(room, startX + dx, startY + dy, hitboxWidth, hitboxHeight)) {
+                        hitboxX = startX + dx;
+                        hitboxY = startY + dy;
+                        foundSpot = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        player.setLocation(hitboxX - hitboxOffsetX, hitboxY - hitboxOffsetY);
+    }
 
     private void updateGhostArrivals() {
         for (int i = ghostArrivals.size() - 1; i >= 0; i--) {
@@ -449,11 +532,13 @@ public class PlayLevelScreen extends Screen implements GameListener {
 
         
     private boolean isValidGhostSpawn(Map room, Ghost ghost, float x, float y) {
+        return isOpenArea(room, x, y, ghost.getBounds().getWidth(), ghost.getBounds().getHeight());
+    }
 
-        float width = ghost.getBounds().getWidth();
-        float height = ghost.getBounds().getHeight();
+    // true if a box at (x, y) of the given size is on the map and not overlapping anything solid
+    private boolean isOpenArea(Map room, float x, float y, float width, float height) {
 
-        // The ghost must remain within the map boundaries.
+        // The area must remain within the map boundaries.
         if (x < 0 || y < 0
                 || x + width > room.getWidthPixels()
                 || y + height > room.getHeightPixels()) {
@@ -501,42 +586,11 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // based on screen state, draw appropriate graphics
         switch (playLevelScreenState) {
             case RUNNING:
-                map.drawWorld(player, graphicsHandler);
-                
-                if (!map.isBookOpen()) {
-                    darknessManager.setTargetRadius(230);//180
-                    darknessManager.draw(
-                            graphicsHandler,
-                            player,
-                            map.getCamera()
-                    );
-                } else {
-                    darknessManager.setTargetRadius(500);//originally 380 but changed to 500 to make it easier to see the book
-                    darknessManager.draw(
-                            graphicsHandler,
-                            player,
-                            map.getCamera()
-                    );
-                }
-
-                map.drawUI(graphicsHandler);
-
-                // Display the XP bar above the game world.
-                levelProgressHUD.draw(graphicsHandler);
-
-                healthHUD.draw(graphicsHandler, player);
-
-                // Render the fade during room transitions.
-                if (fadeAlpha > 0) {
-                    graphicsHandler.drawFilledRectangle(
-                        0,
-                        0,
-                        graphicsHandler.getGraphics().getClipBounds().width,
-                        graphicsHandler.getGraphics().getClipBounds().height,
-                        new Color(0, 0, 0, fadeAlpha)
-                    );
-                }
-
+                drawGame(graphicsHandler);
+                break;
+            case PAUSED:
+                drawGame(graphicsHandler);
+                pauseMenu.draw(graphicsHandler);
                 break;
             case LEVEL_COMPLETED:
                 winScreen.draw(graphicsHandler);
@@ -544,6 +598,44 @@ public class PlayLevelScreen extends Screen implements GameListener {
             case LOSE:
                 loseScreen.draw(graphicsHandler);
                 break;
+        }
+    }
+
+    private void drawGame(GraphicsHandler graphicsHandler) {
+        map.drawWorld(player, graphicsHandler);
+        
+        if (!map.isBookOpen()) {
+            darknessManager.setTargetRadius(230);//180
+            darknessManager.draw(
+                    graphicsHandler,
+                    player,
+                    map.getCamera()
+            );
+        } else {
+            darknessManager.setTargetRadius(500);//originally 380 but changed to 500 to make it easier to see the book
+            darknessManager.draw(
+                    graphicsHandler,
+                    player,
+                    map.getCamera()
+            );
+        }
+
+        map.drawUI(graphicsHandler);
+
+        // Display the XP bar above the game world.
+        levelProgressHUD.draw(graphicsHandler);
+
+        healthHUD.draw(graphicsHandler, player);
+
+        // Render the fade during room transitions.
+        if (fadeAlpha > 0) {
+            graphicsHandler.drawFilledRectangle(
+                0,
+                0,
+                graphicsHandler.getGraphics().getClipBounds().width,
+                graphicsHandler.getGraphics().getClipBounds().height,
+                new Color(0, 0, 0, fadeAlpha)
+            );
         }
     }
 
@@ -556,12 +648,13 @@ public class PlayLevelScreen extends Screen implements GameListener {
     }
 
     public void goBackToMenu() {
+        Mouse.hideCursor();
         screenCoordinator.setGameState(GameState.MENU);
     }
 
     // This enum represents the different states this screen can be in
     private enum PlayLevelScreenState {
-        RUNNING, LEVEL_COMPLETED, LOSE
+        RUNNING, PAUSED, LEVEL_COMPLETED, LOSE
     }
 
     private enum TransitionPhase {

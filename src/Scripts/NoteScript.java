@@ -2,25 +2,22 @@ package Scripts;
 
 import Level.Script;
 import ScriptActions.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
-// shows the note's message in a textbox when the player interacts with it
+// picks up a story note and opens the journal to its page
 public class NoteScript extends Script {
 
-    private BufferedImage itemImage;
+    private final int page;
 
-    public NoteScript(BufferedImage itemImage) {
-        this.itemImage = itemImage;
+    // page is which journal page (1-5) this note holds
+    public NoteScript(int page) {
+        this.page = page;
     }
-    
+
     @Override
     public ArrayList<ScriptAction> loadScriptActions() {
         ArrayList<ScriptAction> scriptActions = new ArrayList<>();
-        //scriptActions.add(new LockPlayerScriptAction()); // Locks player until they hit spacebar
-        scriptActions.add(new PickupScriptAction(itemImage)); // Item disappears, appears in hotbar if possible
-        //scriptActions.add(new TextboxScriptAction("You found a note!")); // WILL BE REPLACED WITH THE OPENING OF THE BOOK LATER (+ sound)
-        //scriptActions.add(new UnlockPlayerScriptAction()); // Unlocks player movement
+        scriptActions.add(new PickupScriptAction(page)); // note disappears and its page is added to the journal
         return scriptActions;
     }
 }

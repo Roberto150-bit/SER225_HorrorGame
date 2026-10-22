@@ -139,7 +139,7 @@ public abstract class Map {
         this.textbox = new Textbox(this);
         this.puzzleUI = new PuzzleUI();
         this.book = new Book();  // ----------------------------------------------------------------------------------
-        this.ui = new UI(this.book); // ----------------------------------------------------------------------------------
+        this.ui = new UI(); // ----------------------------------------------------------------------------------
         this.hotbarUI = new HotbarUI(); // ----------------------------------------------------------------------------------
     }
 
@@ -542,7 +542,8 @@ public abstract class Map {
         }
         // ------------------------------------------------------------------------------
         puzzleUI.update(); //Updates puzzle state
-        book.update(); //Updates book state every update
+        book.update(!puzzleUI.isOpen()); //Updates book state every update, the journal can't be opened over a puzzle
+        ui.update(book.isActive(), puzzleUI.isOpen()); // journal page turning, before the hotbar so clicking an arrow doesn't also use an item
         hotbarUI.update(!puzzleUI.isOpen() && !textbox.isActive()); //Updates hotbar state
         ItemUse usedItem = hotbarUI.takeUsedItem();
         if (usedItem == ItemUse.REUSABLE) {
@@ -550,6 +551,9 @@ public abstract class Map {
         }
         else if (usedItem == ItemUse.SINGLE_USE) {
             thrownItems.add(new ThrownItem(hotbarUI.getUsedItemImage(), player));
+        }
+        else if (usedItem == ItemUse.RANGED) {
+            thrownItems.add(ThrownItem.arrow(player));
         }
         updateWeapons();
 
@@ -669,7 +673,7 @@ public abstract class Map {
         knifeSlash.draw(graphicsHandler, camera);
         defensiveItemEffect.draw(graphicsHandler, camera);
         puzzleUI.draw(graphicsHandler);
-        ui.draw(graphicsHandler);
+        ui.draw(graphicsHandler, book.isActive());
         hotbarUI.draw(graphicsHandler, player == null ? 0 : player.getHealth());
     }
 

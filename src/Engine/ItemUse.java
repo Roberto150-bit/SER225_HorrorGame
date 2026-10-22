@@ -4,5 +4,6 @@ package Engine;
 public enum ItemUse {
     NONE,       // can't be used (notes, rocks)
     SINGLE_USE, // rare relics (eye, ear, crucifix), thrown for 3 damage and removed after one use
-    REUSABLE    // knife, swung for 1 damage and stays in the hotbar
+    REUSABLE,   // knife, swung for 1 damage and stays in the hotbar
+    RANGED      // bow, fires an arrow for 1 damage and stays in the hotbar
 }

@@ -27,11 +27,7 @@ public class DungeonSecretRoomMap extends Map {
 
     @Override
     public void loadScripts() {
-        // door on the right wall next to the stairs stand on the stairs at (12, 4), face right, and press E to go through
-        // TestMap is a placeholder destination until the next room is built
-        
-        // HERE -------------------------------------------------------------
-        //getMapTile(2, 2).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 7, 4, Direction.LEFT));
-
+        // the doorway at the far end of the secret room leads up to the surface
+        getMapTile(4, 10).setInteractScript(new DoorScript(() -> new TestMap(), 22, 20, Direction.DOWN));
     }
 }

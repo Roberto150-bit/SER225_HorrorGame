@@ -34,22 +34,20 @@ public class TestMap extends Map {
 
         // PuzzleObject puzzleObject = new PuzzleObject(getMapTile(2, 7).getLocation());// --------------------------------
         NoteObject noteObject = new NoteObject(getMapTile(4, 7).getLocation());// --------------------------------
-        CollectibleObject collectibleObject = new CollectibleObject(getMapTile(6, 7).getLocation());
         noteObject.setIsUncollidable(true);
 
         BufferedImage noteItemImage = ImageLoader.load("Note.png");
-        noteObject.setInteractScript(new NoteScript(noteItemImage));
+        noteObject.setInteractScript(new NoteScript(1));
         // puzzleObject.setInteractScript(new PuzzleScript());
-        enhancedMapTiles.add(collectibleObject);
         // enhancedMapTiles.add(puzzleObject);
         enhancedMapTiles.add(noteObject);
 
         // temporary: cellar door leading back to the basement's left door, for testing map transitions
         CellarDoor cellarDoor = new CellarDoor(getMapTile(22, 19).getLocation());
         // cellarDoor.setInteractScript(new DoorScript(() -> new BasementMap(), 1, 7, Direction.RIGHT));
-        // spawns the player on the stairs beside the basement's right door
+        // leads back down into the secret room, just inside its doorway
         cellarDoor.setInteractScript(new DoorScript(
-                () -> new BasementMap(), 12, 4, Direction.LEFT, "openingDoor.wav"));
+                () -> new DungeonSecretRoomMap(), 4, 9, Direction.UP, "openingDoor.wav"));
         enhancedMapTiles.add(cellarDoor);
 
         return enhancedMapTiles;

@@ -1,6 +1,7 @@
 package GameObject;
 
 import Engine.GraphicsHandler;
+import Engine.ImageLoader;
 import Engine.SoundPlayer;
 import Level.Camera;
 import Level.Map;
@@ -19,6 +20,7 @@ import java.awt.image.BufferedImage;
 
 // relic thrown the way the player is aiming, does 3 damage to the first enemy it hits
 // missing still uses up the relic
+// also used for the bow's arrows (see arrow()), which fly faster and further, don't spin, and do 1 damage
 public class ThrownItem {
 
     public static final int DAMAGE = 3;
@@ -27,6 +29,12 @@ public class ThrownItem {
     private static final int HITBOX_SIZE = 24;
     private static final int DRAW_SIZE = 32;
     private static final float SPIN_SPEED = 0.35f; // radians per frame
+
+    public static final int ARROW_DAMAGE = 1;
+    private static final float ARROW_SPEED = 11f;
+    private static final float ARROW_MAX_DISTANCE = 450f;
+    public static final String ARROW_SOUND = "knife_free/WEAPKnif_Knife, Unsheathe, 02.wav";
+    private static BufferedImage arrowImage;
 
     public static final String THROW_SOUND = "DefensiveItemUse.wav";
     private static final String[] HIT_SOUNDS = {
@@ -44,7 +52,17 @@ public class ThrownItem {
     private float spin = 0;
     private boolean isFinished = false;
 
+    // these differ between thrown relics and arrows
+    private int damage = DAMAGE;
+    private float speed = SPEED;
+    private float maxDistance = MAX_DISTANCE;
+    private boolean isArrow = false;
+
     public ThrownItem(BufferedImage image, Player player) {
+        this(image, player, THROW_SOUND);
+    }
+
+    private ThrownItem(BufferedImage image, Player player, String sound) {
         this.image = image;
         Point start = player.getCenter();
         Point aim = player.getAimDirection();
@@ -52,7 +70,20 @@ public class ThrownItem {
         this.y = start.y;
         this.directionX = aim.x;
         this.directionY = aim.y;
-        SoundPlayer.play(THROW_SOUND);
+        SoundPlayer.play(sound);
+    }
+
+    // an arrow fired from the bow
+    public static ThrownItem arrow(Player player) {
+        if (arrowImage == null) {
+            arrowImage = ImageLoader.loadWithAlpha("Weapons/arrow.png");
+        }
+        ThrownItem arrow = new ThrownItem(arrowImage, player, ARROW_SOUND);
+        arrow.damage = ARROW_DAMAGE;
+        arrow.speed = ARROW_SPEED;
+        arrow.maxDistance = ARROW_MAX_DISTANCE;
+        arrow.isArrow = true;
+        return arrow;
     }
 
     // moves the item and checks for hits
@@ -60,17 +91,19 @@ public class ThrownItem {
         if (isFinished) {
             return;
         }
-        x += directionX * SPEED;
-        y += directionY * SPEED;
-        distanceTravelled += SPEED;
+        x += directionX * speed;
+        y += directionY * speed;
+        distanceTravelled += speed;
         spin += SPIN_SPEED;
 
         Rectangle hitbox = new Rectangle(x - HITBOX_SIZE / 2f, y - HITBOX_SIZE / 2f, HITBOX_SIZE, HITBOX_SIZE);
         for (NPC npc : map.getActiveNPCs()) {
             if (npc.isEnemy() && npc.getBounds().intersects(hitbox)) {
-                npc.hitByDefensiveItem(DAMAGE);
+                npc.hitByDefensiveItem(damage);
                 SoundPlayer.playRandom(HIT_SOUNDS);
-                burst.start(new Point(x, y), HIT_BURST_RADIUS);
+                if (!isArrow) {
+                    burst.start(new Point(x, y), HIT_BURST_RADIUS);
+                }
                 isFinished = true;
                 return;
             }
@@ -78,8 +111,10 @@ public class ThrownItem {
 
         MapTile tile = map.getTileByPosition(x, y);
         boolean hitWall = tile == null || tile.getTileType() == TileType.NOT_PASSABLE;
-        if (hitWall || distanceTravelled >= MAX_DISTANCE) {
-            burst.start(new Point(x, y), MISS_BURST_RADIUS);
+        if (hitWall || distanceTravelled >= maxDistance) {
+            if (!isArrow) {
+                burst.start(new Point(x, y), MISS_BURST_RADIUS);
+            }
             isFinished = true;
         }
     }
@@ -101,11 +136,14 @@ public class ThrownItem {
         float screenX = x - camera.getX();
         float screenY = y - camera.getY();
 
-        g.setColor(new Color(255, 235, 160, 90));
-        g.fill(new Ellipse2D.Float(screenX - DRAW_SIZE * 0.75f, screenY - DRAW_SIZE * 0.75f, DRAW_SIZE * 1.5f, DRAW_SIZE * 1.5f));
+        if (!isArrow) {
+            g.setColor(new Color(255, 235, 160, 90));
+            g.fill(new Ellipse2D.Float(screenX - DRAW_SIZE * 0.75f, screenY - DRAW_SIZE * 0.75f, DRAW_SIZE * 1.5f, DRAW_SIZE * 1.5f));
+        }
 
         g.translate(screenX, screenY);
-        g.rotate(spin);
+        // relics tumble, arrows point where they're flying (the arrow image points up-right, so turn it by 45 degrees)
+        g.rotate(isArrow ? Math.atan2(directionY, directionX) + Math.PI / 4 : spin);
         g.drawImage(image, -DRAW_SIZE / 2, -DRAW_SIZE / 2, DRAW_SIZE, DRAW_SIZE, null);
 
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, oldAntialiasing);

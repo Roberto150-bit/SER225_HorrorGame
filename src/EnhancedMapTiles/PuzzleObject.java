@@ -104,6 +104,10 @@ public class PuzzleObject extends EnhancedMapTile {
             case SPIRIT_MIRROR:
                 return "Puzzles/SpiritMirror/PuzzleMirror.png";
 
+            // the final seal reuses the lockbox until it gets its own sprite
+            case CODE_LOCK:
+                return "Puzzles/SymbolLock/PuzzleLockbox.png";
+
             default:
                 throw new IllegalArgumentException(
                     "Unsupported puzzle type: " + config.getPuzzleType()

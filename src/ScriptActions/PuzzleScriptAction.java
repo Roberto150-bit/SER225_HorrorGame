@@ -18,6 +18,9 @@ public class PuzzleScriptAction extends ScriptAction {
 
     @Override
     public void setup() {
+        // Close the journal so only the puzzle is on screen.
+        map.setBookOpen(false);
+
         // Opens the UI with this object's specific configuration.
         map.getPuzzleUI().open(config);
     }
