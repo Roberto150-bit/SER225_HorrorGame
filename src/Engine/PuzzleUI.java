@@ -76,6 +76,12 @@ public class PuzzleUI {
             );
         }
 
+        if (config.getPuzzleType() == PuzzleId.RITUAL_SEQUENCE) {
+            backgroundImage = PuzzleAssets.get(
+                "RitualSequence/ritual_sequence_panel.png"
+            );
+        }
+
         // Check whether this specific puzzle was solved before.
         alreadyCompleted = PuzzleManager.isCompleted(
             config.getInstanceId()

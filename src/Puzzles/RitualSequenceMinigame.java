@@ -2,8 +2,12 @@
 package Puzzles;
 
 import Engine.GraphicsHandler;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.util.Random;
 
 public class RitualSequenceMinigame implements PuzzleMinigame {
 
@@ -15,43 +19,89 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
     private boolean solved;
     private boolean failed;
 
-    
     private long previewStartTime;
     private boolean previewing;
 
-    // Configure the sequence based on difficulty.
+    // Positions match the five illustrated symbols.
+    private static final int[] SYMBOL_X = {
+        267, 333, 400, 467, 533
+    };
+
+    private static final int SYMBOL_Y = 310;
+    private static final int SYMBOL_RADIUS = 28;
+
+    private static final Color GOLD =
+        new Color(245, 195, 110);
+
+    private static final Color INACTIVE =
+        new Color(18, 12, 17, 190);
+
     public RitualSequenceMinigame(PuzzleConfig config) {
 
         switch (config.getDifficulty()) {
             case EASY:
                 symbolCount = 3;
-                sequence = new int[]{0, 2, 1};
                 previewDuration = 1200;
                 break;
 
             case MEDIUM:
                 symbolCount = 4;
-                sequence = new int[]{1, 3, 0, 2};
                 previewDuration = 900;
                 break;
 
             case HARD:
                 symbolCount = 5;
-                sequence = new int[]{2, 4, 1, 3, 0};
                 previewDuration = 600;
                 break;
 
             default:
-                throw new IllegalArgumentException("Unknown difficulty");
+                throw new IllegalArgumentException(
+                    "Unknown difficulty"
+                );
         }
 
+        sequence = new int[symbolCount];
+
+        generateSequence(config);
         reset();
     }
 
-    // Process the symbol selected by the player.
+    // Generate one stable, shuffled sequence per instance.
+    private void generateSequence(PuzzleConfig config) {
+
+        long seed =
+            31L * config.getInstanceId().hashCode()
+            + config.getPuzzleType().ordinal();
+
+        seed = 31L * seed
+            + config.getDifficulty().ordinal();
+
+        Random random = new Random(seed);
+
+        for (int i = 0; i < symbolCount; i++) {
+            sequence[i] = i;
+        }
+
+        // Fisher-Yates shuffle.
+        for (int i = symbolCount - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+
+            int temp = sequence[i];
+            sequence[i] = sequence[j];
+            sequence[j] = temp;
+        }
+    }
+
     public void selectSymbol(int symbolIndex) {
-        if (solved || symbolIndex < 0 || symbolIndex >= symbolCount) {
+
+        if (solved || previewing ||
+            symbolIndex < 0 ||
+            symbolIndex >= symbolCount) {
             return;
+        }
+
+        if (failed) {
+            failed = false;
         }
 
         if (sequence[currentStep] == symbolIndex) {
@@ -60,6 +110,7 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
             if (currentStep == sequence.length) {
                 solved = true;
             }
+
         } else {
             failed = true;
             currentStep = 0;
@@ -68,123 +119,129 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
 
     @Override
     public void update() {
+
         if (!previewing) {
             return;
         }
 
-        // Each symbol glows, followed by a short pause.
-        long elapsed = System.currentTimeMillis() - previewStartTime;
-        long totalDuration = (long) sequence.length
-            * (previewDuration + 300);
+        long elapsed =
+            System.currentTimeMillis() - previewStartTime;
+
+        long totalDuration =
+            (long) sequence.length *
+            (previewDuration + 300);
 
         if (elapsed >= totalDuration) {
             previewing = false;
+            failed = false;
         }
     }
-    
+
+    private int getGlowingSymbol() {
+
+        if (!previewing) {
+            return -1;
+        }
+
+        long elapsed =
+            System.currentTimeMillis() - previewStartTime;
+
+        int cycle = previewDuration + 300;
+        int step = (int)(elapsed / cycle);
+
+        if (step >= sequence.length) {
+            return -1;
+        }
+
+        if (elapsed % cycle >= previewDuration) {
+            return -1;
+        }
+
+        return sequence[step];
+    }
 
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
 
-        graphicsHandler.drawString(
-            "RITUAL SEQUENCE",
-            285, 185,
-            new Font("Serif", Font.BOLD, 27),
-            Color.WHITE
-        );
+        if (solved) {
+            return;
+        }
 
-        // Display instructions based on the current phase.
-        String instruction = previewing
-            ? "WATCH THE SYMBOLS"
-            : "REPEAT THE SEQUENCE";
+        Graphics2D g = graphicsHandler.getGraphics();
 
-        graphicsHandler.drawString(
-            instruction,
-            290, 230,
-            new Font("Arial", Font.BOLD, 18),
-            Color.LIGHT_GRAY
-        );
+        int glowingSymbol = getGlowingSymbol();
 
-        // Calculate button positions.
-        int buttonSize = 60;
-        int spacing = 12;
-        int totalWidth = symbolCount * buttonSize
-            + (symbolCount - 1) * spacing;
-        int startX = 400 - totalWidth / 2;
+        Stroke oldStroke = g.getStroke();
 
-        // Identify which symbol should glow.
-        int glowingSymbol = -1;
+        // Match glow and click regions to the artwork.
+        for (int i = 0; i < 5; i++) {
 
-        if (previewing) {
-            long elapsed = System.currentTimeMillis() - previewStartTime;
-            int cycle = previewDuration + 300;
-            int step = (int) (elapsed / cycle);
+            int x = SYMBOL_X[i];
+            int y = SYMBOL_Y;
 
-            if (step < sequence.length &&
-                elapsed % cycle < previewDuration) {
+            if (i >= symbolCount) {
 
-                glowingSymbol = sequence[step];
+                g.setColor(INACTIVE);
+                g.fillOval(
+                    x - SYMBOL_RADIUS,
+                    y - SYMBOL_RADIUS,
+                    SYMBOL_RADIUS * 2,
+                    SYMBOL_RADIUS * 2
+                );
+
+            } else if (i == glowingSymbol) {
+
+                g.setColor(new Color(255, 190, 75, 80));
+                g.fillOval(
+                    x - SYMBOL_RADIUS,
+                    y - SYMBOL_RADIUS,
+                    SYMBOL_RADIUS * 2,
+                    SYMBOL_RADIUS * 2
+                );
+
+                g.setColor(GOLD);
+                g.setStroke(new BasicStroke(4));
+                g.drawOval(
+                    x - SYMBOL_RADIUS,
+                    y - SYMBOL_RADIUS -6,
+                    SYMBOL_RADIUS * 2,
+                    SYMBOL_RADIUS * 2
+                );
             }
         }
 
-        // Draw the available symbols.
-        for (int i = 0; i < symbolCount; i++) {
+        g.setStroke(oldStroke);
 
-            int buttonX = startX + i * (buttonSize + spacing);
 
-            Color buttonColor = (i == glowingSymbol)
-                ? new Color(255, 180, 65)
-                : new Color(85, 45, 65);
+        // Status text inside the lower plaque.
+        String statusText;
 
-            graphicsHandler.drawFilledRectangle(
-                buttonX, 265, buttonSize, buttonSize,
-                buttonColor
-            );
-
-            graphicsHandler.drawString(
-                String.valueOf(i + 1),
-                buttonX + 20, 305,
-                new Font("Serif", Font.BOLD, 28),
-                Color.WHITE
-            );
-        }
-
-        // Display preview or player progress.
         if (previewing) {
-            graphicsHandler.drawString(
-                "Memorize the order...",
-                310, 365,
-                new Font("Arial", Font.BOLD, 18),
-                Color.YELLOW
-            );
+            statusText = "MEMORIZE";
+        } else if (failed) {
+            statusText = "WRONG ORDER";
         } else {
-            graphicsHandler.drawString(
-                "Progress: " + currentStep + "/" + sequence.length,
-                330, 365,
-                new Font("Arial", Font.BOLD, 18),
-                Color.WHITE
-            );
+            statusText = "SEQUENCE " +
+                currentStep + "/" + sequence.length;
         }
 
-        // Display completion or incorrect sequence.
-        if (solved) {
-            graphicsHandler.drawString(
-                "RITUAL COMPLETE",
-                305, 405,
-                new Font("Serif", Font.BOLD, 22),
-                Color.GREEN
-            );
-        } else if (failed && !previewing) {
-            graphicsHandler.drawString(
-                "INCORRECT - TRY AGAIN",
-                280, 405,
-                new Font("Arial", Font.BOLD, 18),
-                Color.RED
-            );
-        }
+        Font statusFont = new Font(
+            "Serif", Font.BOLD, 12
+        );
+
+        g.setFont(statusFont);
+
+        int statusWidth =
+            g.getFontMetrics().stringWidth(statusText);
+
+        graphicsHandler.drawString(
+            statusText,
+            400 - statusWidth / 2,
+            389,
+            statusFont,
+            new Color(245, 210, 155)
+        );
     }
-
-
 
     @Override
     public void onClick(int mouseX, int mouseY) {
@@ -193,21 +250,13 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
             return;
         }
 
-        // Use the same button positions as draw().
-        int buttonSize = 60;
-        int spacing = 12;
-        int totalWidth = symbolCount * buttonSize
-            + (symbolCount - 1) * spacing;
-        int startX = 400 - totalWidth / 2;
-
         for (int i = 0; i < symbolCount; i++) {
 
-            int buttonX = startX + i * (buttonSize + spacing);
+            int dx = mouseX - SYMBOL_X[i];
+            int dy = mouseY - SYMBOL_Y;
 
-            if (mouseX >= buttonX &&
-                mouseX <= buttonX + buttonSize &&
-                mouseY >= 265 &&
-                mouseY <= 265 + buttonSize) {
+            if (dx * dx + dy * dy <=
+                SYMBOL_RADIUS * SYMBOL_RADIUS) {
 
                 selectSymbol(i);
                 return;
@@ -222,12 +271,11 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
 
     @Override
     public void reset() {
+
         currentStep = 0;
         solved = false;
         failed = false;
 
-        
-        // Automatically begin the preview for each new attempt.
         previewStartTime = System.currentTimeMillis();
         previewing = true;
     }
