@@ -171,7 +171,10 @@ public class PlayLevelScreen extends Screen implements GameListener {
                     updateTransition();
                     break;
                 }
-                player.update();
+                // Freeze Dean while reading the journal.
+                if (!map.isBookOpen()) {
+                    player.update();
+                }
                 map.update(player);
                 keepPlayerOutOfWalls();
 

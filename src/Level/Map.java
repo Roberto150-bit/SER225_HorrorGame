@@ -549,7 +549,7 @@ public abstract class Map {
 
         book.update(!puzzleUI.isOpen() && !textbox.isActive());
         ui.update(book.isActive(), puzzleUI.isOpen()); // journal page turning, before the hotbar so clicking an arrow doesn't also use an item
-        hotbarUI.update(!puzzleUI.isOpen() && !textbox.isActive()); //Updates hotbar state
+        hotbarUI.update(!puzzleUI.isOpen() && !textbox.isActive() && !book.isActive());
         ItemUse usedItem = hotbarUI.takeUsedItem();
         if (usedItem == ItemUse.REUSABLE) {
             knifeSlash.swing(player, this);
