@@ -59,14 +59,7 @@ public class TuneRadioMinigame implements PuzzleMinigame {
                 );
         }
 
-        long seed =
-            31L * config.getInstanceId().hashCode()
-            + config.getPuzzleType().ordinal();
-
-        seed = 31L * seed
-            + config.getDifficulty().ordinal();
-
-        Random random = new Random(seed);
+        Random random = new Random();
 
         int positions =
             (maxFrequency - minFrequency) / tuningStep;

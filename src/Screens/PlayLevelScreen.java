@@ -223,6 +223,20 @@ public class PlayLevelScreen extends Screen implements GameListener {
 
     public void resumeGame() {
         playLevelScreenState = PlayLevelScreenState.RUNNING;
+
+        // Restore gameplay music after returning from the main menu.
+        if (ghostChaseMusicPlaying) {
+            MusicManager.play(GHOST_CHASE_MUSIC, 0.6f, true);
+        } else if (musicBeforeGhostChase != null) {
+            MusicManager.play(musicBeforeGhostChase, 0.6f, true);
+        } else {
+            MusicManager.play(
+                "Resources/Audios/Music/Electricity.wav",
+                0.6f,
+                true
+            );
+        }
+
         // puzzles use the mouse, so only hide the cursor if one isn't open
         if (!map.getPuzzleUI().isOpen()) {
             Mouse.hideCursor();

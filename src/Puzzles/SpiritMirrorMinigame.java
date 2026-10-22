@@ -2,6 +2,8 @@
 package Puzzles;
 
 import Engine.GraphicsHandler;
+import Engine.ImageLoader;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -29,6 +31,8 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
         new Color(245, 210, 155);
 
     public SpiritMirrorMinigame(PuzzleConfig config) {
+        
+        reflection = ImageLoader.load("../Resources/Puzzles/SpiritMirror/Fragments/spirit_reflection.png");
 
         switch (config.getDifficulty()) {
             case EASY:
@@ -54,26 +58,16 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
         currentRotations = new int[fragmentCount];
         startingRotations = new int[fragmentCount];
 
-        // Load the complete reflection image.
-        reflection = PuzzleAssets.get(
-            "SpiritMirror/Fragments/spirit_reflection.png"
-        );
+        // Keep the reflection initialization already used
+        // by your project here, if it exists.
 
-        generateStartingRotations(config);
+        generateStartingRotations();
         reset();
     }
 
-    // Generate stable rotations unique to this instance.
-    private void generateStartingRotations(PuzzleConfig config) {
+    private void generateStartingRotations() {
 
-        long seed =
-            31L * config.getInstanceId().hashCode()
-            + config.getPuzzleType().ordinal();
-
-        seed = 31L * seed
-            + config.getDifficulty().ordinal();
-
-        Random random = new Random(seed);
+        Random random = new Random();
 
         boolean anyRotated = false;
 
@@ -86,9 +80,9 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
             }
         }
 
-        // Never start with an already restored mirror.
+        // Ensure the mirror does not start completed.
         if (!anyRotated) {
-            startingRotations[0] = 1;
+            startingRotations[random.nextInt(fragmentCount)] = 1;
         }
     }
 
@@ -324,16 +318,11 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
 
     @Override
     public void reset() {
-
         solved = false;
 
-        System.arraycopy(
-            startingRotations,
-            0,
-            currentRotations,
-            0,
-            fragmentCount
-        );
+        for (int i = 0; i < fragmentCount; i++) {
+            currentRotations[i] = startingRotations[i];
+        }
     }
 
     public int getFragmentCount() {

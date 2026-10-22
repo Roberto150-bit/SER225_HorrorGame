@@ -36,6 +36,14 @@ public class DungeonRoomSetup {
 
     // a puzzle the player interacts with (E) on the given tile, drawn with that puzzle type's sprite
     public static PuzzleObject puzzle(Map map, int tileX, int tileY, String instanceId, PuzzleId type, PuzzleDifficulty difficulty) {
+            if (type == PuzzleId.TUNE_RADIO
+                    || type == PuzzleId.SPIRIT_MIRROR
+                    || type == PuzzleId.RITUAL_SEQUENCE
+                    || type == PuzzleId.HAUNTED_CLOCK) {
+
+                difficulty = PuzzleDifficulty.HARD;
+            }
+
         return new PuzzleObject(map.getMapTile(tileX, tileY).getLocation(), new PuzzleConfig(instanceId, type, difficulty));
     }
 

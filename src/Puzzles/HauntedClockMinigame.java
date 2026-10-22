@@ -76,13 +76,7 @@ public class HauntedClockMinigame implements PuzzleMinigame {
         }
 
         // Same instance ID produces the same target.
-        long seed =
-            31L * config.getInstanceId().hashCode()
-            + config.getPuzzleType().ordinal();
-
-        seed = 31L * seed + difficulty.ordinal();
-
-        Random random = new Random(seed);
+        Random random = new Random();
 
         targetHour = random.nextInt(12) + 1;
 

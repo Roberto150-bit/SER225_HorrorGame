@@ -68,13 +68,7 @@ public class SymbolLockMinigame implements PuzzleMinigame {
 
     private void generateSolution() {
 
-        long seed = 31L * config.getInstanceId().hashCode()
-            + config.getPuzzleType().ordinal();
-
-        seed = 31L * seed
-            + config.getDifficulty().ordinal();
-
-        Random random = new Random(seed);
+        Random random = new Random();
 
         for (int i = 0; i < dialCount; i++) {
             targetSymbols[i] = random.nextInt(symbolCount);

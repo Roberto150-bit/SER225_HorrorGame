@@ -36,7 +36,7 @@ public class BasementMap extends Map {
 
         // tutorial puzzle -- solving it unlocks the stairs up to the dungeon
         // the other puzzles are spread through the dungeon rooms (see DungeonRoomSetup)
-        enhancedMapTiles.add(DungeonRoomSetup.puzzle(this, 10, 2, DungeonRoomSetup.BASEMENT_PUZZLE, PuzzleId.SYMBOL_LOCK, PuzzleDifficulty.EASY));
+        enhancedMapTiles.add(DungeonRoomSetup.puzzle(this, 10, 2, DungeonRoomSetup.BASEMENT_PUZZLE, PuzzleId.SYMBOL_LOCK, PuzzleDifficulty.MEDIUM));
 
         return enhancedMapTiles;
     }

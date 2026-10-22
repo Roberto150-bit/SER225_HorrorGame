@@ -62,7 +62,22 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
 
         sequence = new int[symbolCount];
 
-        generateSequence(config);
+        // Start with each symbol exactly once.
+        for (int i = 0; i < symbolCount; i++) {
+            sequence[i] = i;
+        }
+
+        // Shuffle the ritual order for this puzzle instance.
+        Random random = new Random();
+
+        for (int i = sequence.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+
+            int temp = sequence[i];
+            sequence[i] = sequence[j];
+            sequence[j] = temp;
+        }
+
         reset();
     }
 
