@@ -1,7 +1,7 @@
 package Maps;
 
-import Enemies.Ghost;
-import Enemies.SmallGhost;
+import Enemies.CreepyStickEnemy;
+import Enemies.WeirdEnemy;
 import Engine.ImageLoader;
 import Engine.MusicPlayer;
 import EnhancedMapTiles.*;
@@ -15,6 +15,7 @@ import Scripts.SimpleTextScript; //---------------------------------------------
 import Scripts.TestMap.*;
 import Tilesets.CommonTileset;
 import Utils.Direction;
+import Utils.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -70,11 +71,13 @@ public class TestMap extends Map {
         bug.setInteractScript(new BugScript());
         npcs.add(bug);
 
-        Ghost ghost = new Ghost(4, getMapTile(15, 20).getLocation());
-        npcs.add(ghost);
+        CreepyStickEnemy stickEnemy = new CreepyStickEnemy(4, new Point(0, 0));
+        stickEnemy.setBoundsLocation(getMapTile(15, 20).getX(), getMapTile(15, 20).getY());
+        npcs.add(stickEnemy);
 
-        SmallGhost smallGhost = new SmallGhost(5, getMapTile(18, 15).getLocation());
-        npcs.add(smallGhost);
+        WeirdEnemy weirdEnemy = new WeirdEnemy(5, new Point(0, 0));
+        weirdEnemy.setBoundsLocation(getMapTile(18, 15).getX(), getMapTile(18, 15).getY());
+        npcs.add(weirdEnemy);
 
         return npcs;
     }

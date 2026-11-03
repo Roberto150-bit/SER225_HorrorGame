@@ -83,7 +83,7 @@ public class Ghost extends NPC {
     }
 
     public Ghost(int id, Point location, int maxHealth) {
-        super(id, location.x, location.y, new SpriteSheet(ImageLoader.load("Ghost.png"), 16, 22), "STAND_LEFT");
+        super(id, location.x, location.y, new SpriteSheet(ImageLoader.load("weirdEnemy.png"), 16, 22), "STAND_LEFT");
         this.maxHealth = maxHealth;
         this.health = maxHealth;
     }
@@ -321,7 +321,7 @@ public class Ghost extends NPC {
     public HashMap<String, Frame[]> loadAnimations(SpriteSheet spriteSheet) {
         float scale = getSpriteScale();
         // GhostAttack.png frames: 0 rise, 1 turn red, 2 lunge with mouth open, 3 recover
-        SpriteSheet attackSheet = new SpriteSheet(ImageLoader.load("GhostAttack.png"), 16, 22);
+        SpriteSheet attackSheet = new SpriteSheet(ImageLoader.load("weirdEnemyAttack.png"), 16, 22);
         return new HashMap<String, Frame[]>() {{
             put("STAND_LEFT", new Frame[] {
                     new FrameBuilder(spriteSheet.getSprite(0, 0))

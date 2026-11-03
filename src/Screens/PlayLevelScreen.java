@@ -1,6 +1,7 @@
 package Screens;
 
 import Engine.GraphicsHandler;
+import Engine.Jumpscare;
 import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
@@ -103,6 +104,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // a new game starts with every door locked again and a new code for the final seal
         PuzzleManager.reset();
         Ghost.resetDrops();
+        Jumpscare.stop();
         // full health every new game, including after dying and starting again from the main menu
         Player.setHealth(Player.MAX_HEALTH);
 
@@ -164,6 +166,16 @@ public class PlayLevelScreen extends Screen implements GameListener {
             case RUNNING:
                 if (escPressed() && transitionPhase == TransitionPhase.NONE) {
                     pauseGame();
+                    break;
+                }
+                // everything freezes while a jumpscare is on screen
+                if (Jumpscare.isPlaying()) {
+                    Jumpscare.update();
+                    // jumpscares only play on death, so cut straight from the creature's face to the lose screen
+                    if (!Jumpscare.isPlaying() && player.isDead()) {
+                        playLevelScreenState = PlayLevelScreenState.LOSE;
+                        loseScreen.open();
+                    }
                     break;
                 }
                 updateGhostArrivals();
@@ -574,7 +586,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 continue;
             }
 
-            arrival.ghost.setLocation(safeX, safeY);
+            // the open spot was checked for the ghost's bounds, so place it by its bounds
+            arrival.ghost.setBoundsLocation(safeX, safeY);
 
             // Preserve the existing ghost instance and animations.
             if (!arrival.destination.getNPCs().contains(arrival.ghost)) {
@@ -696,6 +709,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
                 new Color(0, 0, 0, fadeAlpha)
             );
         }
+
+        Jumpscare.draw(graphicsHandler);
     }
 
     public PlayLevelScreenState getPlayLevelScreenState() {

@@ -89,11 +89,7 @@ public class DungeonSecretRoomTileset extends Tileset {
                 FrameBuilder builder = new FrameBuilder(getSubImage(row, col))
                     .withScale(tileScale);
 
-                int[] b = partialBounds.get(index);
-                if (b != null) {
-                    builder = builder.withBounds(b[0], b[1], b[2], b[3]);
-                    solidTiles.add(index);
-                } else if (topTiles.contains(index)) {
+                if (topTiles.contains(index)) {
                     builder = builder.withBounds(0, 0, 32, 24);
                 } else if (bottomTiles.contains(index)) {
                     builder = builder.withBounds(0, 12, 32, 20);
