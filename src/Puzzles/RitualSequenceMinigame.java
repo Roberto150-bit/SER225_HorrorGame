@@ -1,6 +1,5 @@
-
 package Puzzles;
-
+//hint done
 import Engine.GraphicsHandler;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -29,6 +28,13 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
 
     private static final int SYMBOL_Y = 308;
     private static final int SYMBOL_RADIUS = 23;
+
+    // Hint plaque (bottom-left "?"). Same values as the other puzzles;
+    // recalibrate if this panel's artwork sits in a different spot.
+    private static final int HINT_X = 110;
+    private static final int HINT_Y = 365;
+    private static final int HINT_W = 121;
+    private static final int HINT_H = 80;
 
     private static final Color GOLD =
         new Color(245, 195, 110);
@@ -130,6 +136,18 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
             failed = true;
             currentStep = 0;
         }
+    }
+
+    // Hint: replay the glowing sequence without losing progress.
+    private void replaySequence() {
+
+        if (solved || previewing) {
+            return;
+        }
+
+        failed = false;
+        previewStartTime = System.currentTimeMillis();
+        previewing = true;
     }
 
     @Override
@@ -246,10 +264,30 @@ public class RitualSequenceMinigame implements PuzzleMinigame {
         );
     }
 
+    // The caller can use this to let clicks on the plaque
+    // through its insidePuzzle filter.
+    public boolean isHintClick(int mouseX, int mouseY) {
+        return mouseX >= HINT_X &&
+               mouseX <= HINT_X + HINT_W &&
+               mouseY >= HINT_Y &&
+               mouseY <= HINT_Y + HINT_H;
+    }
+
     @Override
     public void onClick(int mouseX, int mouseY) {
 
-        if (solved || previewing) {
+        if (solved) {
+            return;
+        }
+
+        // The hint is checked before the previewing guard,
+        // so clicking it during a replay is simply ignored.
+        if (isHintClick(mouseX, mouseY)) {
+            replaySequence();
+            return;
+        }
+
+        if (previewing) {
             return;
         }
 

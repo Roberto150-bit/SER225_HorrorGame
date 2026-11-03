@@ -1,10 +1,10 @@
 package Maps;
 
 import GameObject.Relic;
-import Puzzles.PuzzleDifficulty;
-import Puzzles.PuzzleId;
 import Level.EnhancedMapTile;
 import Level.Map;
+import Puzzles.PuzzleDifficulty;
+import Puzzles.PuzzleId;
 import Scripts.DoorScript;
 import Tilesets.DungeonWaterRoomTileset;
 import Utils.Direction;
@@ -41,10 +41,11 @@ public class DungeonWaterRoomMap extends Map {
     @Override
     public void loadScripts() {
         // door on the right wall back to the hallway
-        getMapTile(9, 5).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 1, 4, Direction.RIGHT));
+        getMapTile(9, 5).setInteractScript(new DoorScript(DungeonRoomSetup::hallway, 1, 4, Direction.RIGHT));
 
         // door on the top wall to the rundown room
         getMapTile(3, 2).setInteractScript(new DoorScript(() -> new DungeonRundownRoomMap(), 2, 6, Direction.UP)
                 .lockedUntilSolved(DungeonRoomSetup.WATER_ROOM_PUZZLE, "Something holds this door shut.\nThe mirror in this room is watching."));
+    
     }
 }

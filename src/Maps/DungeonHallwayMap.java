@@ -9,12 +9,15 @@ import java.util.ArrayList;
 
 public class DungeonHallwayMap extends Map {
 
+    
     public DungeonHallwayMap() {
         super("DungeonHallwayMap.txt", new DungeonHallwayTileset());
         this.playerStartPosition = getMapTile(6, 7).getLocation();
 
         // ghosts start somewhere random each playthrough
-        DungeonRoomSetup.addRandomGhosts(this, 0, 1);
+        DungeonRoomSetup.addRandomGhosts(this, 0, 1, 1);
+        // a stain on the floor that something rises out of
+        DungeonRoomSetup.addCreeperTrap(this);
     }
 
     @Override
@@ -44,9 +47,9 @@ public class DungeonHallwayMap extends Map {
         getMapTile(3, 6).setInteractScript(new DoorScript(() -> new DungeonLibraryMap(), 3, 9, Direction.UP)
                 .lockedUntilSolved(DungeonRoomSetup.CELL_PUZZLE, "The library door is sealed.\nSomething in the cell might open it."));
 
-        // door at the bottom of the lower corridor to the basic room
-        getMapTile(4, 8).setInteractScript(new DoorScript(() -> new DungeonBasicRoomMap(), 3, 7, Direction.UP)
-                .lockedUntilSolved(DungeonRoomSetup.LIBRARY_PUZZLE, "This door won't budge.\nThe library holds the answer."));
+        getMapTile(4, 8).setInteractScript(new DoorScript(() -> new DungeonBasicRoomMap(), 4, 6, Direction.RIGHT));
+        //only if 5 puzzle completed
+        //getMapTile(5, 3).setInteractScript(new DoorScript(() -> new DungeonSecretRoomMap(), 4, 8, Direction.RIGHT));
     }
 
 }

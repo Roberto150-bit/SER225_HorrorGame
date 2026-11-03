@@ -1,0 +1,11 @@
+Model Information:
+* title:	tall figure in dark
+* source:	https://sketchfab.com/3d-models/tall-figure-in-dark-93cee5d144e14e5babbdafd5dcf0a411
+* author:	nano nova (https://sketchfab.com/nanonova)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "tall figure in dark" (https://sketchfab.com/3d-models/tall-figure-in-dark-93cee5d144e14e5babbdafd5dcf0a411) by nano nova (https://sketchfab.com/nanonova) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

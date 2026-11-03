@@ -1,11 +1,10 @@
-
 package Puzzles;
-
+//hint added
 import Engine.GraphicsHandler;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.BasicStroke;
 import java.awt.Stroke;
 import java.util.Random;
 
@@ -24,6 +23,7 @@ public class HauntedClockMinigame implements PuzzleMinigame {
     private int currentMinute;
     private boolean solved;
     private boolean incorrectAttempt;
+    private boolean hintVisible;
 
     // Coordinates matching the 500x350 clock artwork.
     private static final int CLOCK_X = 400;
@@ -42,6 +42,13 @@ public class HauntedClockMinigame implements PuzzleMinigame {
     private static final int SUBMIT_Y = 370;
     private static final int SUBMIT_W = 240;
     private static final int SUBMIT_H = 44;
+
+    // Hint plaque (bottom-left "?"). Same values as the other puzzles;
+    // recalibrate if this panel's artwork sits in a different spot.
+    private static final int HINT_X = 110;
+    private static final int HINT_Y = 365;
+    private static final int HINT_W = 121;
+    private static final int HINT_H = 80;
 
     private static final Color DARK_INK =
         new Color(75, 35, 38);
@@ -155,6 +162,21 @@ public class HauntedClockMinigame implements PuzzleMinigame {
 
     private String formatTime(int hour, int minute) {
         return String.format("%d:%02d", hour, minute);
+    }
+
+    // Tells the player which part of the time is off.
+    private String getHintMessage() {
+
+        if (currentHour == targetHour &&
+            currentMinute == targetMinute) {
+            return "HINT: THE TIME IS RIGHT - SUBMIT!";
+        }
+
+        if (currentHour != targetHour) {
+            return "HINT: THE HOUR IS WRONG";
+        }
+
+        return "HINT: HOUR IS RIGHT, MINUTES ARE OFF";
     }
 
     // Center text without hardcoding character widths.
@@ -318,6 +340,26 @@ public class HauntedClockMinigame implements PuzzleMinigame {
             new Font("Serif", Font.BOLD, 14),
             DARK_INK
         );
+
+        // Hint text, shown while the hint plaque is toggled on.
+        if (hintVisible) {
+            drawCentered(
+                graphicsHandler, g,
+                getHintMessage(),
+                400, 440,
+                new Font("Serif", Font.ITALIC, 13),
+                GOLD
+            );
+        }
+    }
+
+    // The caller can use this to let clicks on the plaque
+    // through its insidePuzzle filter.
+    public boolean isHintClick(int mouseX, int mouseY) {
+        return mouseX >= HINT_X &&
+               mouseX <= HINT_X + HINT_W &&
+               mouseY >= HINT_Y &&
+               mouseY <= HINT_Y + HINT_H;
     }
 
 
@@ -326,7 +368,13 @@ public class HauntedClockMinigame implements PuzzleMinigame {
 
         if (solved) return;
 
-        // First, check the four clock controls.
+        // Check the hint plaque first.
+        if (isHintClick(mouseX, mouseY)) {
+            hintVisible = !hintVisible;
+            return;
+        }
+
+        // Then check the four clock controls.
         for (int i = 0; i < KNOB_X.length; i++) {
 
             int dx = mouseX - KNOB_X[i];
@@ -380,6 +428,7 @@ public class HauntedClockMinigame implements PuzzleMinigame {
         currentMinute = 0;
         solved = false;
         incorrectAttempt = false;
+        hintVisible = false;
     }
 
     public int getCurrentHour() {

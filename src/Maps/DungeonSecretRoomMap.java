@@ -1,18 +1,33 @@
 package Maps;
 
-import EnhancedMapTiles.*;   
+import Enemies.NecromancerBoss;
 import Level.EnhancedMapTile;
 import Level.Map;
-import Tilesets.DungeonSecretRoomTileset;
-import java.util.ArrayList;
+import Level.MapTile;
+import Utils.Point;
 import Scripts.DoorScript;
+import Tilesets.DungeonSecretRoomTileset;
 import Utils.Direction;
+import java.util.ArrayList;
 
 public class DungeonSecretRoomMap extends Map {
+
+    // the first level's final boss waits in the middle of the room
+    private static final int BOSS_ID = 800;
+    private static final int BOSS_TILE_X = 4;
+    private static final int BOSS_TILE_Y = 5;
 
     public DungeonSecretRoomMap() {
         super("DungeonSecretRoomMap.txt", new DungeonSecretRoomTileset());
         this.playerStartPosition = getMapTile(6, 4).getLocation();
+
+        NecromancerBoss boss = new NecromancerBoss(BOSS_ID, new Point(0, 0));
+        MapTile bossTile = getMapTile(BOSS_TILE_X, BOSS_TILE_Y);
+        float tileSize = getTileset().getScaledSpriteWidth();
+        boss.setBoundsLocation(
+                bossTile.getX() + (tileSize - boss.getBounds().getWidth()) / 2f,
+                bossTile.getY() + (tileSize - boss.getBounds().getHeight()) / 2f);
+        addNPC(boss);
     }
 
     @Override
@@ -27,7 +42,10 @@ public class DungeonSecretRoomMap extends Map {
 
     @Override
     public void loadScripts() {
-        // the doorway at the far end of the secret room leads up to the surface
-        getMapTile(4, 10).setInteractScript(new DoorScript(() -> new TestMap(), 22, 20, Direction.DOWN));
+        // door on the right wall next to the stairs stand on the stairs at (12, 4), face right, and press E to go through
+        // TestMap is a placeholder destination until the next room is built
+        
+        // HERE -------------------------------------------------------------
+        getMapTile(4, 10).setInteractScript(new DoorScript(DungeonRoomSetup::hallway, 5, 4, Direction.LEFT));
     }
 }

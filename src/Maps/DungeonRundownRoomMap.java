@@ -1,9 +1,9 @@
 package Maps;
 
-import Puzzles.PuzzleDifficulty;
-import Puzzles.PuzzleId;
 import Level.EnhancedMapTile;
 import Level.Map;
+import Puzzles.PuzzleDifficulty;
+import Puzzles.PuzzleId;
 import Scripts.DoorScript;
 import Tilesets.DungeonRundownRoomTileset;
 import Utils.Direction;
@@ -40,5 +40,6 @@ public class DungeonRundownRoomMap extends Map {
         // this is the deepest room in the dungeon, so it stays locked until the final seal is broken
         getMapTile(5, 0).setInteractScript(new DoorScript(() -> new DungeonSecretRoomMap(), 4, 2, Direction.DOWN)
                 .lockedUntilSolved(DungeonRoomSetup.FINAL_SEAL_PUZZLE, "Cold air seeps through a crack in the wall.\nThe seal beside it must be broken."));
+
     }
 }

@@ -22,7 +22,16 @@ public class ImageLoader {
     // loads an image as-is, keeping its own alpha channel (no transparent color is applied)
     public static BufferedImage loadWithAlpha(String imageFileName) {
         try {
-            return ImageIO.read(new File(Config.RESOURCES_PATH + imageFileName));
+            BufferedImage image = ImageIO.read(new File(Config.RESOURCES_PATH + imageFileName));
+            if (image.getType() == BufferedImage.TYPE_INT_ARGB) {
+                return image;
+            }
+            // PNGs usually load as 4 byte ABGR, which Java draws much more slowly, so convert once here
+            BufferedImage argb = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = argb.createGraphics();
+            g.drawImage(image, 0, 0, null);
+            g.dispose();
+            return argb;
         } catch (IOException e) {
             System.out.println("Unable to find file " + Config.RESOURCES_PATH + imageFileName);
             throw new RuntimeException(e);

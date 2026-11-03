@@ -1,4 +1,4 @@
-
+//Hint added
 package Puzzles;
 
 import Engine.GraphicsHandler;
@@ -7,6 +7,13 @@ import java.awt.Font;
 import java.util.Random;
 
 public class TuneRadioMinigame implements PuzzleMinigame {
+
+    private static final int HINT_X = 160;
+    private static final int HINT_Y = 376;
+    private static final int HINT_WIDTH = 100;   // 260 - 160
+    private static final int HINT_HEIGHT = 67;   // 443 - 376
+
+    private boolean hintVisible;
 
     private final int minFrequency = 80;
     private final int maxFrequency;
@@ -231,13 +238,28 @@ public class TuneRadioMinigame implements PuzzleMinigame {
             submitFont,
             darkInk
         );
+
+        if (hintVisible) {
+            Font hintFont = new Font("Serif", Font.ITALIC, 12);
+            String hint = getHintMessage();
+
+            g.setFont(hintFont);
+            int hintWidth = g.getFontMetrics().stringWidth(hint);
+
+            graphicsHandler.drawString(
+                hint,
+                centerX - hintWidth / 2,
+                194,
+                hintFont,
+                darkInk
+            );
+        }
     }
 
 
 
     @Override
     public void onClick(int mouseX, int mouseY) {
-
         if (solved) return;
 
         // Check knobs first to avoid hitbox conflicts.
@@ -268,6 +290,17 @@ public class TuneRadioMinigame implements PuzzleMinigame {
             mouseY >= SUBMIT_Y &&
             mouseY <= SUBMIT_Y + SUBMIT_HEIGHT;
 
+
+        boolean clickedHint =
+            mouseX >= HINT_X &&
+            mouseX <= HINT_X + HINT_WIDTH &&
+            mouseY >= HINT_Y &&
+            mouseY <= HINT_Y + HINT_HEIGHT;
+
+        if (clickedHint) {
+            hintVisible = !hintVisible;
+            return;
+        }
         if (clickedSubmit) {
             submitFrequency();
         }
@@ -283,6 +316,7 @@ public class TuneRadioMinigame implements PuzzleMinigame {
         currentFrequency = minFrequency;
         solved = false;
         incorrectAttempt = false;
+        hintVisible = false;
     }
 
     public int getCurrentFrequency() {
@@ -292,4 +326,14 @@ public class TuneRadioMinigame implements PuzzleMinigame {
     public int getTargetFrequency() {
         return targetFrequency;
     }
+
+    private String getHintMessage() {
+        if (currentFrequency == targetFrequency) {
+            return "THE SIGNAL IS CLEAR - SUBMIT!";
+        }
+        return currentFrequency < targetFrequency
+            ? "HINT: TUNE HIGHER"
+            : "HINT: TUNE LOWER";
+    }
+
 }

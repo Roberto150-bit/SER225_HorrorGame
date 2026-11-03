@@ -1,15 +1,15 @@
 package Engine;
 
-import java.awt.image.BufferedImage;
-import java.awt.Color;
-import java.awt.Font;
+import Puzzles.PuzzleAssets;
 import Puzzles.PuzzleConfig;
-import Puzzles.PuzzleResult;
 import Puzzles.PuzzleController;
 import Puzzles.PuzzleFactory;
-import Puzzles.PuzzleManager;
 import Puzzles.PuzzleId;
-import Puzzles.PuzzleAssets;
+import Puzzles.PuzzleManager;
+import Puzzles.PuzzleResult;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.image.BufferedImage;
 
 public class PuzzleUI {
     
@@ -217,15 +217,17 @@ public class PuzzleUI {
             } else {
 
                 // Forward clicks inside the puzzle window.
-                boolean insidePuzzle =
-                    mouseX >= x &&
-                    mouseX <= x + width &&
-                    mouseY >= y &&
-                    mouseY <= y + height;
+                int margin = 120; // enough to cover the hint box hanging off the corner
 
-                if (insidePuzzle) {
-                    controller.onClick(mouseX, mouseY);
-                }
+                boolean insidePuzzle =
+                    mouseX >= x - margin &&
+                    mouseX <= x + width + margin &&
+                    mouseY >= y - margin &&
+                    mouseY <= y + height + margin;                
+                    if (insidePuzzle) {
+                        System.out.println("raw mouse: " + mouseX + ", " + mouseY);
+                        controller.onClick(mouseX, mouseY);
+                    }
             }
 
             // Prevent the click from being processed twice.

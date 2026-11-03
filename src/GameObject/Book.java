@@ -23,7 +23,9 @@ public class Book {
     private KeyLocker keyLocker = new KeyLocker();
 
     //Frame stuff
-    private List<BufferedImage> frames = new ArrayList<>();
+    // every room has its own Book, so the frames are decoded once and shared (decoding them took most of the time a door took)
+    private static List<BufferedImage> sharedFrames;
+    private List<BufferedImage> frames;
     private int currentFrame = 0;
     private int frameTimer = 0;
     private int framesPerImage = 12; // lower = faster animation, higher = slower
@@ -35,8 +37,12 @@ public class Book {
 
 
     public Book() {
-        loadFrames("src/Resources/BookFramesPNG/Intensity", FRAME_COUNT);        buildPingPongOrder();
-        
+        if (sharedFrames == null) {
+            sharedFrames = new ArrayList<>();
+            loadFrames(sharedFrames, "src/Resources/BookFramesPNG/Intensity", FRAME_COUNT);
+        }
+        frames = sharedFrames;
+        buildPingPongOrder();
     }
 
     // Goes through images 1,2,3,4,5,6,7,6,5,4,3,2,1 for animation
@@ -50,7 +56,7 @@ public class Book {
         }
     }
 
-    private void loadFrames(String basePath, int frameCount) {
+    private static void loadFrames(List<BufferedImage> frames, String basePath, int frameCount) {
         for (int i = 1; i <= frameCount; i++) {
             File file = new File(basePath + i + ".png");
             try {

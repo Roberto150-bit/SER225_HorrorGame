@@ -1,5 +1,5 @@
 package Puzzles;
-
+//Hint added or mostly added
 import Engine.GraphicsHandler;
 import java.awt.Color;
 import java.awt.Font;
@@ -21,6 +21,11 @@ public class CodeLockMinigame implements PuzzleMinigame {
     private static final int KEY_GAP = 8;
     private static final int KEYPAD_TOP = 222;
 
+    private static final int HINT_X = 110;
+    private static final int HINT_Y = 365;
+    private static final int HINT_WIDTH = 121;
+    private static final int HINT_HEIGHT = 80;
+
     private static final Color GOLD = new Color(215, 177, 108);
     private static final Color DARK = new Color(38, 26, 35);
     private static final Color INNER = new Color(76, 48, 54);
@@ -31,6 +36,7 @@ public class CodeLockMinigame implements PuzzleMinigame {
 
     private final StringBuilder entered = new StringBuilder();
     private boolean solved;
+    private boolean hintVisible;
     private int wrongTimer;
 
     public CodeLockMinigame(PuzzleConfig config) {
@@ -87,6 +93,10 @@ public class CodeLockMinigame implements PuzzleMinigame {
         if (wrongTimer > 0) {
             drawCentered(graphicsHandler, "The seal rejects you.", 430, new Font("Serif", Font.ITALIC, 16), WRONG);
         }
+
+        if (hintVisible) {
+            drawCentered(graphicsHandler, getHintMessage(), 450, new Font("Serif", Font.ITALIC, 14), LIGHT);
+        }
     }
 
     private void drawCentered(GraphicsHandler graphicsHandler, String text, int y, Font font, Color color) {
@@ -100,6 +110,12 @@ public class CodeLockMinigame implements PuzzleMinigame {
             return;
         }
 
+        // check the hint plaque first
+        if (isHintClick(mouseX, mouseY)) {
+            hintVisible = !hintVisible;
+            return;
+        }
+
         for (int i = 0; i < KEYS.length; i++) {
             if (mouseX >= getKeyX(i) && mouseX <= getKeyX(i) + KEY_WIDTH
                     && mouseY >= getKeyY(i) && mouseY <= getKeyY(i) + KEY_HEIGHT) {
@@ -107,6 +123,25 @@ public class CodeLockMinigame implements PuzzleMinigame {
                 return;
             }
         }
+    }
+
+    // the caller can use this to let clicks on the plaque through its insidePuzzle filter
+    public boolean isHintClick(int mouseX, int mouseY) {
+        return mouseX >= HINT_X && mouseX <= HINT_X + HINT_WIDTH
+                && mouseY >= HINT_Y && mouseY <= HINT_Y + HINT_HEIGHT;
+    }
+
+    private String getHintMessage() {
+        String code = SealCode.getCode();
+        String typed = entered.toString();
+
+        if (typed.equals(code)) {
+            return "HINT: PRESS OK";
+        }
+        if (code.startsWith(typed) && typed.length() < code.length()) {
+            return "HINT: NEXT DIGIT IS " + code.charAt(typed.length());
+        }
+        return "HINT: A DIGIT IS WRONG - PRESS CLR";
     }
 
     public void pressKey(String key) {
@@ -139,6 +174,7 @@ public class CodeLockMinigame implements PuzzleMinigame {
     @Override
     public void reset() {
         solved = false;
+        hintVisible = false;
         wrongTimer = 0;
         entered.setLength(0);
     }

@@ -7,10 +7,10 @@ import Level.Map;
 import Maps.TitleScreenMap;
 import SpriteFont.SpriteFont;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.awt.image.BufferedImage;
 
 // This class is for the credits screen
 public class CreditsScreen extends Screen {
@@ -23,6 +23,15 @@ public class CreditsScreen extends Screen {
     protected SpriteFont hernestCredit;
     protected SpriteFont laurenCredit;
     protected SpriteFont robertoCredit;
+    // CC-BY-4.0 requires crediting the 3D models used in the jumpscares
+    protected SpriteFont specimenCredit;
+    protected SpriteFont specimenLicense;
+    protected SpriteFont tallFigureCredit;
+    protected SpriteFont tallFigureLicense;
+    protected SpriteFont slasherCredit;
+    protected SpriteFont slasherLicense;
+    protected SpriteFont wendigoCredit;
+    protected SpriteFont wendigoLicense;
     protected SpriteFont returnInstructionsLabel;
     protected BufferedImage menuImage;
     public CreditsScreen(ScreenCoordinator screenCoordinator) {
@@ -32,7 +41,7 @@ public class CreditsScreen extends Screen {
     @Override
     public void initialize() {
         // setup graphics on screen (background map, spritefont text)
-        menuImage = ImageLoader.loadWithAlpha("dark_forest.png");
+        menuImage = ImageLoader.loadWithAlpha("TitleScreenImage.png");
         background = new TitleScreenMap();
         background.setAdjustCamera(false);
         try {
@@ -45,6 +54,15 @@ public class CreditsScreen extends Screen {
             hernestCredit = new SpriteFont("Hernest", 360, 175, secretSolver, Color.white);
             laurenCredit = new SpriteFont("Lauren", 360, 225, secretSolver, Color.white);
             robertoCredit = new SpriteFont("Roberto", 360, 275, secretSolver, Color.white);
+            Font smallFont = new Font("Arial", Font.PLAIN, 14);
+            specimenCredit = new SpriteFont("\"Specimen 11 Rig\" (sketchfab.com/3d-models/specimen-11-rig-d4543214b37e4c6e9ef5526844c377de)", 20, 340, smallFont, Color.lightGray);
+            specimenLicense = new SpriteFont("by NO DONT EAT ME CASEOH (Ferris wheel), licensed under CC-BY-4.0", 20, 358, smallFont, Color.lightGray);
+            tallFigureCredit = new SpriteFont("\"tall figure in dark\" (sketchfab.com/3d-models/tall-figure-in-dark-93cee5d144e14e5babbdafd5dcf0a411)", 20, 384, smallFont, Color.lightGray);
+            tallFigureLicense = new SpriteFont("by nano nova, licensed under CC-BY-4.0", 20, 402, smallFont, Color.lightGray);
+            slasherCredit = new SpriteFont("\"Slasher (The LAST thing you'd SEE.)\" by The WarVet, licensed under CC-BY-4.0", 20, 428, smallFont, Color.lightGray);
+            slasherLicense = new SpriteFont("(sketchfab.com/3d-models/slasher-the-last-thing-youd-see-31cb3c3865234ecf9f8e1bf28ca227ab)", 20, 446, smallFont, Color.lightGray);
+            wendigoCredit = new SpriteFont("\"Wendigo - inspired by Until Dawn\" by marc3_C, licensed under CC-BY-4.0", 20, 472, smallFont, Color.lightGray);
+            wendigoLicense = new SpriteFont("(sketchfab.com/3d-models/wendigo-inspired-by-until-dawn-d46093a707a24444af1ed7d10aa7198f)", 20, 490, smallFont, Color.lightGray);
             returnInstructionsLabel = new SpriteFont("Press [ESC] to return to the menu", 20, 532, secretSolver, Color.white);
         } catch (IOException | FontFormatException e) {
             System.out.println("ERROR: CREDITS FONT FILE NOT FOUND");
@@ -74,6 +92,14 @@ public class CreditsScreen extends Screen {
         hernestCredit.draw(graphicsHandler);
         laurenCredit.draw(graphicsHandler);
         robertoCredit.draw(graphicsHandler);
+        specimenCredit.draw(graphicsHandler);
+        specimenLicense.draw(graphicsHandler);
+        tallFigureCredit.draw(graphicsHandler);
+        tallFigureLicense.draw(graphicsHandler);
+        slasherCredit.draw(graphicsHandler);
+        slasherLicense.draw(graphicsHandler);
+        wendigoCredit.draw(graphicsHandler);
+        wendigoLicense.draw(graphicsHandler);
         returnInstructionsLabel.draw(graphicsHandler);
     }
 }

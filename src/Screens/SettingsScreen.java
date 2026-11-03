@@ -31,7 +31,7 @@ public class SettingsScreen extends Screen {
 
     @Override
     public void initialize() {
-        menuImage = ImageLoader.loadWithAlpha("dark_forest.png");
+        menuImage = ImageLoader.loadWithAlpha("TitleScreenImage.png");
 
         selected = 0;
         waitingForKey = false;
@@ -109,10 +109,30 @@ public class SettingsScreen extends Screen {
     public void draw(GraphicsHandler graphicsHandler) {
 
         // Existing menu background.
+        // Draw background without distorting the image.
         if (menuImage != null) {
-            graphicsHandler.drawImage(
-                menuImage, 0, 0, 800, 605
+
+            int screenWidth = 800;
+            int screenHeight = 605;
+
+            double scale = Math.max(
+                (double) screenWidth / menuImage.getWidth(),
+                (double) screenHeight / menuImage.getHeight()
             );
+
+            int scaledWidth = (int) (menuImage.getWidth() * scale);
+            int scaledHeight = (int) (menuImage.getHeight() * scale);
+
+            // Center the image so excess portions are cropped.
+            int x = (screenWidth - scaledWidth) / 2;
+            int y = (screenHeight - scaledHeight) / 2;
+
+            graphicsHandler.drawImage(
+                menuImage,
+                x, y,
+                scaledWidth, scaledHeight
+            );
+
         } else {
             graphicsHandler.drawFilledRectangle(
                 0, 0, 800, 605, new Color(25, 20, 30)
