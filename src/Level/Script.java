@@ -49,6 +49,7 @@ public abstract class Script {
     public void setPlayer(Player player) { this.player = player; }
     public MapEntity getEntity() { return entity; }
     public void setMapEntity(MapEntity entity) { this.entity = entity; }
+    public boolean isLocked() { return false; }
     
     public ArrayList<ScriptAction> getScriptActions() {
         return scriptActions;

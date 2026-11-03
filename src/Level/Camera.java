@@ -188,7 +188,7 @@ public class Camera extends Rectangle {
         g2d.scale(zoom, zoom); // Scale the graphics context based on the current zoom level
 
         drawMapTilesBottomLayer(graphicsHandler);
-        drawMapTilesTopLayer(graphicsHandler);
+        drawMapTilesTopLayer(graphicsHandler, null);
 
         g2d.setTransform(originalTransform); // Restore so nothing drawn after this is affected
     }
@@ -201,7 +201,7 @@ public class Camera extends Rectangle {
 
         drawMapTilesBottomLayer(graphicsHandler);
         drawMapEntities(player, graphicsHandler);
-        drawMapTilesTopLayer(graphicsHandler);
+        drawMapTilesTopLayer(graphicsHandler, player);
 
         g2d.setTransform(originalTransform); // Restore so nothing drawn after this is affected
     }
@@ -228,7 +228,7 @@ public class Camera extends Rectangle {
     }
 
     // draws the top layer of visible map tiles to the screen where applicable
-    public void drawMapTilesTopLayer(GraphicsHandler graphicsHandler) {
+    public void drawMapTilesTopLayer(GraphicsHandler graphicsHandler, Player player) {
         Point tileIndex = getTileIndexByCameraPosition();
         for (int i = tileIndex.y - 1; i <= tileIndex.y + height + 1; i++) {
             for (int j = tileIndex.x - 1; j <= tileIndex.x + width + 1; j++) {
@@ -242,6 +242,36 @@ public class Camera extends Rectangle {
         for (EnhancedMapTile enhancedMapTile : activeEnhancedMapTiles) {
             if (containsDraw(enhancedMapTile) && enhancedMapTile.getTopLayer() != null) {
                 enhancedMapTile.drawTopLayer(graphicsHandler);
+            }
+        }
+
+        for (int i = tileIndex.y - 1; i <= tileIndex.y + height + 1; i++) {
+            for (int j = tileIndex.x - 1; j <= tileIndex.x + width + 1; j++) {
+                MapTile tile = map.getMapTile(j, i);
+                if (tile != null) {
+                    tile.drawLockedIndicator(graphicsHandler, player);
+                }
+            }
+        }
+
+        for (EnhancedMapTile enhancedMapTile : activeEnhancedMapTiles) {
+            if (containsDraw(enhancedMapTile)) {
+                enhancedMapTile.drawLockedIndicator(graphicsHandler, player);
+            }
+        }
+
+        for (int i = tileIndex.y - 1; i <= tileIndex.y + height + 1; i++) {
+            for (int j = tileIndex.x - 1; j <= tileIndex.x + width + 1; j++) {
+                MapTile tile = map.getMapTile(j, i);
+                if (tile != null) {
+                    tile.drawOverlay(graphicsHandler);
+                }
+            }
+        }
+
+        for (EnhancedMapTile enhancedMapTile : activeEnhancedMapTiles) {
+            if (containsDraw(enhancedMapTile)) {
+                enhancedMapTile.drawOverlay(graphicsHandler);
             }
         }
     }

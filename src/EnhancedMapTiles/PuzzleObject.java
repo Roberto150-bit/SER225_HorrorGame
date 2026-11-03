@@ -2,18 +2,29 @@
 package EnhancedMapTiles;
 
 import Builders.FrameBuilder;
+import Engine.Config;
+import Engine.GraphicsHandler;
 import Engine.ImageLoader;
 import GameObject.Frame;
 import GameObject.GameObject;
 import GameObject.SpriteSheet;
 import Level.EnhancedMapTile;
+import Level.Player;
 import Level.TileType;
 import Puzzles.PuzzleConfig;
+import Puzzles.PuzzleManager;
 import Scripts.PuzzleScript;
 import Utils.Point;
 import java.awt.image.BufferedImage;
 
 public class PuzzleObject extends EnhancedMapTile {
+    private static final BufferedImage[] SHINY_FRAMES = ImageLoader.loadGifFrames("ShinyEffect.gif");
+    private static final int SHINY_FRAME_DELAY = Math.max(20, ImageLoader.getGifFrameDelay("ShinyEffect.gif"));
+    private static final int SHINY_SIZE = 96;
+
+    private final String puzzleInstanceId;
+    private int shinyFrameIndex;
+    private int shinyFrameTime;
 
     // Existing constructor: keeps the original rock.
     public PuzzleObject(Point location) {
@@ -38,7 +49,32 @@ public class PuzzleObject extends EnhancedMapTile {
             TileType.NOT_PASSABLE
         );
 
+        puzzleInstanceId = config.getInstanceId();
         setInteractScript(new PuzzleScript(config));
+    }
+
+    @Override
+    public void update(Player player) {
+        super.update(player);
+
+        if (puzzleInstanceId != null && !PuzzleManager.isCompleted(puzzleInstanceId)) {
+            shinyFrameTime += 1000 / Config.TARGET_FPS;
+            while (shinyFrameTime >= SHINY_FRAME_DELAY) {
+                shinyFrameTime -= SHINY_FRAME_DELAY;
+                shinyFrameIndex = (shinyFrameIndex + 1) % SHINY_FRAMES.length;
+            }
+        }
+    }
+
+    @Override
+    public void drawOverlay(GraphicsHandler graphicsHandler) {
+        if (puzzleInstanceId == null || PuzzleManager.isCompleted(puzzleInstanceId)) {
+            return;
+        }
+
+        int x = Math.round(getCalibratedXLocation() + (getWidth() - SHINY_SIZE) / 2f);
+        int y = Math.round(getCalibratedYLocation() + (getHeight() - SHINY_SIZE) / 2f);
+        graphicsHandler.drawImage(SHINY_FRAMES[shinyFrameIndex], x, y, SHINY_SIZE, SHINY_SIZE);
     }
 
 

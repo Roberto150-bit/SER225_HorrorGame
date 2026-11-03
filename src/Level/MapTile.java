@@ -1,14 +1,20 @@
 package Level;
 
 import Engine.GraphicsHandler;
+import Engine.ImageLoader;
 import GameObject.GameObject;
 import GameObject.IntersectableRectangle;
 import GameObject.Rectangle;
 import GameObject.SpriteSheet;
 import Utils.Point;
 
+import java.awt.image.BufferedImage;
+
 // Represents a map tile in a Map's tile map
 public class MapTile extends MapEntity {
+    private static final BufferedImage LOCK_IMAGE = ImageLoader.loadWithAlpha("lock.png");
+    private static final int LOCK_IMAGE_SIZE = 24;
+
     // this determines a tile's properties, like if it's passable or not
     protected TileType tileType;
 
@@ -116,6 +122,19 @@ public class MapTile extends MapEntity {
             drawBounds(graphicsHandler, new Color(0, 0, 255, 100));
         }
         */
+    }
+
+    public void drawOverlay(GraphicsHandler graphicsHandler) { }
+
+    public void drawLockedIndicator(GraphicsHandler graphicsHandler, Player player) {
+        if (player == null || interactScript == null || !interactScript.isLocked()
+                || !intersects(player.getInteractionRange())) {
+            return;
+        }
+
+        int lockX = Math.round(getCalibratedXLocation() + (getWidth() - LOCK_IMAGE_SIZE) / 2f);
+        int lockY = Math.round(getCalibratedYLocation()) - LOCK_IMAGE_SIZE;
+        graphicsHandler.drawImage(LOCK_IMAGE, lockX, lockY, LOCK_IMAGE_SIZE, LOCK_IMAGE_SIZE);
     }
 
     @Override

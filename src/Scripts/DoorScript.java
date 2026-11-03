@@ -18,7 +18,7 @@ import Utils.Direction;
 // example usage in a Map's loadTriggers():
 //     triggers.add(new Trigger(x, y, width, height, new DoorScript(() -> new HallwayMap(), 5, 3, Direction.DOWN)));
 // the spawn tile in the destination map should be NEXT to that map's door trigger, not on it, or the player will bounce straight back
-// a door can be locked until a puzzle is solved:
+// a door can show a lock and stay locked until a puzzle is solved:
 //     new DoorScript(() -> new HallwayMap(), 5, 3, Direction.DOWN).lockedUntilSolved("basement_symbol_lock", "The door is sealed.")
 public class DoorScript extends Script {
     protected KeyLocker keyLocker = new KeyLocker();
@@ -53,6 +53,11 @@ public class DoorScript extends Script {
     }
 
     @Override
+    public boolean isLocked() {
+        return requiredPuzzleId != null && !PuzzleManager.isCompleted(requiredPuzzleId);
+    }
+
+    @Override
     public ArrayList<ScriptAction> loadScriptActions() {
         ArrayList<ScriptAction> scriptActions = new ArrayList<>();
         if (requiredPuzzleId == null) {
@@ -66,7 +71,7 @@ public class DoorScript extends Script {
                 addRequirement(new CustomRequirement() {
                     @Override
                     public boolean isRequirementMet() {
-                        return PuzzleManager.isCompleted(requiredPuzzleId);
+                        return !isLocked();
                     }
                 });
                 for (ScriptAction action : loadOpenDoorActions()) {
@@ -78,7 +83,7 @@ public class DoorScript extends Script {
                 addRequirement(new CustomRequirement() {
                     @Override
                     public boolean isRequirementMet() {
-                        return !PuzzleManager.isCompleted(requiredPuzzleId);
+                        return isLocked();
                     }
                 });
                 addScriptAction(new LockPlayerScriptAction());
