@@ -1,6 +1,5 @@
-
 package Puzzles;
-
+//hint done
 import Engine.GraphicsHandler;
 import Engine.ImageLoader;
 import Engine.MirrorCutscene;
@@ -21,11 +20,19 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
     private final BufferedImage reflection;
 
     private boolean solved;
+    private boolean hintVisible;
 
     // Shared mirror area for every difficulty.
     private static final int MIRROR_X = 304;
     private static final int MIRROR_Y = 157;
     private static final int MIRROR_SIZE = 192;
+
+    // Hint plaque (bottom-left "?"). Same values as the other puzzles;
+    // recalibrate if this panel's artwork sits in a different spot.
+    private static final int HINT_X = 110;
+    private static final int HINT_Y = 365;
+    private static final int HINT_W = 121;
+    private static final int HINT_H = 80;
 
     private static final Color GOLD =
         new Color(245, 210, 155);
@@ -115,6 +122,32 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
         solved = true;
     }
 
+    // Number of shards that are not yet upright.
+    private int countTurnedShards() {
+
+        int count = 0;
+
+        for (int rotation : currentRotations) {
+            if (rotation != 0) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    // Index of the first shard that is not upright, or -1.
+    private int getFirstTurnedShard() {
+
+        for (int i = 0; i < fragmentCount; i++) {
+            if (currentRotations[i] != 0) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     @Override
     public void update() {
         // Mouse controls the fragments.
@@ -191,14 +224,65 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
                     }
                 }
             }
+
+            // Hint: outline the first shard that is still turned.
+            // Drawn after all shards so no other piece covers it.
+            int hintIndex = hintVisible && !solved
+                ? getFirstTurnedShard()
+                : -1;
+
+            if (hintIndex >= 0) {
+
+                int hintRow = hintIndex / gridSize;
+                int hintCol = hintIndex % gridSize;
+
+                java.awt.Polygon hintShard =
+                    createShardPolygon(hintRow, hintCol, tileSize);
+
+                double hintCenterX =
+                    MIRROR_X + hintCol * tileSize + tileSize / 2.0;
+
+                double hintCenterY =
+                    MIRROR_Y + hintRow * tileSize + tileSize / 2.0;
+
+                Graphics2D outline = (Graphics2D) board.create();
+
+                try {
+                    outline.rotate(
+                        Math.toRadians(currentRotations[hintIndex] * 90),
+                        hintCenterX, hintCenterY
+                    );
+
+                    outline.setColor(GOLD);
+
+                    outline.setStroke(
+                        new java.awt.BasicStroke(3f)
+                    );
+
+                    outline.drawPolygon(hintShard);
+
+                } finally {
+                    outline.dispose();
+                }
+            }
         } finally {
             board.dispose();
         }
 
         // Bottom plaque.
-        String label = solved
-            ? "REFLECTION RESTORED"
-            : "ROTATE THE SHARDS";
+        String label;
+
+        if (solved) {
+            label = "REFLECTION RESTORED";
+        } else if (hintVisible) {
+            int turned = countTurnedShards();
+            label = turned + (turned == 1
+                ? " SHARD STILL TURNED"
+                : " SHARDS STILL TURNED");
+        } else {
+            label = "ROTATE THE SHARDS";
+        }
+
         Font font = new Font("Serif", Font.BOLD, 12);
 
         g.setFont(font);
@@ -264,11 +348,26 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
         return new java.awt.Polygon(xs, ys, 8);
     }
 
+    // The caller can use this to let clicks on the plaque
+    // through its insidePuzzle filter.
+    public boolean isHintClick(int mouseX, int mouseY) {
+        return mouseX >= HINT_X &&
+               mouseX <= HINT_X + HINT_W &&
+               mouseY >= HINT_Y &&
+               mouseY <= HINT_Y + HINT_H;
+    }
+
 
     @Override
     public void onClick(int mouseX, int mouseY) {
 
         if (solved) return;
+
+        // Check the hint plaque before the mirror area.
+        if (isHintClick(mouseX, mouseY)) {
+            hintVisible = !hintVisible;
+            return;
+        }
 
         java.awt.geom.Ellipse2D mirrorArea =
             new java.awt.geom.Ellipse2D.Double(
@@ -322,6 +421,7 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
     @Override
     public void reset() {
         solved = false;
+        hintVisible = false;
 
         for (int i = 0; i < fragmentCount; i++) {
             currentRotations[i] = startingRotations[i];

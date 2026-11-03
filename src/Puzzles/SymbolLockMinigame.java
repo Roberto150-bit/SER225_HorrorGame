@@ -1,6 +1,5 @@
-
 package Puzzles;
-
+//Hint added
 import Engine.GraphicsHandler;
 import java.awt.Color;
 import java.awt.Font;
@@ -18,6 +17,7 @@ public class SymbolLockMinigame implements PuzzleMinigame {
     private final int[] clueSymbols;
 
     private boolean solved;
+    private boolean hintVisible;
 
     private static final int PANEL_X = 150;
     private static final int PANEL_Y = 100;
@@ -26,6 +26,13 @@ public class SymbolLockMinigame implements PuzzleMinigame {
     // Center the controls inside the artwork's rings.
     private static final int DIAL_Y = 280;
     private static final int DIAL_RADIUS = 30;
+
+    // Hint plaque (bottom-left "?"). Same values as the other puzzles;
+    // recalibrate if this panel's artwork sits in a different spot.
+    private static final int HINT_X = 110;
+    private static final int HINT_Y = 365;
+    private static final int HINT_W = 121;
+    private static final int HINT_H = 80;
 
     private static final Color GOLD =
         new Color(220, 190, 135);
@@ -149,6 +156,32 @@ public class SymbolLockMinigame implements PuzzleMinigame {
         }
     }
 
+    // Number of dials already showing the right symbol.
+    private int countCorrectDials() {
+
+        int count = 0;
+
+        for (int i = 0; i < dialCount; i++) {
+            if (currentSymbols[i] == targetSymbols[i]) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    // Index of the first wrong dial, or -1 if all are right.
+    private int getFirstWrongDial() {
+
+        for (int i = 0; i < dialCount; i++) {
+            if (currentSymbols[i] != targetSymbols[i]) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     @Override
     public void update() {
         // No continuous updates required.
@@ -184,6 +217,47 @@ public class SymbolLockMinigame implements PuzzleMinigame {
                 DIAL_Y + 9,
                 numberFont,
                 new Color(250, 220, 165)
+            );
+        }
+
+        // Hint: ring the first wrong dial and show how many are right.
+        if (hintVisible && !solved) {
+
+            int wrongDial = getFirstWrongDial();
+
+            if (wrongDial >= 0) {
+
+                java.awt.Stroke previousStroke = g.getStroke();
+
+                g.setColor(new Color(255, 225, 150));
+                g.setStroke(new java.awt.BasicStroke(3f));
+
+                g.drawOval(
+                    getDialCenterX(wrongDial) - DIAL_RADIUS,
+                    DIAL_Y - DIAL_RADIUS,
+                    DIAL_RADIUS * 2,
+                    DIAL_RADIUS * 2
+                );
+
+                g.setStroke(previousStroke);
+            }
+
+            String hint = countCorrectDials() + " OF "
+                + dialCount + " DIALS CORRECT";
+
+            Font hintFont = new Font("Serif", Font.ITALIC, 13);
+
+            g.setFont(hintFont);
+
+            int hintWidth =
+                g.getFontMetrics().stringWidth(hint);
+
+            graphicsHandler.drawString(
+                hint,
+                400 - hintWidth / 2,
+                DIAL_Y + DIAL_RADIUS + 25,
+                hintFont,
+                new Color(255, 225, 175)
             );
         }
 
@@ -249,10 +323,25 @@ public class SymbolLockMinigame implements PuzzleMinigame {
         );
     }
 
+    // The caller can use this to let clicks on the plaque
+    // through its insidePuzzle filter.
+    public boolean isHintClick(int mouseX, int mouseY) {
+        return mouseX >= HINT_X &&
+               mouseX <= HINT_X + HINT_W &&
+               mouseY >= HINT_Y &&
+               mouseY <= HINT_Y + HINT_H;
+    }
+
     @Override
     public void onClick(int mouseX, int mouseY) {
 
         if (solved) {
+            return;
+        }
+
+        // Check the hint plaque first.
+        if (isHintClick(mouseX, mouseY)) {
+            hintVisible = !hintVisible;
             return;
         }
 
@@ -305,6 +394,7 @@ public class SymbolLockMinigame implements PuzzleMinigame {
     public void reset() {
 
         solved = false;
+        hintVisible = false;
 
         // Keep the same solution when restarting.
         Arrays.fill(currentSymbols, 0);
