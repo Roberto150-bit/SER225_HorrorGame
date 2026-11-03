@@ -62,7 +62,7 @@ public abstract class Player extends GameObject {
     private boolean hasCollectible = false;
 
     // Health System
-    public static final int MAX_HEALTH = 5;
+    public static final int MAX_HEALTH = 3;
     protected static int maxHealth = MAX_HEALTH;
     protected static int health = maxHealth;
     protected static final int HURT_FRAMES = 30; // length of the damage animation
@@ -137,7 +137,10 @@ public abstract class Player extends GameObject {
         }
 
         // if a walk key is pressed, player enters WALKING state
-        if (Keyboard.isKeyDown(MOVE_LEFT_KEY) || Keyboard.isKeyDown(MOVE_RIGHT_KEY) || Keyboard.isKeyDown(MOVE_UP_KEY) || Keyboard.isKeyDown(MOVE_DOWN_KEY)) {
+        if (isMovementKeyDown(MOVE_LEFT_KEY, Key.LEFT)
+            || isMovementKeyDown(MOVE_RIGHT_KEY, Key.RIGHT)
+            || isMovementKeyDown(MOVE_UP_KEY, Key.UP)
+            || isMovementKeyDown(MOVE_DOWN_KEY, Key.DOWN)) {
             playerState = PlayerState.WALKING;
         }
     }
@@ -150,7 +153,7 @@ public abstract class Player extends GameObject {
         }
 
         // if walk left key is pressed, move player to the left
-        if (Keyboard.isKeyDown(MOVE_LEFT_KEY)) {
+        if (isMovementKeyDown(MOVE_LEFT_KEY, Key.LEFT)) {
             moveAmountX -= walkSpeed;
             facingDirection = Direction.LEFT;
             currentWalkingXDirection = Direction.LEFT;
@@ -158,7 +161,7 @@ public abstract class Player extends GameObject {
         }
 
         // if walk right key is pressed, move player to the right
-        else if (Keyboard.isKeyDown(MOVE_RIGHT_KEY)) {
+        else if (isMovementKeyDown(MOVE_RIGHT_KEY, Key.RIGHT)) {
             moveAmountX += walkSpeed;
             facingDirection = Direction.RIGHT;
             currentWalkingXDirection = Direction.RIGHT;
@@ -168,12 +171,12 @@ public abstract class Player extends GameObject {
             currentWalkingXDirection = Direction.NONE;
         }
 
-        if (Keyboard.isKeyDown(MOVE_UP_KEY)) {
+        if (isMovementKeyDown(MOVE_UP_KEY, Key.UP)) {
             moveAmountY -= walkSpeed;
             currentWalkingYDirection = Direction.UP;
             lastWalkingYDirection = Direction.UP;
         }
-        else if (Keyboard.isKeyDown(MOVE_DOWN_KEY)) {
+        else if (isMovementKeyDown(MOVE_DOWN_KEY, Key.DOWN)) {
             moveAmountY += walkSpeed;
             currentWalkingYDirection = Direction.DOWN;
             lastWalkingYDirection = Direction.DOWN;
@@ -198,9 +201,20 @@ public abstract class Player extends GameObject {
             lastWalkingXDirection = Direction.NONE;
         }
 
-        if (Keyboard.isKeyUp(MOVE_LEFT_KEY) && Keyboard.isKeyUp(MOVE_RIGHT_KEY) && Keyboard.isKeyUp(MOVE_UP_KEY) && Keyboard.isKeyUp(MOVE_DOWN_KEY)) {
+        if (isMovementKeyUp(MOVE_LEFT_KEY, Key.LEFT)
+            && isMovementKeyUp(MOVE_RIGHT_KEY, Key.RIGHT)
+            && isMovementKeyUp(MOVE_UP_KEY, Key.UP)
+            && isMovementKeyUp(MOVE_DOWN_KEY, Key.DOWN)) {
             playerState = PlayerState.STANDING;
         }
+    }
+
+    private boolean isMovementKeyDown(Key configurableKey, Key arrowKey) {
+        return Keyboard.isKeyDown(configurableKey) || Keyboard.isKeyDown(arrowKey);
+    }
+
+    private boolean isMovementKeyUp(Key configurableKey, Key arrowKey) {
+        return Keyboard.isKeyUp(configurableKey) && Keyboard.isKeyUp(arrowKey);
     }
 
     protected void updateLockedKeys() {

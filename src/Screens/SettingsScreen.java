@@ -21,7 +21,8 @@ public class SettingsScreen extends Screen {
     private String message = "Select a control using UP/DOWN";
 
     private static final String[] ACTIONS = {
-        "Move Up", "Move Left", "Move Down", "Move Right"
+        "Move Up", "Move Left",
+        "Move Down", "Move Right"
     };
 
     public SettingsScreen(ScreenCoordinator screenCoordinator) {
@@ -36,7 +37,7 @@ public class SettingsScreen extends Screen {
         waitingForKey = false;
         navigationHeld = false;
         enterHeld = true;
-        message = "Select a control using UP/DOWN";
+        message = "Use the arrow keys to go up or down. Modify a control by pressing [ENTER].";
 
         Keyboard.clearLastPressedKey();
     }
@@ -99,7 +100,7 @@ public class SettingsScreen extends Screen {
         if (enter && !enterHeld) {
             waitingForKey = true;
             enterHeld = true;
-            message = "Press a new letter key (ESC to cancel)";
+            message = "Press a letter key (ESC to cancel)";
             Keyboard.clearLastPressedKey();
         }
     }
@@ -175,7 +176,7 @@ public class SettingsScreen extends Screen {
         );
 
         graphicsHandler.drawString(
-            "UP/DOWN: select   ENTER: change   ESC: back",
+            "Arrows always move   UP/DOWN: select   ENTER: change   ESC: back",
             80, 530,
             new Font("Arial", Font.BOLD, 15),
             Color.LIGHT_GRAY
