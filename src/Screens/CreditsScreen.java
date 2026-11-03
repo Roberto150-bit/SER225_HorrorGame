@@ -7,10 +7,10 @@ import Level.Map;
 import Maps.TitleScreenMap;
 import SpriteFont.SpriteFont;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.awt.image.BufferedImage;
 
 // This class is for the credits screen
 public class CreditsScreen extends Screen {
@@ -41,7 +41,7 @@ public class CreditsScreen extends Screen {
     @Override
     public void initialize() {
         // setup graphics on screen (background map, spritefont text)
-        menuImage = ImageLoader.loadWithAlpha("dark_forest.png");
+        menuImage = ImageLoader.loadWithAlpha("TitleScreenImage.png");
         background = new TitleScreenMap();
         background.setAdjustCamera(false);
         try {

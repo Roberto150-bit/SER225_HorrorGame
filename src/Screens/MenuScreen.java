@@ -33,7 +33,7 @@ public class MenuScreen extends Screen {
 
     @Override
     public void initialize() {
-        menuImage = ImageLoader.loadWithAlpha("dark_forest.png");
+        menuImage = ImageLoader.loadWithAlpha("TitleScreenImage.png");
         try {
             Font secretSolver = Font.createFont(Font.TRUETYPE_FONT, new FileInputStream(new File("src/Resources/secret_solver.ttf"))).deriveFont(50f);
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
@@ -128,11 +128,49 @@ public class MenuScreen extends Screen {
 
     @Override
     public void draw(GraphicsHandler graphicsHandler) {
+
+        // Draw background map.
         background.draw(graphicsHandler);
-        graphicsHandler.drawImage(menuImage, 0, 0, 800, 1000);
+
+        // Draw menu image without distorting it.
+        if (menuImage != null) {
+
+            int screenWidth = 800;
+            int screenHeight = 605;
+
+            double scale = Math.max(
+                (double) screenWidth / menuImage.getWidth(),
+                (double) screenHeight / menuImage.getHeight()
+            );
+
+            int scaledWidth = (int) (menuImage.getWidth() * scale);
+            int scaledHeight = (int) (menuImage.getHeight() * scale);
+
+            // Center image and crop excess.
+            int x = (screenWidth - scaledWidth) / 2;
+            int y = (screenHeight - scaledHeight) / 2;
+
+            graphicsHandler.drawImage(
+                menuImage,
+                x, y,
+                scaledWidth, scaledHeight
+            );
+        }
+
+        // Draw menu options.
         playGame.draw(graphicsHandler);
         settings.draw(graphicsHandler);
         credits.draw(graphicsHandler);
-        graphicsHandler.drawFilledRectangleWithBorder(pointerLocationX, pointerLocationY, 20, 20, new Color(255, 0, 0), Color.black, 2);
+
+        // Draw selection pointer.
+        graphicsHandler.drawFilledRectangleWithBorder(
+            pointerLocationX,
+            pointerLocationY,
+            20,
+            20,
+            new Color(255, 0, 0),
+            Color.black,
+            2
+        );
     }
 }

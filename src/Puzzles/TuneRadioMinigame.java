@@ -2,7 +2,6 @@
 package Puzzles;
 
 import Engine.GraphicsHandler;
-import Engine.MirrorCutscene;
 import java.awt.Color;
 import java.awt.Font;
 import java.util.Random;
@@ -37,9 +36,6 @@ public class TuneRadioMinigame implements PuzzleMinigame {
         new Color(60, 28, 34);
 
     public TuneRadioMinigame(PuzzleConfig config) {
-
-        MirrorCutscene.start();
-
 
         switch (config.getDifficulty()) {
             case EASY:
