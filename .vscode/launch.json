@@ -6,6 +6,13 @@
             "name": "Game",
             "request": "launch",
             "mainClass": "Game.Game",
+            "projectName": "SER225_HorrorGame_f8a9bc6"
+        },
+        {
+            "type": "java",
+            "name": "Game",
+            "request": "launch",
+            "mainClass": "Game.Game",
             "projectName": "SER225_HorrorGame_dbf5b49a"
         },
         {

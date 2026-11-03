@@ -12,16 +12,16 @@ import javax.imageio.ImageIO;
 import Level.Player;
 
 // the player's 6 slot inventory bar
-// press 1-6 to select a slot (it lights up red), then use the item in it (it flashes green) by:
-//   pressing E, double tapping the same number, or left clicking (clicking right on a slot uses that slot)
-// pressing the selected number again slowly deselects it
-// single use items disappear after the green flash, reusable items stay
+// the equipped weapon (lit up red) is used with SPACE or a left click, and stays equipped after each use
+// press 1-6, or click a slot, to equip something else; picking up the first weapon equips it automatically
+// single use items (relics) flash green and disappear, then the player goes back to their knife or bow
+// E is left to the player for interacting (doors, notes, pickups)
 public class HotbarUI {
 
     private BufferedImage slotBackgroundImage;
     private BufferedImage heartImage;
 
-    private Key useKey = Key.E; // key to use the selected item
+    private Key attackKey = Key.SPACE; // key to use the equipped item
     private static final int SLOT_COUNT = 6;
     private static final int HEART_COUNT = Player.getHealth();
     private Key[] slotKeys = {Key.ONE, Key.TWO, Key.THREE, Key.FOUR, Key.FIVE, Key.SIX}; // key to select each slot
@@ -47,17 +47,18 @@ public class HotbarUI {
     private int yHeart = 420;
     private int ySlot = 490; // Y position for all slots
 
-    private static final Color SELECTED_COLOR = new Color(255, 0, 0, 110);
+    private static final Color EQUIPPED_COLOR = new Color(255, 0, 0, 110);
     private static final Color USING_COLOR = new Color(0, 255, 0, 140);
     private static final Font SLOT_NUMBER_FONT = new Font("Chalkduster", Font.BOLD, 13);
-    
+    private static final Font HINT_FONT = new Font("Arial", Font.BOLD, 14);
+    private static final String CONTROLS_HINT = "SPACE / CLICK  attack     1-6  switch weapon     E  interact";
 
-    private static final int DOUBLE_TAP_FRAMES = 25; // max frames between taps of a number for it to count as a double tap
-    private static final int USE_FLASH_FRAMES = 20; // how long a slot stays green after its item is used
+    private static final int USE_FLASH_FRAMES = 20; // how long a slot stays green after its item is used (also the time between attacks)
+    private static final int HINT_FRAMES = 60 * 12; // the controls hint shows for 12 seconds after the first weapon is picked up
 
-    private int frameCount = 0;
-    private int selectedSlot = -1; // -1 when no slot is selected
-    private int lastSlotTapFrame = 0;
+    private int equippedSlot = -1; // -1 when nothing usable is equipped
+    private int hintTimer = 0;
+    private boolean hintShown = false;
     private int usingSlot = -1; // slot currently flashing green, -1 when none
     private int useTimer = 0;
     private ItemUse usedItem; // set the frame an item is used so the map can apply its effect
@@ -90,9 +91,11 @@ public class HotbarUI {
         }
     }
 
-    // canTakeInput is false while something else needs the keyboard/mouse (puzzles, textboxes)
+    // canTakeInput is false while something else needs the keyboard/mouse (puzzles, textboxes, the journal)
     public void update(boolean canTakeInput) {
-        frameCount++;
+        if (hintTimer > 0) {
+            hintTimer--;
+        }
 
         // finish the green flash, then remove single use items
         if (usingSlot != -1) {
@@ -106,69 +109,85 @@ public class HotbarUI {
         }
 
         if (!canTakeInput) {
+            // a SPACE press or click that closes a textbox or puzzle shouldn't also attack once it's gone
+            if (Keyboard.isKeyDown(attackKey)) {
+                keyLocker.lockKey(attackKey);
+            }
             return;
         }
 
         for (int i = 0; i < slotKeys.length; i++) {
             if (Keyboard.isKeyDown(slotKeys[i]) && !keyLocker.isKeyLocked(slotKeys[i])) {
                 keyLocker.lockKey(slotKeys[i]);
-                onSlotKeyTapped(i);
+                equip(i);
             }
             else if (Keyboard.isKeyUp(slotKeys[i])) {
                 keyLocker.unlockKey(slotKeys[i]);
             }
         }
 
-        if (Keyboard.isKeyDown(useKey) && !keyLocker.isKeyLocked(useKey)) {
-            keyLocker.lockKey(useKey);
-            if (selectedSlot != -1) {
-                useItem(selectedSlot);
-            }
+        if (Keyboard.isKeyDown(attackKey) && !keyLocker.isKeyLocked(attackKey)) {
+            keyLocker.lockKey(attackKey);
+            attack();
         }
-        else if (Keyboard.isKeyUp(useKey)) {
-            keyLocker.unlockKey(useKey);
+        else if (Keyboard.isKeyUp(attackKey)) {
+            keyLocker.unlockKey(attackKey);
         }
 
         if (Mouse.isLeftClicked()) {
+            // clicking a slot equips it, clicking anywhere else attacks
             int clickedSlot = getSlotAt(Mouse.getMouseX(), Mouse.getMouseY());
-            if (clickedSlot != -1 && itemImages[clickedSlot] != null) {
-                useItem(clickedSlot);
-            } else if (selectedSlot != -1) {
-                useItem(selectedSlot);
+            if (clickedSlot != -1) {
+                equip(clickedSlot);
+            } else {
+                attack();
             }
             Mouse.resetClick();
         }
     }
 
-    private void onSlotKeyTapped(int slot) {
-        if (slot == selectedSlot) {
-            if (frameCount - lastSlotTapFrame <= DOUBLE_TAP_FRAMES) {
-                useItem(slot);
-            } else {
-                selectedSlot = -1;
-            }
-        } else {
-            // only slots holding an item can be selected, tapping an empty one clears the selection
-            selectedSlot = itemImages[slot] != null ? slot : -1;
+    // only usable items (weapons, relics) can be equipped, notes and such just sit in the bar
+    private void equip(int slot) {
+        if (itemImages[slot] != null && itemUses[slot] != null && itemUses[slot] != ItemUse.NONE) {
+            equippedSlot = slot;
         }
-        lastSlotTapFrame = frameCount;
     }
 
-    private void useItem(int slot) {
-        // nothing happens while another item is flashing
-        if (usingSlot != -1) {
+    // uses the equipped item, which stays equipped (relics are removed after their flash, see update)
+    private void attack() {
+        // nothing equipped, or the last attack is still flashing
+        if (equippedSlot == -1 || usingSlot != -1) {
             return;
         }
-        // items that can't be used (like notes) just get deselected, so the interact key goes back to normal
-        if (itemImages[slot] == null || itemUses[slot] == ItemUse.NONE) {
-            selectedSlot = -1;
-            return;
-        }
-        usingSlot = slot;
+        usingSlot = equippedSlot;
         useTimer = USE_FLASH_FRAMES;
-        usedItem = itemUses[slot];
-        usedItemImage = itemImages[slot];
-        selectedSlot = -1;
+        usedItem = itemUses[equippedSlot];
+        usedItemImage = itemImages[equippedSlot];
+    }
+
+    // after a relic is used up, go back to a weapon that stays (knife or bow), if there is one
+    private void equipReusableWeapon() {
+        equippedSlot = -1;
+        for (int i = 0; i < itemImages.length; i++) {
+            if (itemImages[i] != null && (itemUses[i] == ItemUse.REUSABLE || itemUses[i] == ItemUse.RANGED)) {
+                equippedSlot = i;
+                return;
+            }
+        }
+    }
+
+    // a new usable item is equipped automatically if the player isn't holding anything
+    private void onItemAdded(int slot) {
+        if (itemUses[slot] == ItemUse.NONE) {
+            return;
+        }
+        if (equippedSlot == -1) {
+            equippedSlot = slot;
+        }
+        if (!hintShown) {
+            hintShown = true;
+            hintTimer = HINT_FRAMES;
+        }
     }
 
     // returns the slot under the given screen position, or -1 if there isn't one
@@ -179,11 +198,6 @@ public class HotbarUI {
             }
         }
         return -1;
-    }
-
-    // true while a slot is selected, so the player's interact key is left to the hotbar
-    public boolean hasSelectedItem() {
-        return selectedSlot != -1;
     }
 
     // returns the type of item used since the last call (null if none), so the map can apply its effect only once
@@ -208,6 +222,7 @@ public class HotbarUI {
             if (itemImages[i] == null) {
                 itemImages[i] = itemImage;
                 itemUses[i] = itemUse;
+                onItemAdded(i);
                 return true; // Places in first open slot, ends loop by returning true
             }
         }
@@ -226,6 +241,7 @@ public class HotbarUI {
                 itemFrames[i] = frames;
                 frameDelays[i] = frameDelay;
                 itemUses[i] = itemUse;
+                onItemAdded(i);
                 return true;
             }
         }
@@ -237,8 +253,8 @@ public class HotbarUI {
             itemImages[slotIndex] = null;
             itemFrames[slotIndex] = null;
             itemUses[slotIndex] = null;
-            if (selectedSlot == slotIndex) {
-                selectedSlot = -1;
+            if (equippedSlot == slotIndex) {
+                equipReusableWeapon();
             }
         }
     }
@@ -256,8 +272,8 @@ public class HotbarUI {
                 graphicsHandler.drawImage(slotBackgroundImage, xSlots[i], ySlot, SLOT_SIZE, SLOT_SIZE);
             }
 
-            // light up the inside of the ring: red when selected, green while the item is being used
-            Color highlight = i == usingSlot ? USING_COLOR : i == selectedSlot ? SELECTED_COLOR : null;
+            // light up the inside of the ring: red for the equipped item, green while it's being used
+            Color highlight = i == usingSlot ? USING_COLOR : i == equippedSlot ? EQUIPPED_COLOR : null;
             if (highlight != null) {
                 g.setColor(highlight);
                 g.fillOval(xSlots[i] + 10, ySlot + 8, SLOT_SIZE - 20, SLOT_SIZE - 20);
@@ -276,6 +292,10 @@ public class HotbarUI {
             graphicsHandler.drawStringWithOutline(String.valueOf(i + 1), xSlots[i] + 11, ySlot + 16, SLOT_NUMBER_FONT, Color.WHITE, Color.BLACK, 2);
         }
 
+        // how to fight, shown for a while after the first weapon is picked up
+        if (hintTimer > 0) {
+            graphicsHandler.drawStringWithOutline(CONTROLS_HINT, 8, ySlot - 8, HINT_FONT, Color.WHITE, Color.BLACK, 2);
+        }
     }
 
 

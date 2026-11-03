@@ -345,7 +345,8 @@ public class Ghost extends NPC {
         }
     }
 
-    private boolean isTileOpen(int tileX, int tileY) {
+    // a floor tile with no solid object (puzzle, rock) on it
+    protected boolean isTileOpen(int tileX, int tileY) {
         MapTile tile = map.getMapTile(tileX, tileY);
         if (tile == null || tile.getTileType() != TileType.PASSABLE) {
             return false;

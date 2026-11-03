@@ -14,6 +14,7 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Composite;
 import java.awt.Graphics2D;
+import java.util.ArrayDeque;
 import java.util.HashMap;
 
 // A trap: a faint stain on the floor that's easy to walk over
@@ -39,7 +40,10 @@ public class CosmicCreeper extends Ghost {
     private static final float CATCH_RANGE = 40f;
     // it counts as being looked at when it's within this much of the way the player is facing (dot product)
     private static final float WATCHED_DOT = 0.35f;
-    private static final float[] SPAWN_DISTANCES_IN_TILES = {4f, 3.5f, 3f, 2.5f, 2f};
+    // where it rises: ideally this many tiles straight behind the player, never closer than the minimum
+    private static final float RISE_DISTANCE_IN_TILES = 3.5f;
+    private static final float MIN_RISE_DISTANCE_IN_TILES = 2f;
+    private static final int MAX_RISE_STEPS = 8; // how far across the floor it looks for a spot
 
     private static final int RISE_FRAMES = 45;
     private static final int HUNT_FRAMES = 25 * 60; // gives up after 25 seconds
@@ -169,27 +173,77 @@ public class CosmicCreeper extends Ghost {
         return dot > WATCHED_DOT;
     }
 
-    // appears a few tiles behind the player, as far back as there's open floor
+    // appears behind the player, on floor that's connected to where they're standing
+    // (so never past a wall, in a wall, or in the dark space around a room)
     private boolean riseBehind(Player player) {
         Point aim = player.getAimDirection();
         float tileSize = map.getTileset().getScaledSpriteWidth();
-        float px = centerX(player);
-        float py = centerY(player);
-        // straight behind first, then a little to either side
-        float[][] directions = {{-aim.x, -aim.y}, {-aim.x - aim.y * 0.6f, -aim.y + aim.x * 0.6f}, {-aim.x + aim.y * 0.6f, -aim.y - aim.x * 0.6f}};
-        for (float distance : SPAWN_DISTANCES_IN_TILES) {
-            for (float[] direction : directions) {
-                float length = (float) Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
-                float x = px + direction[0] / length * distance * tileSize;
-                float y = py + direction[1] / length * distance * tileSize;
-                if (canStandAt(x, y)) {
-                    setBoundsLocation(x - getBounds().getWidth() / 2f, y - getBounds().getHeight() / 2f);
-                    faceTowards(player);
-                    return true;
+        Point start = map.getTileIndexByPosition(centerX(player), centerY(player));
+        int width = map.getWidth();
+        int height = map.getHeight();
+        int startX = (int) start.x, startY = (int) start.y;
+        if (startX < 0 || startY < 0 || startX >= width || startY >= height) {
+            return false;
+        }
+
+        // walk out from the player's tile across open floor, scoring each tile by how far behind them it is
+        boolean[] seen = new boolean[width * height];
+        ArrayDeque<int[]> queue = new ArrayDeque<>();
+        queue.add(new int[] {startX, startY, 0});
+        seen[startY * width + startX] = true;
+        float bestScore = Float.NEGATIVE_INFINITY;
+        int bestX = -1, bestY = -1;
+        while (!queue.isEmpty()) {
+            int[] tile = queue.poll();
+            float dx = tile[0] - startX;
+            float dy = tile[1] - startY;
+            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+            if (distance >= MIN_RISE_DISTANCE_IN_TILES && fitsOnFloor(tile[0], tile[1], tileSize)) {
+                // straight behind the player is best, and about RISE_DISTANCE_IN_TILES away
+                float behind = -(dx * aim.x + dy * aim.y) / distance;
+                float score = behind - Math.abs(distance - RISE_DISTANCE_IN_TILES) * 0.3f;
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestX = tile[0];
+                    bestY = tile[1];
                 }
             }
+            if (tile[2] >= MAX_RISE_STEPS) {
+                continue;
+            }
+            for (int[] step : new int[][] {{1, 0}, {-1, 0}, {0, 1}, {0, -1}}) {
+                int nx = tile[0] + step[0], ny = tile[1] + step[1];
+                if (nx < 0 || ny < 0 || nx >= width || ny >= height || seen[ny * width + nx] || !isTileOpen(nx, ny)) {
+                    continue;
+                }
+                seen[ny * width + nx] = true;
+                queue.add(new int[] {nx, ny, tile[2] + 1});
+            }
         }
-        return false;
+        if (bestX < 0) {
+            return false; // nowhere to rise, it tries again while the player is still on the stain
+        }
+        float x = (bestX + 0.5f) * tileSize;
+        float y = (bestY + 0.5f) * tileSize;
+        setBoundsLocation(x - getBounds().getWidth() / 2f, y - getBounds().getHeight() / 2f);
+        faceTowards(player);
+        return true;
+    }
+
+    // true if the creeper's feet, centred on this tile, are entirely on floor tiles (not the walkable edge of a wall)
+    private boolean fitsOnFloor(int tileX, int tileY, float tileSize) {
+        float x = (tileX + 0.5f) * tileSize;
+        float y = (tileY + 0.5f) * tileSize;
+        float halfWidth = getBounds().getWidth() / 2f;
+        float halfHeight = getBounds().getHeight() / 2f;
+        float[][] corners = {{x - halfWidth, y - halfHeight}, {x + halfWidth - 1, y - halfHeight}, {x - halfWidth, y + halfHeight - 1}, {x + halfWidth - 1, y + halfHeight - 1}};
+        for (float[] corner : corners) {
+            Point tile = map.getTileIndexByPosition(corner[0], corner[1]);
+            if (tile.x < 0 || tile.y < 0 || tile.x >= map.getWidth() || tile.y >= map.getHeight() || !isTileOpen((int) tile.x, (int) tile.y)) {
+                return false;
+            }
+        }
+        return canStandAt(x, y);
     }
 
     private void faceTowards(Player player) {

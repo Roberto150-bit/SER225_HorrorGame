@@ -133,10 +133,7 @@ public abstract class Player extends GameObject {
     protected void playerStanding() {
         if (!keyLocker.isKeyLocked(INTERACT_KEY) && Keyboard.isKeyDown(INTERACT_KEY)) {
             keyLocker.lockKey(INTERACT_KEY);
-            // while a hotbar slot is selected, the interact key uses that item instead
-            if (!map.getHotbarUI().hasSelectedItem()) {
-                map.entityInteract(this);
-            }
+            map.entityInteract(this);
         }
 
         // if a walk key is pressed, player enters WALKING state
@@ -149,10 +146,7 @@ public abstract class Player extends GameObject {
     protected void playerWalking() {
         if (!keyLocker.isKeyLocked(INTERACT_KEY) && Keyboard.isKeyDown(INTERACT_KEY)) {
             keyLocker.lockKey(INTERACT_KEY);
-            // while a hotbar slot is selected, the interact key uses that item instead
-            if (!map.getHotbarUI().hasSelectedItem()) {
-                map.entityInteract(this);
-            }
+            map.entityInteract(this);
         }
 
         // if walk left key is pressed, move player to the left
