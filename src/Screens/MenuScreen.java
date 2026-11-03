@@ -61,7 +61,7 @@ public class MenuScreen extends Screen {
         keyLocker.lockKey(Key.SPACE);
 
         // Play music here
-        MusicManager.play("Resources/Audios/Music/MenuMusic.wav", 0.6f, true);
+        MusicManager.play("Resources/Audios/Music/BackgroundHorror.wav", 0.6f, true);
     }
 
     public void update() {

@@ -111,7 +111,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         Player.setHealth(Player.MAX_HEALTH);
 
         map = new BasementMap();
-        MusicManager.play("Resources/Audios/Music/Electricity.wav", 0.6f, true);
+        MusicManager.play("Resources/Audios/Music/FirstBackgroundMusic.wav", 1.6f, true);
 
         loadedRooms.clear();
         preloadedRooms.clear();
@@ -249,10 +249,10 @@ public class PlayLevelScreen extends Screen implements GameListener {
         if (ghostChaseMusicPlaying) {
             MusicManager.play(GHOST_CHASE_MUSIC, 0.6f, true);
         } else if (musicBeforeGhostChase != null) {
-            MusicManager.play(musicBeforeGhostChase, 0.6f, true);
+            MusicManager.play(musicBeforeGhostChase, 1.6f, true);
         } else {
             MusicManager.play(
-                "Resources/Audios/Music/Electricity.wav",
+                "Resources/Audios/Music/FirstBackgroundMusic.wav",
                 0.6f,
                 true
             );
