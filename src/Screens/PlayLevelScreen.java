@@ -1,10 +1,12 @@
 package Screens;
 
+import Enemies.Ghost;
 import Engine.GraphicsHandler;
 import Engine.Jumpscare;
 import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
+import Engine.MirrorCutscene;
 import Engine.Mouse;
 import Engine.MusicManager;
 import Engine.Screen;
@@ -15,14 +17,13 @@ import Lighting.DarknessManager;
 import Maps.BasementMap;
 import Players.DeanPlayer;
 import Puzzles.PuzzleManager;
+import Scripts.ValeIntroScript;
 import Utils.Direction;
 import Utils.Point;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import Enemies.Ghost;
-import java.util.ArrayList;
-import Scripts.ValeIntroScript;
 
 // This class is for when the RPG game is actually being played
 public class PlayLevelScreen extends Screen implements GameListener {
@@ -105,6 +106,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         PuzzleManager.reset();
         Ghost.resetDrops();
         Jumpscare.stop();
+        MirrorCutscene.stop();
         // full health every new game, including after dying and starting again from the main menu
         Player.setHealth(Player.MAX_HEALTH);
 
@@ -178,6 +180,13 @@ public class PlayLevelScreen extends Screen implements GameListener {
                     }
                     break;
                 }
+
+                // everything freezes while the mirror cutscene plays
+                if (MirrorCutscene.isPlaying()) {
+                    MirrorCutscene.update();
+                    break;
+                }
+
                 updateGhostArrivals();
                 if (transitionPhase != TransitionPhase.NONE) {
                     updateTransition();
@@ -711,6 +720,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         }
 
         Jumpscare.draw(graphicsHandler);
+        MirrorCutscene.draw(graphicsHandler);
     }
 
     public PlayLevelScreenState getPlayLevelScreenState() {

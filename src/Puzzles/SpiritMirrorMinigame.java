@@ -3,7 +3,7 @@ package Puzzles;
 
 import Engine.GraphicsHandler;
 import Engine.ImageLoader;
-
+import Engine.MirrorCutscene;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
@@ -32,6 +32,9 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
 
     public SpiritMirrorMinigame(PuzzleConfig config) {
         
+        MirrorCutscene.start();
+
+
         reflection = ImageLoader.load("../Resources/Puzzles/SpiritMirror/Fragments/spirit_reflection.png");
 
         switch (config.getDifficulty()) {
