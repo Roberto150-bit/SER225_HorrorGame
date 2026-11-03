@@ -66,7 +66,7 @@ public abstract class Player extends GameObject {
     protected static int maxHealth = MAX_HEALTH;
     protected static int health = maxHealth;
     protected static final int HURT_FRAMES = 30; // length of the damage animation
-    protected static final int INVINCIBLE_FRAMES = 90; // frames before the player can be hit again
+    protected static final int INVINCIBLE_FRAMES = 60; // frames before the player can be hit again (1 second)
     protected int hurtTimer = 0;
     protected int invincibleTimer = 0;
 
@@ -355,6 +355,20 @@ public abstract class Player extends GameObject {
         invincibleTimer = INVINCIBLE_FRAMES;
         playerState = PlayerState.WALKING;
         return true;
+    }
+
+    // takes every heart at once (the CosmicCreeper catching the player), ignores invincibility
+    public void kill() {
+        if (health <= 0) {
+            return;
+        }
+        health = 0;
+        hurtTimer = HURT_FRAMES;
+        playerState = PlayerState.WALKING;
+    }
+
+    public boolean isInvincible() {
+        return invincibleTimer > 0;
     }
 
     // direction the player is aiming, used by the knife and thrown relics

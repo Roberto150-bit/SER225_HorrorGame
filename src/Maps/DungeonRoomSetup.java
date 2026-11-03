@@ -1,5 +1,6 @@
 package Maps;
 
+import Enemies.CosmicCreeper;
 import Enemies.CreepyStickEnemy;
 import Enemies.Ghost;
 import Enemies.WeirdEnemy;
@@ -8,14 +9,17 @@ import EnhancedMapTiles.PuzzleObject;
 import Level.EnhancedMapTile;
 import Level.Map;
 import Level.MapTile;
+import Level.NPC;
 import Level.TileType;
 import Puzzles.PuzzleConfig;
 import Puzzles.PuzzleDifficulty;
 import Puzzles.PuzzleId;
+import Puzzles.PuzzleManager;
 import Scripts.CodeNoteScript;
 import Scripts.NoteScript;
 import Utils.Point;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 
 // shared helpers the dungeon rooms use to place their puzzles, code notes and ghosts
@@ -35,8 +39,19 @@ public class DungeonRoomSetup {
     private static final int LURKER_DOOR_DISTANCE = 2;
     private static final int ENTRANCE_DISTANCE = 3;
     private static final int FIRST_GHOST_ID = 100;
+    private static final int FIRST_CREEPER_ID = 700;
 
     private static final Random random = new Random();
+
+    // puzzles that have to be solved before the hallway's secret door appears
+    private static final int PUZZLES_TO_REVEAL_SECRET_DOOR = 5;
+
+    // the hallway a room's door leads back to: the one with the secret door once all the puzzles are solved
+    public static Map hallway() {
+        return PuzzleManager.getCompletedCount() >= PUZZLES_TO_REVEAL_SECRET_DOOR
+                ? new DungeonHallwaySecretDoorRevealedMap()
+                : new DungeonHallwayMap();
+    }
 
     // a puzzle the player interacts with (E) on the given tile, drawn with that puzzle type's sprite
     public static PuzzleObject puzzle(Map map, int tileX, int tileY, String instanceId, PuzzleId type, PuzzleDifficulty difficulty) {
@@ -67,17 +82,21 @@ public class DungeonRoomSetup {
         return note;
     }
 
+    public static ArrayList<Ghost> addRandomGhosts(Map map, int stickCount, int weirdCount) {
+        return addRandomGhosts(map, stickCount, weirdCount, 0);
+    }
+
     // places the enemies, a new layout every time the room is built (each playthrough)
-    // creepy stick enemies go on random open floor away from the doors, weird enemies lurk against the walls,
-    // either beside an entrance or along the sides of the room
+    // creepy stick enemies and pale ghosts go on random open floor away from the doors,
+    // weird enemies lurk against the walls, either beside an entrance or along the sides of the room
     // call at the end of a map's constructor, after its doors and objects are set up, so they can be avoided
     // returns the enemies it placed (stick enemies first), so a room can give one of them an item to drop
-    public static ArrayList<Ghost> addRandomGhosts(Map map, int stickCount, int weirdCount) {
+    public static ArrayList<Ghost> addRandomGhosts(Map map, int stickCount, int weirdCount, int ghostCount) {
         ArrayList<Ghost> enemies = new ArrayList<>();
         ArrayList<Point> doors = findDoors(map);
         ArrayList<Point> openTiles = findGhostSpawnTiles(map, doors, GHOST_DOOR_DISTANCE);
         // small rooms might not have enough space that far from the doors, so allow closer spots if needed
-        if (openTiles.size() < stickCount + weirdCount) {
+        if (openTiles.size() < stickCount + weirdCount + ghostCount) {
             openTiles = findGhostSpawnTiles(map, doors, GHOST_DOOR_DISTANCE - 1);
         }
         // lurking spots: open tiles against a wall, near an entrance or anywhere along the sides
@@ -94,26 +113,71 @@ public class DungeonRoomSetup {
             }
         }
 
+        // tiles already used, by index, so two enemies never start on the same tile
+        // (the lists hold separate Point objects for the same tile, and Point has no equals, so remove(tile) can't be used)
+        HashSet<Integer> taken = new HashSet<>();
         int id = FIRST_GHOST_ID;
-        for (int i = 0; i < stickCount && !openTiles.isEmpty(); i++) {
-            Point tile = openTiles.remove(random.nextInt(openTiles.size()));
-            enemies.add(placeEnemy(map, new CreepyStickEnemy(id++, new Point(0, 0)), tile));
-            entranceTiles.remove(tile);
-            sideTiles.remove(tile);
-        }
-        for (int i = 0; i < weirdCount; i++) {
-            ArrayList<Point> spots = !entranceTiles.isEmpty() && (sideTiles.isEmpty() || random.nextBoolean()) ? entranceTiles : sideTiles;
-            if (spots.isEmpty()) {
-                spots = openTiles; // no walls to lurk against, so anywhere will do
-            }
-            if (spots.isEmpty()) {
+        for (int i = 0; i < stickCount; i++) {
+            Point tile = takeRandom(openTiles, taken, map);
+            if (tile == null) {
                 break;
             }
-            Point tile = spots.remove(random.nextInt(spots.size()));
+            enemies.add(placeEnemy(map, new CreepyStickEnemy(id++, new Point(0, 0)), tile));
+        }
+        for (int i = 0; i < weirdCount; i++) {
+            boolean preferEntrance = random.nextBoolean();
+            Point tile = takeRandom(preferEntrance ? entranceTiles : sideTiles, taken, map);
+            if (tile == null) {
+                tile = takeRandom(preferEntrance ? sideTiles : entranceTiles, taken, map);
+            }
+            if (tile == null) {
+                tile = takeRandom(openTiles, taken, map); // no walls to lurk against, so anywhere will do
+            }
+            if (tile == null) {
+                break;
+            }
             enemies.add(placeEnemy(map, new WeirdEnemy(id++, new Point(0, 0)), tile));
-            openTiles.remove(tile);
+        }
+        for (int i = 0; i < ghostCount; i++) {
+            Point tile = takeRandom(openTiles, taken, map);
+            if (tile == null) {
+                break;
+            }
+            enemies.add(placeEnemy(map, new Ghost(id++, new Point(0, 0)), tile));
         }
         return enemies;
+    }
+
+    // hides a CosmicCreeper's stain on a random open tile away from the doors
+    public static CosmicCreeper addCreeperTrap(Map map) {
+        ArrayList<Point> doors = findDoors(map);
+        HashSet<Integer> taken = new HashSet<>();
+        // keep the stain off tiles an enemy already starts on
+        for (NPC npc : map.getNPCs()) {
+            Point tile = map.getTileIndexByPosition(npc.getBounds().getX() + npc.getBounds().getWidth() / 2f, npc.getBounds().getY() + npc.getBounds().getHeight() / 2f);
+            taken.add((int) tile.y * map.getWidth() + (int) tile.x);
+        }
+        Point tile = takeRandom(findGhostSpawnTiles(map, doors, GHOST_DOOR_DISTANCE - 1), taken, map);
+        if (tile == null) {
+            return null;
+        }
+        return (CosmicCreeper) placeEnemy(map, new CosmicCreeper(FIRST_CREEPER_ID, new Point(0, 0)), tile);
+    }
+
+    // a random tile from the list that hasn't been taken yet, marked as taken; null if there are none left
+    private static Point takeRandom(ArrayList<Point> tiles, HashSet<Integer> taken, Map map) {
+        ArrayList<Point> free = new ArrayList<>();
+        for (Point tile : tiles) {
+            if (!taken.contains((int) tile.y * map.getWidth() + (int) tile.x)) {
+                free.add(tile);
+            }
+        }
+        if (free.isEmpty()) {
+            return null;
+        }
+        Point tile = free.get(random.nextInt(free.size()));
+        taken.add((int) tile.y * map.getWidth() + (int) tile.x);
+        return tile;
     }
 
     // centres the enemy's collision bounds on the tile and adds it to the map

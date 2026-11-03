@@ -24,9 +24,9 @@ import java.util.HashMap;
 // it keeps its distance and throws fire skulls, blasts the player with its staff up close,
 // and once it's badly hurt it summons WeirdEnemies to help
 // beating it wins the level, being killed by it plays the slasher jumpscare
-// has 8 health (hearts)
+// has 10 health (hearts)
 public class NecromancerBoss extends Ghost {
-    public static final int BOSS_HEALTH = 8;
+    public static final int BOSS_HEALTH = 10;
     public static final int BOSS_XP_REWARD = 100;
 
     // NecromancerBoss.png rows: 0 idle (8), 1 walk (8), 2 staff blast (13), 3 summon (13), 4 fire skull cast (17), 5 hurt (5), 6 death (9)
@@ -77,7 +77,8 @@ public class NecromancerBoss extends Ghost {
     public NecromancerBoss(int id, Point location) {
         super(id, location, new SpriteSheet(ImageLoader.loadWithAlpha("NecromancerBoss.png"), FRAME_WIDTH, FRAME_HEIGHT), BOSS_HEALTH);
         speed = 0.9f;
-        followDistance = 130f; // a caster, it doesn't walk right up to the player
+        // walks in until the player is inside its staff's reach (attackRange), throws fire skulls from further away
+        followDistance = 100f;
         detectionRadius = 700f; // the whole room
         xpReward = BOSS_XP_REWARD;
         knockbackSpeed = 1f;
@@ -269,22 +270,6 @@ public class NecromancerBoss extends Ghost {
             g.setColor(new Color(255, 200, 170));
             g.fillOval(x - 4, y - 5, 8, 8);
         }
-    }
-
-    private float centerX() {
-        return getBounds().getX() + getBounds().getWidth() / 2f;
-    }
-
-    private float centerY() {
-        return getBounds().getY() + getBounds().getHeight() / 2f;
-    }
-
-    private static float centerX(Player player) {
-        return player.getBounds().getX() + player.getBounds().getWidth() / 2f;
-    }
-
-    private static float centerY(Player player) {
-        return player.getBounds().getY() + player.getBounds().getHeight() / 2f;
     }
 
     @Override

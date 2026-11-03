@@ -4,7 +4,6 @@ import Level.EnhancedMapTile;
 import Level.Map;
 import Puzzles.PuzzleDifficulty;
 import Puzzles.PuzzleId;
-import static Puzzles.PuzzleManager.getCompletedCount;
 import Scripts.DoorScript;
 import Tilesets.DungeonCellTileset;
 import Utils.Direction;
@@ -17,7 +16,7 @@ public class DungeonCellMap extends Map {
         this.playerStartPosition = getMapTile(6, 4).getLocation();
 
         // ghosts start somewhere random each playthrough
-        DungeonRoomSetup.addRandomGhosts(this, 0, 1);
+        DungeonRoomSetup.addRandomGhosts(this, 0, 1, 1);
     }
 
     @Override
@@ -40,14 +39,7 @@ public class DungeonCellMap extends Map {
     @Override
     public void loadScripts() {
         // door on the top wall back to the hallway
-        getMapTile(2, 2).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 7, 4, Direction.LEFT));
-
-        System.out.println(getCompletedCount());
-        getMapTile(13, 4).setInteractScript(new DoorScript(
-            () -> getCompletedCount() >= 5
-                    ? new DungeonHallwaySecretDoorRevealedMap()
-                    : new DungeonHallwayMap(),
-            4, 7, Direction.UP   // <-- replace with the spawn tile + facing you want in the hallway
-        ));
+        getMapTile(2, 2).setInteractScript(new DoorScript(DungeonRoomSetup::hallway, 7, 4, Direction.LEFT));
+
     }
 }

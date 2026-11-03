@@ -87,13 +87,7 @@ public class WeirdEnemy extends Ghost {
             super.idle(player);
             return;
         }
-        currentAnimationName = dx < 0 ? "WALK_LEFT" : "WALK_RIGHT";
-        if (Math.abs(dx) > speed) {
-            moveXHandleCollision(Math.signum(dx) * speed);
-        }
-        if (Math.abs(dy) > speed) {
-            moveYHandleCollision(Math.signum(dy) * speed);
-        }
+        travelTo(homeX + getBounds().getWidth() / 2f, homeY + getBounds().getHeight() / 2f);
     }
 
     private float distanceFromHome() {

@@ -15,7 +15,9 @@ public class DungeonHallwayMap extends Map {
         this.playerStartPosition = getMapTile(6, 7).getLocation();
 
         // ghosts start somewhere random each playthrough
-        DungeonRoomSetup.addRandomGhosts(this, 0, 1);
+        DungeonRoomSetup.addRandomGhosts(this, 0, 1, 1);
+        // a stain on the floor that something rises out of
+        DungeonRoomSetup.addCreeperTrap(this);
     }
 
     @Override

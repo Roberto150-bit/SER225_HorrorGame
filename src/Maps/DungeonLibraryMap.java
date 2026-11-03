@@ -5,7 +5,6 @@ import Level.EnhancedMapTile;
 import Level.Map;
 import Puzzles.PuzzleDifficulty;
 import Puzzles.PuzzleId;
-import static Puzzles.PuzzleManager.getCompletedCount;
 import Scripts.DoorScript;
 import Tilesets.DungeonLibraryTileset;
 import Utils.Direction;
@@ -20,7 +19,9 @@ public class DungeonLibraryMap extends Map {
 
         // ghosts start somewhere random each playthrough
         // the big ghost guards the bloody eye relic and drops it when banished
-        DungeonRoomSetup.addRandomGhosts(this, 1, 0).get(0).setDrop(Relic.BloodyEye::new);
+        DungeonRoomSetup.addRandomGhosts(this, 1, 0, 1).get(0).setDrop(Relic.BloodyEye::new);
+        // a stain on the floor that something rises out of
+        DungeonRoomSetup.addCreeperTrap(this);
     }
 
     @Override
@@ -43,14 +44,7 @@ public class DungeonLibraryMap extends Map {
     @Override
     public void loadScripts() {
         // door on the bottom wall back to the hallway
-        getMapTile(3, 10).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 4, 6, Direction.RIGHT));
-
-        System.out.println(getCompletedCount());
-        getMapTile(13, 4).setInteractScript(new DoorScript(
-            () -> getCompletedCount() >= 5
-                    ? new DungeonHallwaySecretDoorRevealedMap()
-                    : new DungeonHallwayMap(),
-            4, 7, Direction.UP   // <-- replace with the spawn tile + facing you want in the hallway
-        ));
+        getMapTile(3, 10).setInteractScript(new DoorScript(DungeonRoomSetup::hallway, 4, 6, Direction.RIGHT));
+
     }
 }

@@ -5,7 +5,6 @@ import Level.EnhancedMapTile;
 import Level.Map;
 import Puzzles.PuzzleDifficulty;
 import Puzzles.PuzzleId;
-import static Puzzles.PuzzleManager.getCompletedCount;
 import Scripts.DoorScript;
 import Tilesets.DungeonBasicRoomTileset;
 import Utils.Direction;
@@ -19,7 +18,7 @@ public class DungeonBasicRoomMap extends Map {
 
         // ghosts start somewhere random each playthrough
         // the big ghost guards the ear relic and drops it when banished
-        DungeonRoomSetup.addRandomGhosts(this, 1, 1).get(0).setDrop(Relic.Ear::new);
+        DungeonRoomSetup.addRandomGhosts(this, 1, 1, 1).get(0).setDrop(Relic.Ear::new);
     }
 
     @Override
@@ -42,14 +41,7 @@ public class DungeonBasicRoomMap extends Map {
     @Override
     public void loadScripts() {
         // door on the bottom wall back to the hallway
-        getMapTile(3, 8).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 4, 7, Direction.UP));
-
-        System.out.println(getCompletedCount());
-        getMapTile(13, 4).setInteractScript(new DoorScript(
-            () -> getCompletedCount() >= 5
-                    ? new DungeonHallwaySecretDoorRevealedMap()
-                    : new DungeonHallwayMap(),
-            4, 7, Direction.UP   // <-- replace with the spawn tile + facing you want in the hallway
-        ));
+        getMapTile(3, 8).setInteractScript(new DoorScript(DungeonRoomSetup::hallway, 4, 7, Direction.UP));
+
     }
 }
