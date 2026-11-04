@@ -225,7 +225,6 @@ public class PuzzleUI {
                     mouseY >= y - margin &&
                     mouseY <= y + height + margin;                
                     if (insidePuzzle) {
-                        System.out.println("raw mouse: " + mouseX + ", " + mouseY);
                         controller.onClick(mouseX, mouseY);
                     }
             }
