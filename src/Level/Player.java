@@ -1,16 +1,8 @@
 package Level;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
 import Engine.GraphicsHandler;
 import Engine.Key;
+import Engine.KeyBindings;
 import Engine.KeyLocker;
 import Engine.Keyboard;
 import GameObject.GameObject;
@@ -18,7 +10,6 @@ import GameObject.Rectangle;
 import GameObject.SpriteSheet;
 import Utils.Direction;
 import Utils.Point;
-import Engine.KeyBindings;
 
 public abstract class Player extends GameObject {
     // values that affect player movement
@@ -62,7 +53,7 @@ public abstract class Player extends GameObject {
     private boolean hasCollectible = false;
 
     // Health System
-    public static final int MAX_HEALTH = 3;
+    public static final int MAX_HEALTH = 7;
     protected static int maxHealth = MAX_HEALTH;
     protected static int health = maxHealth;
     protected static final int HURT_FRAMES = 30; // length of the damage animation

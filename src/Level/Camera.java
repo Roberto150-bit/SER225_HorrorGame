@@ -25,7 +25,7 @@ public class Camera extends Rectangle {
     private int leftoverSpaceX, leftoverSpaceY;
 
     // Current zoom level. 1.0 = normal, 2.0 = zoomed in 2x, 0.5 = zoomed out 2x
-    private float zoom = 1.0f; // -------------------------------------------------------------------------------------
+    private float zoom = 1.0f; 
 
     // current map entities that are to be included in this frame's update/draw cycle
     private ArrayList<EnhancedMapTile> activeEnhancedMapTiles = new ArrayList<>();

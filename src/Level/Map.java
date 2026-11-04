@@ -5,12 +5,12 @@ import Engine.GraphicsHandler;
 import Engine.HotbarUI;
 import Engine.ItemUse;
 import Engine.PuzzleUI;
-import Engine.UI; // ----------------------------------------------------------------------------------
+import Engine.UI; 
 import GameObject.Book;
 import GameObject.DefensiveItemEffect;
 import GameObject.KnifeSlash;
-import GameObject.ThrownItem;
 import GameObject.Rectangle;
+import GameObject.ThrownItem;
 import Utils.Direction;
 import Utils.Point; 
 import java.io.File;
@@ -18,7 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner; // ----------------------------------------------------------------------------------
+import java.util.Scanner; 
 
 /*
     This class is for defining a map that is used for a specific level
@@ -89,9 +89,9 @@ public abstract class Map {
     protected DefensiveItemEffect defensiveItemEffect = new DefensiveItemEffect();
 
     // Book's instance
-    protected Book book; // ----------------------------------------------------------------------------------
+    protected Book book; 
 
-    protected UI ui; // ----------------------------------------------------------------------------------
+    protected UI ui;
 
     // reference to current player
     protected Player player;
