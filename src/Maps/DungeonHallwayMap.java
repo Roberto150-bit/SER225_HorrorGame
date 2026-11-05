@@ -30,7 +30,6 @@ public class DungeonHallwayMap extends Map {
         return enhancedMapTiles;
     }
 
-
     @Override
     public void loadScripts() {
         // stairs on the top wall up to the basement

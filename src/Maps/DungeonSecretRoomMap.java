@@ -4,10 +4,12 @@ import Enemies.NecromancerBoss;
 import Level.EnhancedMapTile;
 import Level.Map;
 import Level.MapTile;
-import Utils.Point;
+import Level.Trigger;
 import Scripts.DoorScript;
+import Scripts.DungeonMap.BossEnterScript;
 import Tilesets.DungeonSecretRoomTileset;
 import Utils.Direction;
+import Utils.Point;
 import java.util.ArrayList;
 
 public class DungeonSecretRoomMap extends Map {
@@ -30,6 +32,13 @@ public class DungeonSecretRoomMap extends Map {
         addNPC(boss);
     }
 
+    public ArrayList<Trigger> loadTriggers() {
+        ArrayList<Trigger> triggers = new ArrayList<>();
+        Trigger bossTrigger = new Trigger(300, 600, 100, 100, new BossEnterScript(), "HasEnteredRoom");
+        bossTrigger.setExistenceFlag("HasEnteredRoom");
+        triggers.add(bossTrigger);
+        return triggers;
+    }
     @Override
     public ArrayList<EnhancedMapTile> loadEnhancedMapTiles() {
         ArrayList<EnhancedMapTile> enhancedMapTiles = new ArrayList<>();

@@ -17,7 +17,7 @@ import Lighting.DarknessManager;
 import Maps.BasementMap;
 import Players.DeanPlayer;
 import Puzzles.PuzzleManager;
-import Scripts.ValeIntroScript;
+import Scripts.DungeonMap.ValeIntroScript;
 import Utils.Direction;
 import Utils.Point;
 import java.awt.Color;
@@ -95,10 +95,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // setup state
         flagManager = new FlagManager();
         flagManager.addFlag("hasLostBall", false);
-        flagManager.addFlag("hasTalkedToWalrus", false);
-        flagManager.addFlag("hasTalkedToDinosaur", false);
-        flagManager.addFlag("hasFoundBall", false);
-
+        flagManager.addFlag("HasEnteredRoom", false);
         // define/setup map -------------------------------------------------------------------------------
         //map = new TestMap();
 

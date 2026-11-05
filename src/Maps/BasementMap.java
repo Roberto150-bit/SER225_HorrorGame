@@ -64,7 +64,7 @@ public class BasementMap extends Map {
         getMapTile(13, 4).setInteractScript(new DoorScript(
             () -> getCompletedCount() >= 5
                     ? new DungeonHallwaySecretDoorRevealedMap()
-                    : new DungeonHallwayMap(),
+                    : new DungeonHallwayMap(),//DungeonHallwayMap
             1, 2, Direction.RIGHT)
                 .lockedUntilSolved(DungeonRoomSetup.BASEMENT_PUZZLE,
                         "The stairs are sealed.\nSolve the puzzle in the basement first."));

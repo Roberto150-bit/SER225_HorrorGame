@@ -111,7 +111,7 @@ public class Textbox {
             int fontY = !map.getCamera().isAtBottomOfMap() ? fontBottomY : fontTopY;
   
             // create text spritefont that will be drawn in textbox
-            text = new SpriteFont(currentTextItem.getText(), fontX, fontY, "Arial", 30, Color.white);
+            text = new SpriteFont(currentTextItem.getText(), fontX, fontY, "Times New Roman", 30, Color.white);
 
             // if there are options associated with this text item, prepare option spritefont text to be drawn in options textbox
             if (currentTextItem.getOptions() != null) {
