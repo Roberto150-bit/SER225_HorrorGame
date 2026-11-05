@@ -80,6 +80,12 @@ public class CosmicCreeper extends Ghost {
         return false;
     }
 
+    // only a target while it's out of the dark, so a thrown relic isn't used up on the hidden stain
+    @Override
+    public boolean isEnemy() {
+        return isVisible() && super.isEnemy();
+    }
+
     // can only be hit while it's out of the dark
     @Override
     public void hitByDefensiveItem(int damage) {

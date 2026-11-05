@@ -5,6 +5,7 @@ import Engine.Key;
 import Engine.KeyBindings;
 import Engine.KeyLocker;
 import Engine.Keyboard;
+import Engine.SoundPlayer;
 import GameObject.GameObject;
 import GameObject.Rectangle;
 import GameObject.SpriteSheet;
@@ -60,6 +61,8 @@ public abstract class Player extends GameObject {
     protected static final int INVINCIBLE_FRAMES = 60; // frames before the player can be hit again (1 second)
     protected int hurtTimer = 0;
     protected int invincibleTimer = 0;
+    // played when the player loses a heart (a stand-in impact until the game gets its own hurt sound)
+    public static final String HURT_SOUND = "knife_free/WEAPKnif_Knife hit, Impact, 03.wav";
 
     public Player(SpriteSheet spriteSheet, float x, float y, String startingAnimationName) {
         super(spriteSheet, x, y, startingAnimationName);
@@ -353,6 +356,7 @@ public abstract class Player extends GameObject {
         hurtTimer = HURT_FRAMES;
         invincibleTimer = INVINCIBLE_FRAMES;
         playerState = PlayerState.WALKING;
+        SoundPlayer.play(HURT_SOUND);
         return true;
     }
 
@@ -368,6 +372,12 @@ public abstract class Player extends GameObject {
 
     public boolean isInvincible() {
         return invincibleTimer > 0;
+    }
+
+    // a moment of safety right after restarting from a checkpoint, shown by the same blinking as after a hit
+    public void grantInvincibility(int frames) {
+        invincibleTimer = Math.max(invincibleTimer, frames);
+        hurtTimer = 0;
     }
 
     // direction the player is aiming, used by the knife and thrown relics

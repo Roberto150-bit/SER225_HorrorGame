@@ -28,6 +28,18 @@ public class PlayerProgress {
         }
     }
 
+    // Back to Level 1 with no XP, used when a new game starts.
+    public void reset() {
+        level = 1;
+        currentXP = 0;
+    }
+
+    // Puts the level and XP back to saved values, used when restarting from a checkpoint.
+    public void restore(int savedLevel, int savedXP) {
+        level = Math.max(1, savedLevel);
+        currentXP = Math.max(0, savedXP);
+    }
+
     // Get the player's current level.
     public int getLevel() {
         return level;

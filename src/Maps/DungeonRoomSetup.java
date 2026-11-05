@@ -164,6 +164,12 @@ public class DungeonRoomSetup {
         return (CosmicCreeper) placeEnemy(map, new CosmicCreeper(FIRST_CREEPER_ID, new Point(0, 0)), tile);
     }
 
+    // puts an enemy on a chosen tile (centred on it), for rooms that place their enemies by hand
+    public static <T extends Ghost> T addEnemyAt(Map map, T enemy, int tileX, int tileY) {
+        placeEnemy(map, enemy, new Point(tileX, tileY));
+        return enemy;
+    }
+
     // a random tile from the list that hasn't been taken yet, marked as taken; null if there are none left
     private static Point takeRandom(ArrayList<Point> tiles, HashSet<Integer> taken, Map map) {
         ArrayList<Point> free = new ArrayList<>();

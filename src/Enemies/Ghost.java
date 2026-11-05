@@ -130,9 +130,18 @@ public class Ghost extends NPC {
         return 3;
     }
 
+    // a ghost that's already being banished can't be hit again, so knives and relics pass through it
     @Override
     public boolean isEnemy() {
-        return true;
+        return !isBanished;
+    }
+
+    public boolean isBanished() {
+        return isBanished;
+    }
+
+    public int getMaxHealth() {
+        return maxHealth;
     }
 
     public int getHealth() {
@@ -171,8 +180,25 @@ public class Ghost extends NPC {
         bowDropped = false;
     }
 
+    // used when restarting from a checkpoint: if the player didn't have the bow then, the next ghost banished drops it again
+    public static void setBowDropped(boolean dropped) {
+        bowDropped = dropped;
+    }
+
     public boolean canFollowThroughDoor(Player player) {
-        return isWithinDetectionRadius(player);
+        return !staysInRoom && isWithinDetectionRadius(player);
+    }
+
+    // guards (like the great door's guardians) stay in their room instead of following the player through doors
+    private boolean staysInRoom = false;
+
+    public void setStaysInRoom(boolean staysInRoom) {
+        this.staysInRoom = staysInRoom;
+    }
+
+    // e.g. the boss room's guards notice the player from across the room once the boss wakes up
+    public void setDetectionRadius(float detectionRadius) {
+        this.detectionRadius = detectionRadius;
     }
 
 
@@ -493,6 +519,30 @@ public class Ghost extends NPC {
         }
     }
 
+    // gone without any fuss: no XP, no drop, no fading (e.g. a boss that was already beaten before a checkpoint)
+    public void removeFromRoom() {
+        health = 0;
+        isBanished = true;
+        setIsUncollidable(true);
+        setMapEntityStatus(MapEntityStatus.REMOVED);
+    }
+
+    // fades away without giving XP or dropping anything, e.g. the boss's summoned minions when the boss falls
+    public void vanish() {
+        if (isBanished) {
+            return;
+        }
+        if (isAttacking) {
+            stopAttacking();
+        }
+        health = 0;
+        isBanished = true;
+        setIsUncollidable(true);
+        banishTimer = banishFrames;
+        currentAnimationName = currentAnimationName.contains("RIGHT") ? "STAND_RIGHT" : "STAND_LEFT";
+        onBanished();
+    }
+
     // leaves the carried item (and the bow, if this is the first ghost banished) where the ghost was
     private void dropItems() {
         // items are 32x32 in the world, so center them on the ghost
@@ -554,7 +604,7 @@ public class Ghost extends NPC {
         g.setComposite(oldComposite);
 
         // hearts show once it has noticed the player or been hurt
-        if (!isBanished && (noticedPlayer || health < maxHealth)) {
+        if (!isBanished && showsHearts() && (noticedPlayer || health < maxHealth)) {
             drawHearts(graphicsHandler);
         }
     }
@@ -571,6 +621,11 @@ public class Ghost extends NPC {
             graphicsHandler.drawImage(heartImage, x + i * HEART_SPACING, y, HEART_SIZE, HEART_SIZE);
         }
         g.setComposite(oldComposite);
+    }
+
+    // false for enemies whose health is shown somewhere else (the boss's bar)
+    protected boolean showsHearts() {
+        return true;
     }
 
     // where the hearts go relative to the top of the image, for sprites with empty space above the enemy

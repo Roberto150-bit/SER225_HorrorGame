@@ -90,12 +90,20 @@ public class CodeLockMinigame implements PuzzleMinigame {
             graphicsHandler.drawString(KEYS[i], getKeyX(i) + (KEY_WIDTH - keyTextWidth) / 2, getKeyY(i) + 27, keyFont, LIGHT);
         }
 
+        // the "?" plaque, like the illustrated one on the other puzzles' panels
+        int plaqueX = 162;
+        int plaqueY = 378;
+        graphicsHandler.drawFilledRectangleWithBorder(plaqueX, plaqueY, 62, 56, INNER, GOLD, 2);
+        Font plaqueFont = new Font("Serif", Font.BOLD, 34);
+        int questionWidth = graphicsHandler.getGraphics().getFontMetrics(plaqueFont).stringWidth("?");
+        graphicsHandler.drawString("?", plaqueX + (62 - questionWidth) / 2, plaqueY + 41, plaqueFont, LIGHT);
+
         if (wrongTimer > 0) {
             drawCentered(graphicsHandler, "The seal rejects you.", 430, new Font("Serif", Font.ITALIC, 16), WRONG);
         }
 
         if (hintVisible) {
-            drawCentered(graphicsHandler, getHintMessage(), 450, new Font("Serif", Font.ITALIC, 14), LIGHT);
+            drawCentered(graphicsHandler, getHintMessage(), 444, new Font("Serif", Font.ITALIC, 14), LIGHT);
         }
     }
 

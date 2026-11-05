@@ -35,6 +35,21 @@ public class SealCode {
         return code.charAt(index);
     }
 
+    // which digits have been found, saved by checkpoints (the code itself stays the same for the whole game)
+    public static boolean[] snapshotFound() {
+        return found.clone();
+    }
+
+    public static void restoreFound(boolean[] savedFound) {
+        for (int i = 0; i < LENGTH; i++) {
+            found[i] = savedFound[i];
+        }
+    }
+
+    public static boolean isFound(int index) {
+        return found[index];
+    }
+
     public static void markFound(int index) {
         found[index] = true;
     }

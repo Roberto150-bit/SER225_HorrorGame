@@ -32,6 +32,13 @@ public class FlagManager {
         }
     }
 
+    // an independent copy of every flag, used by checkpoints
+    public FlagManager copy() {
+        FlagManager copy = new FlagManager();
+        copy.flags.putAll(flags);
+        return copy;
+    }
+
     public boolean isFlagSet(String flagName) {
         if (flags.containsKey(flagName)) {
             return flags.get(flagName);

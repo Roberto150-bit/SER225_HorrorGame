@@ -21,6 +21,16 @@ public class PlayerProgressManager {
         }
     }
 
+    // Starts a new game at Level 1 with no XP.
+    public static void reset() {
+        progress.reset();
+    }
+
+    // Puts the level and XP back to what they were at a checkpoint.
+    public static void restore(int level, int currentXP) {
+        progress.restore(level, currentXP);
+    }
+
     // Returns the player's current level.
     public static int getLevel() {
         return progress.getLevel();
