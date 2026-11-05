@@ -15,6 +15,7 @@ import Game.ScreenCoordinator;
 import Level.*;
 import Lighting.DarknessManager;
 import Maps.BasementMap;
+import Maps.DungeonSecretRoomMap;
 import Players.DeanPlayer;
 import Puzzles.PuzzleManager;
 import Scripts.ValeIntroScript;
@@ -27,7 +28,9 @@ import java.util.HashSet;
 
 // This class is for when the RPG game is actually being played
 public class PlayLevelScreen extends Screen implements GameListener {
+    private static final String GAMEPLAY_MUSIC = "Resources/Audios/Music/FirstBackgroundMusic.wav";
     private static final String GHOST_CHASE_MUSIC = "Resources/Audios/Music/Whisper of the Abyss.wav";
+    private static final String BOSS_AREA_MUSIC = "Resources/Audios/bossMusic.wav";
 
     protected ScreenCoordinator screenCoordinator;
     protected Map map;
@@ -61,7 +64,6 @@ public class PlayLevelScreen extends Screen implements GameListener {
     // last spot the player stood that wasn't inside a wall, used to rescue them if something pushes them into one
     private float lastSafePlayerX, lastSafePlayerY;
     private boolean ghostChaseMusicPlaying;
-    private String musicBeforeGhostChase;
 
     // Stores the information needed for a delayed ghost arrival.
     private static class GhostArrival {
@@ -111,7 +113,7 @@ public class PlayLevelScreen extends Screen implements GameListener {
         Player.setHealth(Player.MAX_HEALTH);
 
         map = new BasementMap();
-        MusicManager.play("Resources/Audios/Music/FirstBackgroundMusic.wav", 1.6f, true);
+        MusicManager.play(GAMEPLAY_MUSIC, 1.6f, true);
 
         loadedRooms.clear();
         preloadedRooms.clear();
@@ -248,14 +250,8 @@ public class PlayLevelScreen extends Screen implements GameListener {
         // Restore gameplay music after returning from the main menu.
         if (ghostChaseMusicPlaying) {
             MusicManager.play(GHOST_CHASE_MUSIC, 0.6f, true);
-        } else if (musicBeforeGhostChase != null) {
-            MusicManager.play(musicBeforeGhostChase, 1.6f, true);
         } else {
-            MusicManager.play(
-                "Resources/Audios/Music/FirstBackgroundMusic.wav",
-                0.6f,
-                true
-            );
+            MusicManager.play(getRoomMusic(), 0.6f, true);
         }
 
         // puzzles use the mouse, so only hide the cursor if one isn't open
@@ -277,27 +273,19 @@ public class PlayLevelScreen extends Screen implements GameListener {
 
         String currentTrack = MusicManager.getCurrentFile();
         if (ghostNearby) {
-            if (!ghostChaseMusicPlaying) {
-                musicBeforeGhostChase = currentTrack;
-                ghostChaseMusicPlaying = true;
-            } else if (!GHOST_CHASE_MUSIC.equals(currentTrack)) {
-                musicBeforeGhostChase = currentTrack;
-            }
-
-            if (!GHOST_CHASE_MUSIC.equals(currentTrack)) {
-                MusicManager.play(GHOST_CHASE_MUSIC, 0.6f, true);
-            }
-        } else if (ghostChaseMusicPlaying) {
-            if (GHOST_CHASE_MUSIC.equals(currentTrack)) {
-                if (musicBeforeGhostChase == null) {
-                    MusicManager.stop();
-                } else {
-                    MusicManager.play(musicBeforeGhostChase, 0.6f, true);
-                }
-            }
-            musicBeforeGhostChase = null;
+            ghostChaseMusicPlaying = true;
+        } else {
             ghostChaseMusicPlaying = false;
         }
+
+        String targetTrack = ghostNearby ? GHOST_CHASE_MUSIC : getRoomMusic();
+        if (!targetTrack.equals(currentTrack)) {
+            MusicManager.play(targetTrack, 0.6f, true);
+        }
+    }
+
+    private String getRoomMusic() {
+        return map instanceof DungeonSecretRoomMap ? BOSS_AREA_MUSIC : GAMEPLAY_MUSIC;
     }
 
     @Override

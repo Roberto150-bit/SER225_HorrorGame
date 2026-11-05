@@ -21,6 +21,8 @@ import Utils.Direction;
 // a door can show a lock and stay locked until a puzzle is solved:
 //     new DoorScript(() -> new HallwayMap(), 5, 3, Direction.DOWN).lockedUntilSolved("basement_symbol_lock", "The door is sealed.")
 public class DoorScript extends Script {
+    private static final String DEFAULT_OPENING_SOUND = "openingDoor.wav";
+
     protected KeyLocker keyLocker = new KeyLocker();
     protected Supplier<Map> destinationMap;
     protected int spawnTileX, spawnTileY;
@@ -42,7 +44,7 @@ public class DoorScript extends Script {
         this.spawnTileX = spawnTileX;
         this.spawnTileY = spawnTileY;
         this.facingDirection = facingDirection;
-        this.openingSound = openingSound;
+        this.openingSound = openingSound == null ? DEFAULT_OPENING_SOUND : openingSound;
     }
 
     // keeps the door locked, showing lockedMessage, until the given puzzle has been solved
@@ -96,15 +98,13 @@ public class DoorScript extends Script {
 
     private ArrayList<ScriptAction> loadOpenDoorActions() {
         ArrayList<ScriptAction> scriptActions = new ArrayList<>();
-        if (openingSound != null) {
-            scriptActions.add(new ScriptAction() {
-                @Override
-                public ScriptState execute() {
-                    SoundPlayer.play(openingSound);
-                    return ScriptState.COMPLETED;
-                }
-            });
-        }
+        scriptActions.add(new ScriptAction() {
+            @Override
+            public ScriptState execute() {
+                SoundPlayer.play(openingSound);
+                return ScriptState.COMPLETED;
+            }
+        });
         scriptActions.add(new ChangeMapScriptAction(destinationMap, spawnTileX, spawnTileY, facingDirection));
         return scriptActions;
     }

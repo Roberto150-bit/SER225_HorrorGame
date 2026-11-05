@@ -13,6 +13,7 @@ import Engine.GraphicsHandler;
 import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
+import Engine.SoundPlayer;
 import GameObject.GameObject;
 import GameObject.Rectangle;
 import GameObject.SpriteSheet;
@@ -358,6 +359,7 @@ public abstract class Player extends GameObject {
         if (invincibleTimer > 0 || health <= 0) {
             return false;
         }
+        SoundPlayer.play("horrorHit.wav");
         health--;
         hurtTimer = HURT_FRAMES;
         invincibleTimer = INVINCIBLE_FRAMES;
@@ -370,6 +372,7 @@ public abstract class Player extends GameObject {
         if (health <= 0) {
             return;
         }
+        SoundPlayer.play("horrorHit.wav");
         health = 0;
         hurtTimer = HURT_FRAMES;
         playerState = PlayerState.WALKING;
