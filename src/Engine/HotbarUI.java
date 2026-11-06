@@ -1,15 +1,12 @@
 package Engine;
 
+import Level.Player;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
-
-import Level.Player;
 
 // the player's 6 slot inventory bar
 // the equipped weapon (lit up red) is used with SPACE or a left click, and stays equipped after each use

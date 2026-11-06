@@ -54,7 +54,7 @@ public abstract class Player extends GameObject {
     private boolean hasCollectible = false;
 
     // Health System
-    public static final int MAX_HEALTH = 3;
+    public static final int MAX_HEALTH = 7;
     protected static int maxHealth = MAX_HEALTH;
     protected static int health = maxHealth;
     protected static final int HURT_FRAMES = 30; // length of the damage animation
