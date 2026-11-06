@@ -53,7 +53,15 @@ public class DungeonSecretRoomMap extends Map {
         }
         return boss;
     }
-
+    /* 
+    public ArrayList<Trigger> loadTriggers() {
+        ArrayList<Trigger> triggers = new ArrayList<>();
+        Trigger bossTrigger = new Trigger(300, 600, 100, 100, new BossEnterScript(), "HasEnteredRoom");
+        bossTrigger.setExistenceFlag("HasEnteredRoom");
+        triggers.add(bossTrigger);
+        return triggers;
+    }
+    */
     @Override
     public ArrayList<EnhancedMapTile> loadEnhancedMapTiles() {
         ArrayList<EnhancedMapTile> enhancedMapTiles = new ArrayList<>();

@@ -1,4 +1,4 @@
-package Scripts;
+package Scripts.DungeonMap;
 
 import Level.Script;
 import ScriptActions.*;
@@ -17,9 +17,9 @@ public class ValeIntroScript extends Script {
             "MRS. VALE: Easy now, dear.\nYou took a nasty knock.",
             "DEAN: Where... where am I?",
             "MRS. VALE: Somewhere dry.\nI found you on my porch in the storm.",
-            "DEAN: My locket. Where's my locket?",
+            "DEAN: My book. Where's my book?",
             "MRS. VALE: Here you are.\nYour things are on the table.",
-            "(Dean's hand closes around the worn silver locket.\nHe exhales)",
+            "(Dean's hand closes around the worn leather book.\nHe exhales)",
             "DEAN: This is Mara's...",
             "MRS. VALE: Mara... Lovely name.\nYour wife?",
             "DEAN: Girlfriend.\nShe's waiting for me.",
