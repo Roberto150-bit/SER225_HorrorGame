@@ -12,6 +12,14 @@ public class Relic extends CollectibleObject {
         super(location, imageFile, 256, ItemUse.SINGLE_USE);
     }
 
+    // each room has one ghost carrying a relic, and where it lands depends on where that ghost is banished,
+    // so the relic is remembered by room instead of by position: once it's picked up, a fresh copy of the room
+    // (like after restarting from a checkpoint) won't drop a second one
+    @Override
+    protected void useCollectedFlag() {
+        setExistenceFlag("collected_relic_" + map.getClass().getSimpleName());
+    }
+
     public static class BloodyEye extends Relic {
         public BloodyEye(Point location) {
             super(location, "BloodyEye.gif");

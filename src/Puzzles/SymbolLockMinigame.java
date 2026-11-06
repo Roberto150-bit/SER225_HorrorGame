@@ -197,7 +197,27 @@ public class SymbolLockMinigame implements PuzzleMinigame {
         Font instructionFont = new Font("Serif", Font.PLAIN, 12);
 
         // The background PNG already contains the five dial
-        // frames. Only draw the values of active dials.
+        // frames. Rings that this difficulty doesn't use are
+        // sealed over so they don't look like a broken dial.
+        int[] allSlots = {225, 315, 400, 485, 575};
+        for (int slotX : allSlots) {
+            boolean used = false;
+            for (int i = 0; i < dialCount; i++) {
+                if (getDialCenterX(i) == slotX) {
+                    used = true;
+                }
+            }
+            if (!used) {
+                g.setColor(new Color(20, 12, 14, 215));
+                g.fillOval(slotX - DIAL_RADIUS + 2, DIAL_Y - DIAL_RADIUS + 2,
+                        DIAL_RADIUS * 2 - 4, DIAL_RADIUS * 2 - 4);
+                g.setColor(new Color(120, 90, 60));
+                g.drawLine(slotX - 10, DIAL_Y - 10, slotX + 10, DIAL_Y + 10);
+                g.drawLine(slotX - 10, DIAL_Y + 10, slotX + 10, DIAL_Y - 10);
+            }
+        }
+
+        // Only draw the values of active dials.
         for (int i = 0; i < dialCount; i++) {
 
             int centerX = getDialCenterX(i);

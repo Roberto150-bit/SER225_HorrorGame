@@ -1,11 +1,13 @@
 package Level;
 
 import Engine.GraphicsHandler;
+import Engine.ImageLoader;
 import Engine.Key;
 import Engine.KeyLocker;
 import Engine.Keyboard;
 import SpriteFont.SpriteFont;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -51,6 +53,7 @@ public class Textbox {
     private ArrayList<SpriteFont> options = null;
     private KeyLocker keyLocker = new KeyLocker();
     private Key interactKey = Key.SPACE;
+    private static BufferedImage textboxImage;
 
     private Map map;
 
@@ -108,7 +111,7 @@ public class Textbox {
             int fontY = !map.getCamera().isAtBottomOfMap() ? fontBottomY : fontTopY;
   
             // create text spritefont that will be drawn in textbox
-            text = new SpriteFont(currentTextItem.getText(), fontX, fontY, "Arial", 30, Color.black);
+            text = new SpriteFont(currentTextItem.getText(), fontX, fontY, "Arial", 30, Color.white);
 
             // if there are options associated with this text item, prepare option spritefont text to be drawn in options textbox
             if (currentTextItem.getOptions() != null) {
@@ -167,7 +170,11 @@ public class Textbox {
         // if camera is at bottom of screen, textbox is drawn at top of screen instead of the bottom like usual
         // to prevent it from covering the player
         int y = !map.getCamera().isAtBottomOfMap() ? bottomY : topY;
-        graphicsHandler.drawFilledRectangleWithBorder(x, y, width, height, Color.white, Color.black, 2);
+
+    
+        textboxImage = ImageLoader.loadWithAlpha("textboxgood.png");
+        graphicsHandler.drawImage(textboxImage, x, y, width, height);
+        //graphicsHandler.drawFilledRectangleWithBorder(x, y, width, height, Color.white, Color.black, 2);
 
         if (text != null) {
             // draw text in textbox

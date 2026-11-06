@@ -1,6 +1,7 @@
 
 package ScriptActions;
 
+import Level.GameListener;
 import Level.ScriptState;
 import Puzzles.PuzzleConfig;
 import Puzzles.PuzzleManager;
@@ -40,6 +41,11 @@ public class PuzzleScriptAction extends ScriptAction {
 
             if (firstCompletion) {
                 PlayerProgressManager.awardXP(50);
+
+                // every solved puzzle is a checkpoint
+                for (GameListener listener : map.getListeners()) {
+                    listener.onCheckpointReached();
+                }
 
                 System.out.println(
                     "Puzzle completed! +50 XP | Level: "

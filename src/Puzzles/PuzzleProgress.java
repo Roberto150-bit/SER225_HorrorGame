@@ -24,6 +24,17 @@ public class PuzzleProgress {
         completed.clear();
     }
 
+    // A copy of every completed puzzle id, saved by checkpoints.
+    public Set<String> snapshot() {
+        return new HashSet<>(completed);
+    }
+
+    // Puts the completed puzzles back to a saved set, used when restarting from a checkpoint.
+    public void restore(Set<String> savedCompleted) {
+        completed.clear();
+        completed.addAll(savedCompleted);
+    }
+
     // Returns the total number of completed puzzle instances.
     public int getCompletedCount() {
         return completed.size();

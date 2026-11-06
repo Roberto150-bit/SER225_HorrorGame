@@ -261,8 +261,9 @@ public class PuzzleUI {
         );
 
         // Only show a generic title for puzzles without
-        // their own illustrated header.
-        if (backgroundImage == null) {
+        // their own illustrated header (the final seal draws its own).
+        if (backgroundImage == null
+                && (currentPuzzle == null || currentPuzzle.getPuzzleType() != PuzzleId.CODE_LOCK)) {
             graphicsHandler.drawString(
                 "PUZZLE",
                 x + 25,

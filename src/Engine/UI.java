@@ -52,6 +52,14 @@ public class UI {
         keyLocker.lockKey(Key.RIGHT);
     }
 
+    // an independent copy of the journal (which pages were found, which one is open), used by checkpoints
+    public UI copy() {
+        UI copy = new UI();
+        System.arraycopy(storyPagesFound, 0, copy.storyPagesFound, 0, storyPagesFound.length);
+        copy.currentPage = currentPage;
+        return copy;
+    }
+
     // a story note was picked up: keep its page and turn to it
     public void addStoryPage(int page) {
         if (page >= 1 && page <= STORY_PAGE_COUNT) {
@@ -185,7 +193,7 @@ public class UI {
                                     "Remember them", 115,260, secretSolverFont, Color.black);
         }
         else if (page == CONTROLS_PAGE) {
-            graphicsHandler.drawString("Esc to pause game \nArrows / extra keys to Move \nSPACE to Continue\nE to Interact \nC to Open/Close Journal\nArrows to Turn Pages", 115,100, secretSolverFont, Color.black);
+            graphicsHandler.drawString("Esc to pause game \nArrows / extra keys to Move \nSPACE to Continue\nE to Interact \nSPACE or Click to Attack\nKeys 1 to 6 pick a weapon\nC to Open/Close Journal\nArrows to Turn Pages", 115,100, secretSolverFont, Color.black);
         }
         else if (page == 1) {
             graphicsHandler.drawString("I am sorry for the souls \n who rest here. \n \n" + //

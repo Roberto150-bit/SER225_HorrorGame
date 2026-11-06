@@ -30,6 +30,8 @@ public class OverlayMenu {
     private final String[] options;
     private final Color titleColor;
     private String hint = "";
+    // moves the whole menu down (or up) from the center of the screen, e.g. to sit under other text
+    private int offsetY = 0;
     private int selected = 0;
     private int adjustDirection = 0;
     private int lastMouseX = -1, lastMouseY = -1;
@@ -56,6 +58,10 @@ public class OverlayMenu {
 
     public void setOption(int index, String label) {
         options[index] = label;
+    }
+
+    public void setOffsetY(int offsetY) {
+        this.offsetY = offsetY;
     }
 
     public void setHint(String hint) {
@@ -130,7 +136,7 @@ public class OverlayMenu {
 
     private int getButtonsTop() {
         int panelHeight = TITLE_SPACE + options.length * (BUTTON_HEIGHT + BUTTON_GAP);
-        return (ScreenManager.getScreenHeight() - panelHeight) / 2 + TITLE_SPACE;
+        return (ScreenManager.getScreenHeight() - panelHeight) / 2 + TITLE_SPACE + offsetY;
     }
 
     private int getButtonX() {
@@ -158,7 +164,9 @@ public class OverlayMenu {
         // dim the game behind the menu
         graphicsHandler.drawFilledRectangle(0, 0, screenWidth, screenHeight, new Color(0, 0, 0, 170));
 
-        drawCentered(graphicsHandler, title, getButtonsTop() - 30, TITLE_FONT, titleColor);
+        if (!title.isEmpty()) {
+            drawCentered(graphicsHandler, title, getButtonsTop() - 30, TITLE_FONT, titleColor);
+        }
 
         for (int i = 0; i < options.length; i++) {
             boolean isSelected = i == selected;

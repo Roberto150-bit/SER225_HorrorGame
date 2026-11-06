@@ -5,12 +5,12 @@ import Engine.GraphicsHandler;
 import Engine.HotbarUI;
 import Engine.ItemUse;
 import Engine.PuzzleUI;
-import Engine.UI; // ----------------------------------------------------------------------------------
+import Engine.UI; 
 import GameObject.Book;
 import GameObject.DefensiveItemEffect;
 import GameObject.KnifeSlash;
-import GameObject.ThrownItem;
 import GameObject.Rectangle;
+import GameObject.ThrownItem;
 import Utils.Direction;
 import Utils.Point; 
 import java.io.File;
@@ -18,7 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner; // ----------------------------------------------------------------------------------
+import java.util.Scanner; 
 
 /*
     This class is for defining a map that is used for a specific level
@@ -89,9 +89,9 @@ public abstract class Map {
     protected DefensiveItemEffect defensiveItemEffect = new DefensiveItemEffect();
 
     // Book's instance
-    protected Book book; // ----------------------------------------------------------------------------------
+    protected Book book; 
 
-    protected UI ui; // ----------------------------------------------------------------------------------
+    protected UI ui;
 
     // reference to current player
     protected Player player;
@@ -394,6 +394,14 @@ public abstract class Map {
         }
     }
 
+    // gets a script added after the room was loaded (like a door that appears later) ready to run
+    public void initializeScript(Script script) {
+        script.setMap(this);
+        script.setPlayer(player);
+        script.setListeners(listeners);
+        script.initialize();
+    }
+
     public NPC getNPCById(int id) {
         for (NPC npc : npcs) {
             if (npc.getId() == id) {
@@ -680,6 +688,30 @@ public abstract class Map {
         }
     }
 
+    // how far the player's light reaches in this room; rooms with their own light source can see further
+    public float getLightRadius() {
+        return 230;
+    }
+
+    // glowing things in the room, drawn over the darkness (with the camera's zoom, like the rest of the world)
+    public void drawAboveDarkness(GraphicsHandler graphicsHandler) {
+        java.awt.Graphics2D g = graphicsHandler.getGraphics();
+        java.awt.geom.AffineTransform oldTransform = g.getTransform();
+        g.scale(camera.getZoom(), camera.getZoom());
+        for (EnhancedMapTile enhancedMapTile : getActiveEnhancedMapTiles()) {
+            enhancedMapTile.drawAboveDarkness(graphicsHandler);
+        }
+        for (NPC npc : getActiveNPCs()) {
+            npc.drawAboveDarkness(graphicsHandler);
+        }
+        g.setTransform(oldTransform);
+    }
+
+    // a line shown at the top of the screen while in this room (e.g. how many guardians are left), or null for none
+    public String getObjectiveText() {
+        return null;
+    }
+
     public void drawUI(GraphicsHandler graphicsHandler){      
         // drawn here so they show over the darkness
         for (ThrownItem thrownItem : thrownItems) {
@@ -687,8 +719,11 @@ public abstract class Map {
         }
         knifeSlash.draw(graphicsHandler, camera);
         defensiveItemEffect.draw(graphicsHandler, camera);
+        // hearts and the hotbar are hidden while a puzzle has the player's attention
+        if (!puzzleUI.isOpen()) {
+            hotbarUI.draw(graphicsHandler, Player.getHealth());
+        }
         puzzleUI.draw(graphicsHandler);
-        hotbarUI.draw(graphicsHandler, player == null ? 0 : player.getHealth());
     }
 
     

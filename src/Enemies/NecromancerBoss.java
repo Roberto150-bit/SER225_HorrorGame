@@ -8,7 +8,7 @@ import Engine.SoundPlayer;
 import GameObject.Frame;
 import GameObject.ImageEffect;
 import GameObject.SpriteSheet;
-import Level.GameListener;
+import Scripts.ChapterOneEndingScript;
 import Level.MapEntityStatus;
 import Level.MapTile;
 import Level.Player;
@@ -20,10 +20,10 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-// The first level's final boss, waiting in the secret room
+// The Necromancer, the boss of Chapter 1, waiting on the dais of its ritual chamber behind the great door
 // it keeps its distance and throws fire skulls, blasts the player with its staff up close,
 // and once it's badly hurt it summons WeirdEnemies to help
-// beating it wins the level, being killed by it plays the slasher jumpscare
+// beating it ends Chapter 1 (the story goes on), being killed by it plays the slasher jumpscare
 // has 10 health (hearts)
 public class NecromancerBoss extends Ghost {
     public static final int BOSS_HEALTH = 10;
@@ -49,6 +49,7 @@ public class NecromancerBoss extends Ghost {
     private static final int CAST_LENGTH = 17 * CAST_DELAY;
     private static final int CAST_RELEASE_FRAME = 10 * CAST_DELAY;
     private static final int CAST_COOLDOWN = 140;
+    private static final int ENRAGED_CAST_COOLDOWN = 85;
     private static final float FIREBALL_SPEED = 3.2f;
     private static final int FIREBALL_LIFE = 240;
     private static final float FIREBALL_HIT_RANGE = 26f;
@@ -64,6 +65,21 @@ public class NecromancerBoss extends Ghost {
     private int summonCooldown = 0;
     private int nextMinionId = FIRST_MINION_ID;
     private final ArrayList<WeirdEnemy> minions = new ArrayList<>();
+
+    // it waits on its dais until the player steps past awakenLineY (or attacks it), then the encounter begins
+    private boolean awake = false;
+    private float awakenLineY = Float.MAX_VALUE;
+    private static final float AWAKEN_DISTANCE = 230f;
+    // the intro is played in full the first time, and cut short when the player comes back after dying
+    private static boolean introSeenThisGame = false;
+    // the servants that stand with it; they notice the player from anywhere in the room once it wakes
+    private final ArrayList<Ghost> guards = new ArrayList<>();
+
+    // below half health it's enraged: it moves faster, throws fire skulls more often, and burns with a red aura
+    private static final int ENRAGE_HEALTH = BOSS_HEALTH / 2;
+    private static final float ENRAGED_SPEED = 1.25f;
+    private boolean enraged = false;
+    private int auraTimer = 0;
 
     private enum Cast { NONE, FIRE_SKULL, SUMMON }
     private Cast cast = Cast.NONE;
@@ -97,15 +113,80 @@ public class NecromancerBoss extends Ghost {
         return false;
     }
 
+    // the y position (in the room) the player has to cross to wake it, e.g. the edge of the ritual rug
+    public void setAwakenLineY(float awakenLineY) {
+        this.awakenLineY = awakenLineY;
+    }
+
+    public void addGuard(Ghost guard) {
+        guards.add(guard);
+    }
+
+    public boolean isAwake() {
+        return awake;
+    }
+
+    public boolean isEnraged() {
+        return enraged;
+    }
+
+    // called when a new game starts, so the full intro plays again
+    public static void resetIntro() {
+        introSeenThisGame = false;
+    }
+
+    private void awaken() {
+        if (awake) {
+            return;
+        }
+        awake = true;
+        // a moment after the intro before the first fire skull
+        fireballCooldown = 100;
+        for (Ghost guard : guards) {
+            guard.setDetectionRadius(detectionRadius);
+        }
+        map.setActiveScript(new Scripts.BossIntroScript(!introSeenThisGame));
+        introSeenThisGame = true;
+    }
+
+    // attacking it while it waits wakes it up too
+    @Override
+    public void hitByDefensiveItem(int damage) {
+        awaken();
+        super.hitByDefensiveItem(damage);
+    }
+
     @Override
     public void performAction(Player player) {
+        auraTimer++;
+        if (!awake) {
+            // waiting on the dais, facing whoever comes in
+            currentAnimationName = centerX(player) < centerX() ? "STAND_LEFT" : "STAND_RIGHT";
+            float dx = centerX(player) - centerX();
+            float dy = centerY(player) - centerY();
+            boolean close = dx * dx + dy * dy <= AWAKEN_DISTANCE * AWAKEN_DISTANCE;
+            if (!player.isDead() && (centerY(player) < awakenLineY || close)) {
+                awaken();
+            }
+            return;
+        }
+
         updateFireballs(player);
 
-        if (fireballCooldown > 0) {
-            fireballCooldown--;
+        boolean waiting = player.isLocked() || map.getTextbox().isActive();
+        if (!waiting) {
+            if (fireballCooldown > 0) {
+                fireballCooldown--;
+            }
+            if (summonCooldown > 0) {
+                summonCooldown--;
+            }
         }
-        if (summonCooldown > 0) {
-            summonCooldown--;
+
+        if (!enraged && health > 0 && health <= ENRAGE_HEALTH) {
+            enraged = true;
+            speed = ENRAGED_SPEED;
+            SoundPlayer.play("slasherScream.wav");
         }
 
         if (cast != Cast.NONE) {
@@ -147,7 +228,7 @@ public class NecromancerBoss extends Ghost {
             }
             if (castTimer >= CAST_LENGTH) {
                 endCast();
-                fireballCooldown = CAST_COOLDOWN;
+                fireballCooldown = enraged ? ENRAGED_CAST_COOLDOWN : CAST_COOLDOWN;
             }
         } else if (cast == Cast.SUMMON) {
             if (castTimer >= SUMMON_LENGTH) {
@@ -239,14 +320,36 @@ public class NecromancerBoss extends Ghost {
         cast = Cast.NONE;
         fireballs.clear();
         currentAnimationName = currentAnimationName.contains("RIGHT") ? "DEATH_RIGHT" : "DEATH_LEFT";
+        // the encounter is over: whatever it summoned fades with it (no XP for those)
+        for (WeirdEnemy minion : minions) {
+            minion.vanish();
+        }
+        minions.clear();
+        // its servants fall with it
+        for (Ghost guard : guards) {
+            guard.vanish();
+        }
     }
 
-    // beating the boss wins the level
+    // the player already beat it this playthrough (coming back to its room, or restarting from a checkpoint after)
+    public void setAlreadyDefeated() {
+        awake = true;
+        removeFromRoom();
+        for (Ghost guard : guards) {
+            guard.removeFromRoom();
+        }
+    }
+
+    // once it has crumbled, the Chapter 1 ending plays (its last line ends the level)
+    // this only happens once: the boss is removed from the map right after
     @Override
     protected void onBanishFinished() {
-        for (GameListener listener : map.getListeners()) {
-            listener.onWin();
-        }
+        map.setActiveScript(new ChapterOneEndingScript());
+    }
+
+    // true once its health has hit 0 (while it crumbles and after)
+    public boolean isDefeated() {
+        return getHealth() <= 0;
     }
 
     @Override
@@ -254,11 +357,28 @@ public class NecromancerBoss extends Ghost {
         return 120;
     }
 
+    // its own health bar is shown across the top of the screen, so no hearts over its head
     @Override
-    public void draw(GraphicsHandler graphicsHandler) {
-        super.draw(graphicsHandler);
-        // fire skulls: a dark red glow around a hot core
+    protected boolean showsHearts() {
+        return false;
+    }
+
+    // fire skulls and the enraged aura glow through the darkness
+    @Override
+    public void drawAboveDarkness(GraphicsHandler graphicsHandler) {
         Graphics2D g = graphicsHandler.getGraphics();
+        float auraX = getCalibratedBounds().getX() + getBounds().getWidth() / 2f;
+        float auraY = getCalibratedBounds().getY() - 70;
+        if (!awake) {
+            // two embers for eyes in the dark
+            float flicker = 0.6f + 0.2f * (float) Math.sin(auraTimer / 15.0);
+            EnhancedMapTiles.RitualFire.glow(g, auraX - 6, auraY - 30, 10, new Color(255, 40, 30), flicker);
+            EnhancedMapTiles.RitualFire.glow(g, auraX + 6, auraY - 30, 10, new Color(255, 40, 30), flicker);
+        } else if (enraged && !isDefeated()) {
+            float pulse = 0.45f + 0.2f * (float) Math.sin(auraTimer / 6.0);
+            EnhancedMapTiles.RitualFire.glow(g, auraX, auraY, 120, new Color(200, 0, 10), pulse);
+        }
+        // fire skulls: a dark red glow around a hot core
         for (Fireball fireball : fireballs) {
             int x = Math.round(fireball.x - map.getCamera().getX());
             int y = Math.round(fireball.y - map.getCamera().getY());

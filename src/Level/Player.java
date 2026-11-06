@@ -1,16 +1,8 @@
 package Level;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
-
 import Engine.GraphicsHandler;
 import Engine.Key;
+import Engine.KeyBindings;
 import Engine.KeyLocker;
 import Engine.Keyboard;
 import Engine.SoundPlayer;
@@ -19,7 +11,6 @@ import GameObject.Rectangle;
 import GameObject.SpriteSheet;
 import Utils.Direction;
 import Utils.Point;
-import Engine.KeyBindings;
 
 public abstract class Player extends GameObject {
     // values that affect player movement
@@ -63,13 +54,15 @@ public abstract class Player extends GameObject {
     private boolean hasCollectible = false;
 
     // Health System
-    public static final int MAX_HEALTH = 3;
+    public static final int MAX_HEALTH = 7;
     protected static int maxHealth = MAX_HEALTH;
     protected static int health = maxHealth;
     protected static final int HURT_FRAMES = 30; // length of the damage animation
     protected static final int INVINCIBLE_FRAMES = 60; // frames before the player can be hit again (1 second)
     protected int hurtTimer = 0;
     protected int invincibleTimer = 0;
+    // played when the player loses a heart (a stand-in impact until the game gets its own hurt sound)
+    public static final String HURT_SOUND = "knife_free/WEAPKnif_Knife hit, Impact, 03.wav";
 
     public Player(SpriteSheet spriteSheet, float x, float y, String startingAnimationName) {
         super(spriteSheet, x, y, startingAnimationName);
@@ -364,6 +357,7 @@ public abstract class Player extends GameObject {
         hurtTimer = HURT_FRAMES;
         invincibleTimer = INVINCIBLE_FRAMES;
         playerState = PlayerState.WALKING;
+        SoundPlayer.play(HURT_SOUND);
         return true;
     }
 
@@ -380,6 +374,12 @@ public abstract class Player extends GameObject {
 
     public boolean isInvincible() {
         return invincibleTimer > 0;
+    }
+
+    // a moment of safety right after restarting from a checkpoint, shown by the same blinking as after a hit
+    public void grantInvincibility(int frames) {
+        invincibleTimer = Math.max(invincibleTimer, frames);
+        hurtTimer = 0;
     }
 
     // direction the player is aiming, used by the knife and thrown relics
