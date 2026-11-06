@@ -27,6 +27,17 @@ public class PuzzleManager {
         SealCode.reset();
     }
 
+    // A copy of which puzzles are solved, saved by checkpoints.
+    public static java.util.Set<String> snapshot() {
+        return progress.snapshot();
+    }
+
+    // Puts the solved puzzles back the way they were at a checkpoint.
+    // A puzzle solved after the checkpoint can be solved again, but one solved before it can't give XP twice.
+    public static void restore(java.util.Set<String> savedCompleted) {
+        progress.restore(savedCompleted);
+    }
+
     // Returns the total number of unique puzzles completed.
     public static int getCompletedCount() {
         return progress.getCompletedCount();

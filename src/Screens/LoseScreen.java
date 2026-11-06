@@ -1,20 +1,20 @@
 package Screens;
 
 import Engine.*;
-import Level.Player;
 
 import java.awt.*;
 
 // This class is for the lose (death) screen
-// shows a menu where the player can click to try again, go back to the main menu, or quit
+// shows a menu where the player can restart from their last checkpoint, start Chapter 1 over, go back to the main menu, or quit
 public class LoseScreen extends Screen {
-    private static final int TRY_AGAIN = 0;
-    private static final int MAIN_MENU = 1;
-    private static final int QUIT = 2;
+    private static final int RESTART_FROM_CHECKPOINT = 0;
+    private static final int RESTART_CHAPTER = 1;
+    private static final int MAIN_MENU = 2;
+    private static final int QUIT = 3;
 
     protected PlayLevelScreen playLevelScreen;
     protected OverlayMenu menu = new OverlayMenu("You Died!", new Color(200, 30, 30),
-            "Try Again", "Main Menu", "Quit Game");
+            "Restart from Checkpoint", "Restart Chapter", "Main Menu", "Quit Game");
     protected KeyLocker keyLocker = new KeyLocker();
 
     public LoseScreen(PlayLevelScreen playLevelScreen) {
@@ -45,9 +45,12 @@ public class LoseScreen extends Screen {
         }
 
         switch (menu.update()) {
-            case TRY_AGAIN:
+            case RESTART_FROM_CHECKPOINT:
                 Mouse.hideCursor();
-                Player.setHealth(Player.MAX_HEALTH);
+                playLevelScreen.restartFromCheckpoint();
+                break;
+            case RESTART_CHAPTER:
+                Mouse.hideCursor();
                 playLevelScreen.resetLevel();
                 break;
             case MAIN_MENU:

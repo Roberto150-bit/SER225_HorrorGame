@@ -5,7 +5,6 @@ import Level.*;
 import NPCs.MsValeNPC;
 import Puzzles.PuzzleDifficulty;
 import Puzzles.PuzzleId;
-import static Puzzles.PuzzleManager.getCompletedCount;
 import Scripts.DoorScript;
 import Tilesets.BasementTileset;
 import Utils.Direction;
@@ -53,23 +52,12 @@ public class BasementMap extends Map {
 
     @Override
     public void loadScripts() {
-        // door on the left wall stand next to it, face left, and press E to go through
-        // TestMap is a placeholder destination until the next room is built
-        getMapTile(0, 7).setInteractScript(new DoorScript(() -> new TestMap(), 22, 20, Direction.RIGHT));
-        getMapTile(0, 8).setInteractScript(new DoorScript(() -> new TestMap(), 22, 20, Direction.RIGHT));
-
-        // door on the right wall next to the stairs stand on the stairs at (12, 4), face right, and press E to go through
-        // TestMap is a placeholder destination until the next room is built
-        System.out.println(getCompletedCount());
-        getMapTile(13, 4).setInteractScript(new DoorScript(
-            () -> getCompletedCount() >= 5
-                    ? new DungeonHallwaySecretDoorRevealedMap()
-                    : new DungeonHallwayMap(),//DungeonHallwayMap
-            1, 2, Direction.RIGHT)
+        // the stairs on the right wall: stand on them at (12, 4), face right, and press E
+        // they lead up to the hallway, which shows the secret door once every puzzle is solved
+        getMapTile(13, 4).setInteractScript(new DoorScript(DungeonRoomSetup::hallway, 1, 2, Direction.RIGHT)
                 .lockedUntilSolved(DungeonRoomSetup.BASEMENT_PUZZLE,
                         "The stairs are sealed.\nSolve the puzzle in the basement first."));
 
-        //getMapTile(13, 4).setInteractScript(new DoorScript(() -> new DungeonHallwayMap(), 1, 2, Direction.RIGHT));
     }
 
 }

@@ -23,7 +23,7 @@ public class HotbarUI {
 
     private Key attackKey = Key.SPACE; // key to use the equipped item
     private static final int SLOT_COUNT = 6;
-    private static final int HEART_COUNT = Player.getHealth();
+    private static final int HEART_COUNT = Player.MAX_HEALTH;
     private Key[] slotKeys = {Key.ONE, Key.TWO, Key.THREE, Key.FOUR, Key.FIVE, Key.SIX}; // key to select each slot
 
     private KeyLocker keyLocker = new KeyLocker();
@@ -144,6 +144,32 @@ public class HotbarUI {
             }
             Mouse.resetClick();
         }
+    }
+
+    // an independent copy of the inventory (items, which one is equipped), used by checkpoints
+    public HotbarUI copy() {
+        HotbarUI copy = new HotbarUI();
+        copy.itemImages = itemImages.clone();
+        copy.itemFrames = itemFrames.clone();
+        copy.frameDelays = frameDelays.clone();
+        copy.itemUses = itemUses.clone();
+        copy.equippedSlot = equippedSlot;
+        copy.hintShown = hintShown;
+        // a relic that was mid-throw when the copy was made is already gone
+        if (usingSlot != -1 && itemUses[usingSlot] == ItemUse.SINGLE_USE) {
+            copy.removeItem(usingSlot);
+        }
+        return copy;
+    }
+
+    // true if the bow (or any other reusable ranged weapon) is in the bar
+    public boolean hasItem(ItemUse itemUse) {
+        for (int i = 0; i < SLOT_COUNT; i++) {
+            if (itemImages[i] != null && itemUses[i] == itemUse) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // only usable items (weapons, relics) can be equipped, notes and such just sit in the bar

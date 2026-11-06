@@ -38,6 +38,8 @@ public class PuzzleObject extends EnhancedMapTile {
             ),
             TileType.NOT_PASSABLE
         );
+        // a plain rock isn't tied to a puzzle, so it never sparkles
+        puzzleInstanceId = null;
     }
 
     // Automatically chooses the sprite and interaction.

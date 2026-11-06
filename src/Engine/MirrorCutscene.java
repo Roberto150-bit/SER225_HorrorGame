@@ -55,6 +55,21 @@ public class MirrorCutscene {
         skipArmed = false;
     }
 
+    // plays the cutscene the first time it's asked for each game (the mirror puzzle is rebuilt every time it's opened)
+    private static boolean seenThisGame = false;
+
+    public static void startOnce() {
+        if (!seenThisGame) {
+            seenThisGame = true;
+            start();
+        }
+    }
+
+    // called when a new game starts so the cutscene plays again the first time the mirror is used
+    public static void resetSeen() {
+        seenThisGame = false;
+    }
+
     public static void stop() {
         playing = false;
         frame = 0;

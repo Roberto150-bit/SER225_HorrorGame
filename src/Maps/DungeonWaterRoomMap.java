@@ -44,8 +44,10 @@ public class DungeonWaterRoomMap extends Map {
         getMapTile(9, 5).setInteractScript(new DoorScript(DungeonRoomSetup::hallway, 1, 4, Direction.RIGHT));
 
         // door on the top wall to the rundown room
-        getMapTile(3, 2).setInteractScript(new DoorScript(() -> new DungeonRundownRoomMap(), 2, 6, Direction.UP)
+        getMapTile(3, 2).setInteractScript(new DoorScript(() -> new DungeonRundownRoomMap(),
+                DungeonRundownRoomMap.FROM_WATER_ROOM_X, DungeonRundownRoomMap.FROM_WATER_ROOM_Y, Direction.UP)
                 .lockedUntilSolved(DungeonRoomSetup.WATER_ROOM_PUZZLE, "Something holds this door shut.\nThe mirror in this room is watching."));
-    
+    
+
     }
 }

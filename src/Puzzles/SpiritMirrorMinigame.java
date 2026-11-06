@@ -38,9 +38,9 @@ public class SpiritMirrorMinigame implements PuzzleMinigame {
         new Color(245, 210, 155);
 
     public SpiritMirrorMinigame(PuzzleConfig config) {
-        
-        MirrorCutscene.start();
 
+        // the reflection flashes into the demon eye the first time Dean looks into the mirror
+        MirrorCutscene.startOnce();
 
         reflection = ImageLoader.load("../Resources/Puzzles/SpiritMirror/Fragments/spirit_reflection.png");
 

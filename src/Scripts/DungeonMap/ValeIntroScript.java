@@ -34,7 +34,7 @@ public class ValeIntroScript extends Script {
             "MRS. VALE: You can barely stand.\nLet an old woman look after you.",
             "DEAN: ...I never told you my name.",
             "MRS. VALE: You said it in your sleep.\nRight next to hers.",
-            "MRS. VALE: Use W, A, S, D\nto move around.",
+            "MRS. VALE: Use the arrow keys (or W, A, S, D)\nto move around.",
             "MRS. VALE: Press E to interact.\nPress C to open your journal.",
             "MRS. VALE: Here, the Tenant's Book.\nIt may help with your memories.",
             "DEAN: Where is the exit?",

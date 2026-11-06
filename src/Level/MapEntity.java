@@ -6,7 +6,6 @@ import GameObject.SpriteSheet;
 
 import java.util.HashMap;
 
-import javax.sound.SoundClip;
 
 import Engine.SoundPlayer;
 
@@ -111,6 +110,10 @@ public class MapEntity extends GameObject {
             map.getFlagManager().addFlag(existenceFlag, true);
         }
     }
+
+    // drawn after the darkness, so things that give off light (candles, glowing seals, fireballs) show up in the dark
+    // screen position works the same as draw(), e.g. getCalibratedXLocation()
+    public void drawAboveDarkness(Engine.GraphicsHandler graphicsHandler) { }
 
     public boolean isUncollidable() {
         return isUncollidable;
